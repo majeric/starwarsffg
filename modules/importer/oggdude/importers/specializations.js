@@ -32,12 +32,33 @@ export default class Specializations {
                 tags: [
                   "specialization",
                 ],
+                sources: ImportHelpers.getSourcesAsArray(item?.Sources ?? item?.Source),
               },
+              careerSkills: {
+                careerSkill0: "(none)",
+                careerSkill1: "(none)",
+                careerSkill2: "(none)",
+                careerSkill3: "(none)",
+                careerSkill4: "(none)",
+              },
+              universal: false,
             };
 
-            data.system.description += ImportHelpers.getSources(item?.Sources ?? item?.Source);
-            data.system.attributes = foundry.utils.mergeObject(data.system.attributes, ImportHelpers.processStatMod(item?.Attributes));
-            data.system.attributes = foundry.utils.mergeObject(data.system.attributes, ImportHelpers.processCareerSkills(item?.CareerSkills, true));
+            // process career skills
+            let currentSkill = 0;
+            if (item?.CareerSkills && item.CareerSkills?.Key) {
+              item.CareerSkills.Key.forEach((skillKey) => {
+                let skill = CONFIG.temporary.skills[skillKey];
+                if (skill) {
+                  data.system.careerSkills[`careerSkill${currentSkill}`] = skill;
+                  currentSkill++;
+                }
+              });
+            }
+
+            if (item?.Universal) {
+              data.system.universal = item.Universal === 'true';
+            }
 
             for (let i = 0; i < item.TalentRows.TalentRow.length; i += 1) {
               const row = item.TalentRows.TalentRow[i];

@@ -1,3 +1,32 @@
+`?`
+* Features:
+  *  [Active Effects](https://foundryvtt.com/article/active-effects/) have been implemented. This means it's now possible to make changes to actors with status effects - [even custom ones](https://github.com/StarWarsFoundryVTT/StarWarsFFG/wiki/Creating-New-Statuses)!
+  * New built-in status effects for single-use boost/setback dice, staggered, disoriented, and staggered
+  * End-to-end tests for new functionality are in place. Hopefully, this will reduce bugs going forward ([#1837](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1837))
+  * Add Force Power Roll button ([#1827](http://overlord.wrycu.com:12121/game))
+  * Added support for universal specializations (requires a re-import of the data) ([#1778](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1778))
+  * Noted that Oggdude _character_ importer is deprecated and is likely to result in stat mismatches
+  * Career skills now have first-class support and can be set without using modifiers! ([#1861](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1861))
+  * some XP purchases made going forward can be refunded ([#1809](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1809))
+* Fixes:
+  * Talent modifiers on specializations are now properly cleaned up when a new talent overrides an old one
+  * Force powers, signature abilities, and specializations now use a unified UI to editing upgrades/talents on their sheets ([#1828](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1828))
+  * Dragging a talent onto a specialization now properly copies the state of forceTalent, conflictTalent, and Ranks ([#1805](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1805))
+  * Modifier options are now unified: the same options are presented, regardless of actor, mod, or attachment type ([#1800](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1800))
+  * Vehicle images are now properly capped at 200 px high ([#1807](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1807))
+  * The custom combat tracker now supports using the `secret` token disposition ([#1813](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1813))
+  * It's now possible to remove an actor from the custom combat tracker even if no slots have been claimed this round
+  * Corrected translations not occurring for Initiative mode and group manager PC list mode ([#1814](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1814))
+  * Corrected default item names when created in actors ([#1815](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1815))
+  * The crew role update button is now localized ([#1822](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1822))
+  * The Popout modifier window now has a scrollbar! You can now see the giant modifier list directly on force powers ([#1824](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1824))
+  * Fix for talent send-to-chat not working if the talent came from a specialization ([#1819](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1819))
+  * Update "Not enough XP" language to be more generic ([#1820](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1820))
+  * A limited subset of qualities now have dice mods created upon import ([#1836](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1836))
+  * Actors who roll a `0` for initiative no longer continue to show a prompt to roll initiative ([#1865](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1865))
+  * Fix for removing actor before combat starts - the slot is no longer retained as a generic slot and is deleted ([#1864](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1864))
+  * Prevent duplicate Hook activation on Actor sheets ([#1818](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1818))
+
 `1.906`
 * Features:
   * Compendiums have been migrated back to world compendiums (from system compendiums) ([#1794](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1794))

@@ -837,12 +837,30 @@
         "talent17": {},
         "talent18": {},
         "talent19": {}
-      }
+      },
+      "careerSkills": {
+        "careerSkill0": "(none)",
+        "careerSkill1": "(none)",
+        "careerSkill2": "(none)",
+        "careerSkill3": "(none)",
+        "careerSkill4": "(none)"
+      },
+      "universal": false
     },
     "career" : {
       "templates": ["core"],
       "specializations": {},
-      "signatureabilities": {}
+      "signatureabilities": {},
+      "careerSkills": {
+        "careerSkill0": "(none)",
+        "careerSkill1": "(none)",
+        "careerSkill2": "(none)",
+        "careerSkill3": "(none)",
+        "careerSkill4": "(none)",
+        "careerSkill5": "(none)",
+        "careerSkill6": "(none)",
+        "careerSkill7": "(none)"
+      }
     },
     "signatureability": {
       "templates": ["core"],
@@ -866,11 +884,11 @@
     },
     "itemattachment": {
       "templates": ["core", "basic", "hardpoints", "qualities", "itemattachments"],
-      "type": ""
+      "type": "all"
     },
     "itemmodifier": {
       "templates": ["core", "qualities"],
-      "type": "",
+      "type": "all",
       "rank": 0
     }
   }
