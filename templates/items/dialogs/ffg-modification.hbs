@@ -1,4 +1,4 @@
-<div>
+<div class="modification_title">
   <h2>{{ localize "SWFFG.Items.Popout.Label.Modification" }} #{{ number }}&nbsp;<a class="flat_editor add-modification" title="Delete Modification" data-action="delete" data-id="{{ id }}"><i class="fas fa-trash"></i></a></h2>
   <div class="modification_header">
     <div class="form-group">
@@ -26,7 +26,7 @@
       </header>
       <ol class="attributes-list">
       {{#each mod.system.attributes as |attr id|}}
-        {{> "systems/starwarsffg/templates/items/dialogs/ffg-mod.hbs" (object attr=attr id=id number=../number number2=@index modTypeChoices=../modTypeChoices modChoices=../modChoices direct=false attachmentType=../attachmentType) }}
+        {{> "systems/starwarsffg/templates/items/dialogs/ffg-mod.html" (object attr=attr id=id number=../number number2=@index modifierChoices=../modifierChoices modifierTypes=../modifierTypes direct=false attachmentType=../attachmentType) }}
       {{/each }}
       </ol>
     </div>

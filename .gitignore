@@ -3,4 +3,10 @@ node_modules
 cypress/audio/
 cypress/videos/
 cypress/screenshots/
-/styles/starwarsffg.css.map
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+state.json

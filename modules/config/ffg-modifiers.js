@@ -4,131 +4,6 @@ import {vehicle_stats} from "./ffg-vehicles.js";
 import {character_characteristics, character_stats} from "./ffg-characters.js";
 import {skills} from "./ffg-skills.js";
 
-export const general_modifiers = {
-  "Characteristic": {
-    "value": "Characteristic",
-    "label": "SWFFG.ModTypeCharacteristic",
-  },
-  "Career Skill": {
-    "value": "Career Skill",
-    "label": "SWFFG.ModTypeCareerSkill",
-  },
-  "Force Boost": {
-    "value": "Force Boost",
-    "label": "SWFFG.ModTypeSkillForceBoost",
-  },
-  "Skill Add Advantage": {
-    "value": "Skill Add Advantage",
-    "label": "SWFFG.ModTypeSkillAddAdvantage",
-  },
-  "Skill Add Dark": {
-    "value": "Skill Add Dark",
-    "label": "SWFFG.ModTypeSkillAddDark",
-  },
-  "Skill Add Despair": {
-    "value": "Skill Add Despair",
-    "label": "SWFFG.ModTypeSkillAddDespair",
-  },
-  "Skill Add Failure": {
-    "value": "Skill Add Failure",
-    "label": "SWFFG.ModTypeSkillAddFailure",
-  },
-  "Skill Add Light": {
-    "value": "Skill Add Light",
-    "label": "SWFFG.ModTypeSkillAddLight",
-  },
-  "Skill Add Success": {
-    "value": "Skill Add Success",
-    "label": "SWFFG.ModTypeSkillAddSuccess",
-  },
-  "Skill Add Threat": {
-    "value": "Skill Add Threat",
-    "label": "SWFFG.ModTypeSkillAddThreat",
-  },
-  "Skill Add Triumph": {
-    "value": "Skill Add Triumph",
-    "label": "SWFFG.ModTypeSkillAddTriumph",
-  },
-  "Skill Add Upgrade": {
-    "value": "Skill Add Upgrade",
-    "label": "SWFFG.ModTypeSkillAddUpgrade",
-  },
-  "Skill Boost": {
-    "value": "Skill Boost",
-    "label": "SWFFG.ModTypeSkillBoost",
-  },
-  "Skill Rank": {
-    "value": "Skill Rank",
-    "label": "SWFFG.ModTypeSkillRank",
-  },
-  "Skill Remove Setback": {
-    "value": "Skill Remove Setback",
-    "label": "SWFFG.ModTypeSkillRemoveSetback",
-  },
-  "Skill Setback": {
-    "value": "Skill Setback",
-    "label": "SWFFG.ModTypeSkillSetback",
-  },
-  "Weapon Stat": {
-    "value": "Weapon Stat",
-    "label": "SWFFG.ModTypeStatWeapon",
-  },
-  "Armor Stat": {
-    "value": "Armor Stat",
-    "label": "SWFFG.ModTypeStatArmor",
-  },
-  "Vehicle Stat": {
-    "value": "Vehicle Stat",
-    "label": "SWFFG.ModTypeStatVehicle",
-  },
-  "Stat": {
-    "value": "Stat",
-    "label": "SWFFG.ModTypeStat",
-  },
-};
-
-export const weapon_modifiers = {
-  "Result Modifiers": {
-    "value": "Result Modifiers",
-    "label": "SWFFG.ModTypeResultModifiers",
-  },
-  "Dice Modifiers": {
-    "value": "Dice Modifiers",
-    "label": "SWFFG.ModTypeDiceModifiers",
-  },
-  "Roll Modifiers": {
-    "value": "Roll Modifiers",
-    "label": "SWFFG.ModTypeRollModifiers",
-  },
-  "Weapon Stat": {
-    "value": "Weapon Stat",
-    "label": "SWFFG.ModTypeStatWeapon",
-  },
-};
-
-export const armor_modifiers = {
-  "Result Modifiers": {
-    "value": "Result Modifiers",
-    "label": "SWFFG.ModTypeResultModifiers",
-  },
-  "Dice Modifiers": {
-    "value": "Dice Modifiers",
-    "label": "SWFFG.ModTypeDiceModifiers",
-  },
-  "Roll Modifiers": {
-    "value": "Roll Modifiers",
-    "label": "SWFFG.ModTypeRollModifiers",
-  },
-  "Armor Stat": {
-    "value": "Armor Stat",
-    "label": "SWFFG.ModTypeStatArmor",
-  },
-  "Stat": {
-    "value": "Stat",
-    "label": "SWFFG.ModTypeStat",
-  },
-};
-
 export const vehicle_modifiers = {
   "Vehicle Stat": {
     "value": "Vehicle Stat",
@@ -152,37 +27,6 @@ export const modifier_types = {
   "Weapon": {
     "value": "weapon",
     "label": "SWFFG.ItemsWeapons",
-  },
-};
-
-export const itemmodifier_modifiertypes = {
-  "Result Modifiers": {
-    "value": "Result Modifiers",
-    "label": "SWFFG.ModTypeResultModifiers",
-  },
-  "Dice Modifiers": {
-    "value": "Dice Modifiers",
-    "label": "SWFFG.ModTypeDiceModifiers",
-  },
-  "Roll Modifiers": {
-    "value": "Roll Modifiers",
-    "label": "SWFFG.ModTypeRollModifiers",
-  },
-  "Weapon Stat": {
-    "value": "Weapon Stat",
-    "label": "SWFFG.ModTypeStatWeapon",
-  }, //-> Damage, Crit, Encum, HP, Rarity, Price, Range,
-  "Armor Stat": {
-    "value": "Armor Stat",
-    "label": "SWFFG.ModTypeStatArmor",
-  }, //-> Def, Soak, Encum, HP, Rarity, Price
-  "Vehicle Stat": {
-    "value": "Vehicle Stat",
-    "label": "SWFFG.ModTypeStatVehicle",
-  },
-  "Stat": {
-    "value": "Stat",
-    "label": "SWFFG.ModTypeStat",
   },
 };
 
@@ -259,36 +103,135 @@ export const itemmodifier_resultmodifiers = {
   },
 };
 
-export const modTypeToModMap = {
-  "Weapon Stat": weapon_stats,
-  "Armor Stat": armor_stats,
-  "Vehicle Stat": vehicle_stats,
-  "Stat": character_stats,
-  "Result Modifiers": itemmodifier_resultmodifiers,
-  "Dice Modifiers": itemmodifier_dicemodifiers,
-  "Roll Modifiers": itemmodifier_rollmodifiers,
-  "Characteristic": character_characteristics,
-  "Career Skill": skills,
-  "Force Boost": skills,
-  "Skill Add Advantage": skills,
-  "Skill Add Dark": skills,
-  "Skill Add Despair": skills,
-  "Skill Add Failure": skills,
-  "Skill Add Light": skills,
-  "Skill Add Success": skills,
-  "Skill Add Threat": skills,
-  "Skill Add Triumph": skills,
-  "Skill Add Upgrade": skills,
-  "Skill Boost": skills,
-  "Skill Rank": skills,
-  "Skill Remove Setback": skills,
-  "Skill Setback": skills,
-};
 
-export const itemTypeToModTypeMap = {
-  "weapon": weapon_modifiers,
-  "armor": armor_modifiers,
-  "armour": armor_modifiers,
-  "vehicle": vehicle_modifiers,
-  "all": general_modifiers,
+/**
+ * Used for the "modifier type" selector for modifiers
+ */
+export const allModifiersTypes = {
+  "Stat All": {
+    "value": "Stat All",
+    "label": "SWFFG.ModTypeStatAll",
+  },
+  "Stat": {
+    "value": "Stat",
+    "label": "SWFFG.ModTypeStat",
+  },
+  "Characteristic": {
+    "value": "Characteristic",
+    "label": "SWFFG.ModTypeCharacteristic",
+  },
+  "Result Modifiers": {
+    "value": "Result Modifiers",
+    "label": "SWFFG.ModTypeResultModifiers",
+  },
+  "Dice Modifiers": {
+    "value": "Dice Modifiers",
+    "label": "SWFFG.ModTypeDiceModifiers",
+  },
+  "Roll Modifiers": {
+    "value": "Roll Modifiers",
+    "label": "SWFFG.ModTypeRollModifiers",
+  },
+  "Career Skill": {
+    "value": "Career Skill",
+    "label": "SWFFG.ModTypeCareerSkill",
+  },
+  "Force Boost": {
+    "value": "Force Boost",
+    "label": "SWFFG.ModTypeSkillForceBoost",
+  },
+  "Skill Add Advantage": {
+    "value": "Skill Add Advantage",
+    "label": "SWFFG.ModTypeSkillAddAdvantage",
+  },
+  "Skill Add Dark": {
+    "value": "Skill Add Dark",
+    "label": "SWFFG.ModTypeSkillAddDark",
+  },
+  "Skill Add Despair": {
+    "value": "Skill Add Despair",
+    "label": "SWFFG.ModTypeSkillAddDespair",
+  },
+  "Skill Add Failure": {
+    "value": "Skill Add Failure",
+    "label": "SWFFG.ModTypeSkillAddFailure",
+  },
+  "Skill Add Light": {
+    "value": "Skill Add Light",
+    "label": "SWFFG.ModTypeSkillAddLight",
+  },
+  "Skill Add Success": {
+    "value": "Skill Add Success",
+    "label": "SWFFG.ModTypeSkillAddSuccess",
+  },
+  "Skill Add Threat": {
+    "value": "Skill Add Threat",
+    "label": "SWFFG.ModTypeSkillAddThreat",
+  },
+  "Skill Add Triumph": {
+    "value": "Skill Add Triumph",
+    "label": "SWFFG.ModTypeSkillAddTriumph",
+  },
+  "Skill Add Upgrade": {
+    "value": "Skill Add Upgrade",
+    "label": "SWFFG.ModTypeSkillAddUpgrade",
+  },
+  "Skill Boost": {
+    "value": "Skill Boost",
+    "label": "SWFFG.ModTypeSkillBoost",
+  },
+  "Skill Rank": {
+    "value": "Skill Rank",
+    "label": "SWFFG.ModTypeSkillRank",
+  },
+  "Skill Remove Setback": {
+    "value": "Skill Remove Setback",
+    "label": "SWFFG.ModTypeSkillRemoveSetback",
+  },
+  "Skill Setback": {
+    "value": "Skill Setback",
+    "label": "SWFFG.ModTypeSkillSetback",
+  },
+  "Weapon Stat": {
+    "value": "Weapon Stat",
+    "label": "SWFFG.ModTypeStatWeapon",
+  },
+  "Armor Stat": {
+    "value": "Armor Stat",
+    "label": "SWFFG.ModTypeStatArmor",
+  },
+  "Vehicle Stat": {
+    "value": "Vehicle Stat",
+    "label": "SWFFG.ModTypeStatVehicle",
+  },
+}
+
+/**
+ * Used for the "modifier" selector of modifiers
+ */
+export const allModifiersMap = {
+  "Weapon Stat": foundry.utils.duplicate(weapon_stats),
+  "Armor Stat": foundry.utils.duplicate(armor_stats),
+  "Vehicle Stat": foundry.utils.duplicate(vehicle_stats),
+  "Stat All": Object.assign(foundry.utils.duplicate(character_stats), foundry.utils.duplicate(vehicle_stats), foundry.utils.duplicate(armor_stats), foundry.utils.duplicate(weapon_stats)),
+  "Stat": character_stats,
+  "Result Modifiers": foundry.utils.duplicate(itemmodifier_resultmodifiers),
+  "Dice Modifiers": foundry.utils.duplicate(itemmodifier_dicemodifiers),
+  "Roll Modifiers": foundry.utils.duplicate(itemmodifier_rollmodifiers),
+  "Characteristic": foundry.utils.duplicate(character_characteristics),
+  "Career Skill": foundry.utils.duplicate(skills),
+  "Force Boost": foundry.utils.duplicate(skills),
+  "Skill Add Advantage": foundry.utils.duplicate(skills),
+  "Skill Add Dark": foundry.utils.duplicate(skills),
+  "Skill Add Despair": foundry.utils.duplicate(skills),
+  "Skill Add Failure": foundry.utils.duplicate(skills),
+  "Skill Add Light": foundry.utils.duplicate(skills),
+  "Skill Add Success": foundry.utils.duplicate(skills),
+  "Skill Add Threat": foundry.utils.duplicate(skills),
+  "Skill Add Triumph": foundry.utils.duplicate(skills),
+  "Skill Add Upgrade": foundry.utils.duplicate(skills),
+  "Skill Boost": foundry.utils.duplicate(skills),
+  "Skill Rank": foundry.utils.duplicate(skills),
+  "Skill Remove Setback": foundry.utils.duplicate(skills),
+  "Skill Setback": foundry.utils.duplicate(skills),
 }
