@@ -6,7 +6,7 @@ import ImportHelpers from "../importer/import-helpers.js";
 import DiceHelpers from "../helpers/dice-helpers.js";
 import item from "../helpers/embeddeditem-helpers.js";
 import EmbeddedItemHelpers from "../helpers/embeddeditem-helpers.js";
-import {xpLogSpend} from "../helpers/actor-helpers.js";
+import ActorHelpers, {xpLogSpend} from "../helpers/actor-helpers.js";
 import ItemOptions from "./item-ffg-options.js";
 import {forcePowerEditor, itemEditor, talentEditor} from "./item-editor.js";
 
@@ -296,15 +296,27 @@ export class ItemSheetFFG extends ItemSheet {
     data.FFG = CONFIG.FFG;
 
     // prepare skills for career skill usage
-    data.careerSkills = foundry.utils.mergeObject(
-      {
-        "(none)": {
-          value: "(none)",
-          label: "SWFFG.CareerSkills.None",
-        }
-      },
-      foundry.utils.deepClone(CONFIG.FFG.skills)
-    )
+    if (this?.actor?.system?.skills) {
+      data.careerSkills = foundry.utils.mergeObject(
+        {
+          "(none)": {
+            value: "(none)",
+            label: "SWFFG.CareerSkills.None",
+          }
+        },
+        foundry.utils.deepClone(this.actor.system.skills)
+      );
+    } else {
+      data.careerSkills = foundry.utils.mergeObject(
+        {
+          "(none)": {
+            value: "(none)",
+            label: "SWFFG.CareerSkills.None",
+          }
+        },
+        foundry.utils.deepClone(CONFIG.FFG.skills)
+      );
+    }
 
     data.renderedDesc = PopoutEditor.renderDiceImages(data.description, this.actor ? this.actor : {});
     if (!data.renderedDesc) {
@@ -1060,6 +1072,8 @@ export class ItemSheetFFG extends ItemSheet {
       CONFIG.logger.warn("Refused to buy for item with no found owner actor");
       throw new Error("Refused to buy for item with no found owner actor");
     }
+    const availableXPToLog = foundry.utils.deepClone(owner.system.experience.available);
+    const AEState = await ActorHelpers.beginEditMode(owner, true);
     const availableXP = owner.system.experience.available;
     const totalXP = owner.system.experience.total;
     if (cost > availableXP) {
@@ -1070,7 +1084,9 @@ export class ItemSheetFFG extends ItemSheet {
       owner: owner,
       cost: cost,
       availableXP: availableXP,
+      availableXPToLog: availableXPToLog,
       totalXP: totalXP,
+      AEState: AEState,
     }
   }
 
@@ -1142,14 +1158,8 @@ export class ItemSheetFFG extends ItemSheet {
     let owner;
     let availableXP;
     let totalXP;
-    try {
-      const basic_data = await this._buyHandleClick(cost, "forcepower");
-      owner = basic_data.owner;
-      availableXP = basic_data.availableXP;
-      totalXP = basic_data.totalXP;
-    } catch (e) {
-      return;
-    }
+    let AEState;
+    let availableXPToLog;
     const dialog = new Dialog(
       {
         title: game.i18n.localize("SWFFG.Actors.Sheets.Purchase.FP.ConfirmTitle"),
@@ -1159,12 +1169,24 @@ export class ItemSheetFFG extends ItemSheet {
             icon: '<i class="fa-regular fa-circle-up"></i>',
             label: game.i18n.localize("SWFFG.Actors.Sheets.Purchase.ConfirmPurchase"),
             callback: async (that) => {
+              try {
+                // this fixes the actual math bugs but the log shows incorrect values. need to fix that.
+                const basic_data = await this._buyHandleClick(cost, "forcepower");
+                owner = basic_data.owner;
+                availableXP = basic_data.availableXP;
+                totalXP = basic_data.totalXP;
+                AEState = basic_data.AEState;
+                availableXPToLog = basic_data.availableXPToLog;
+              } catch (e) {
+                return;
+              }
               // update the form because the fields are read when an update is performed
               const input = $(`[name="data.upgrades.${upgradeId}.islearned"]`, this.element)[0];
               input.checked = true;
               await this.object.sheet.submit({preventClose: true});
               owner.update({system: {experience: {available: availableXP - cost}}});
-              await xpLogSpend(owner, `force power ${baseName} upgrade ${upgradeName}`, cost, availableXP - cost, totalXP);
+              await xpLogSpend(owner, `force power ${baseName} upgrade ${upgradeName}`, cost, availableXPToLog - cost, totalXP);
+              await ActorHelpers.endEditMode(owner, AEState, true);
             },
           },
           cancel: {
@@ -1188,14 +1210,8 @@ export class ItemSheetFFG extends ItemSheet {
     let owner;
     let availableXP;
     let totalXP;
-    try {
-      const basic_data = await this._buyHandleClick(cost, "signatureability");
-      owner = basic_data.owner;
-      availableXP = basic_data.availableXP;
-      totalXP = basic_data.totalXP;
-    } catch (e) {
-      return;
-    }
+    let AEState;
+    let availableXPToLog;
     const dialog = new Dialog(
       {
         title: game.i18n.localize("SWFFG.Actors.Sheets.Purchase.SA.ConfirmTitle"),
@@ -1205,12 +1221,26 @@ export class ItemSheetFFG extends ItemSheet {
             icon: '<i class="fa-regular fa-circle-up"></i>',
             label: game.i18n.localize("SWFFG.Actors.Sheets.Purchase.ConfirmPurchase"),
             callback: async (that) => {
+
+              try {
+                // this fixes the actual math bugs but the log shows incorrect values. need to fix that.
+                const basic_data = await this._buyHandleClick(cost, "signatureability");
+                owner = basic_data.owner;
+                availableXP = basic_data.availableXP;
+                totalXP = basic_data.totalXP;
+                AEState = basic_data.AEState;
+                availableXPToLog = basic_data.availableXPToLog;
+              } catch (e) {
+                return;
+              }
+
               // update the form because the fields are read when an update is performed
               const input = $(`[name="data.upgrades.${upgradeId}.islearned"]`, this.element)[0];
               input.checked = true;
               await this.object.sheet.submit({preventClose: true});
               owner.update({system: {experience: {available: availableXP - cost}}});
-              await xpLogSpend(owner, `signature ability ${baseName} upgrade ${upgradeName}`, cost, availableXP - cost, totalXP);
+              await xpLogSpend(owner, `signature ability ${baseName} upgrade ${upgradeName}`, cost, availableXPToLog - cost, totalXP);
+              await ActorHelpers.endEditMode(owner, AEState, true);
             },
           },
           cancel: {
@@ -1234,14 +1264,8 @@ export class ItemSheetFFG extends ItemSheet {
     let owner;
     let availableXP;
     let totalXP;
-    try {
-      const basic_data = await this._buyHandleClick(cost, "specialization");
-      owner = basic_data.owner;
-      availableXP = basic_data.availableXP;
-      totalXP = basic_data.totalXP;
-    } catch (e) {
-      return;
-    }
+    let AEState;
+    let availableXPToLog;
     const dialog = new Dialog(
       {
         title: game.i18n.localize("SWFFG.Actors.Sheets.Purchase.Specialization.ConfirmTitle"),
@@ -1251,12 +1275,25 @@ export class ItemSheetFFG extends ItemSheet {
             icon: '<i class="fa-regular fa-circle-up"></i>',
             label: game.i18n.localize("SWFFG.Actors.Sheets.Purchase.ConfirmPurchase"),
             callback: async (that) => {
+
+              try {
+                // this fixes the actual math bugs but the log shows incorrect values. need to fix that.
+                const basic_data = await this._buyHandleClick(cost, "specialization");
+                owner = basic_data.owner;
+                availableXP = basic_data.availableXP;
+                totalXP = basic_data.totalXP;
+                AEState = basic_data.AEState;
+                availableXPToLog = basic_data.availableXPToLog;
+              } catch (e) {
+                return;
+              }
               // update the form because the fields are read when an update is performed
               const input = $(`[name="data.talents.${upgradeId}.islearned"]`, this.element)[0];
               input.checked = true;
               await this.object.sheet.submit({preventClose: true});
               owner.update({system: {experience: {available: availableXP - cost}}});
-              await xpLogSpend(owner, `specialization ${baseName} upgrade ${upgradeName}`, cost, availableXP - cost, totalXP);
+              await xpLogSpend(owner, `specialization ${baseName} upgrade ${upgradeName}`, cost, availableXPToLog - cost, totalXP);
+              await ActorHelpers.endEditMode(owner, AEState, true);
             },
           },
           cancel: {
@@ -1595,7 +1632,7 @@ export class ItemSheetFFG extends ItemSheet {
               // these are cloned to avoid local-only clobbers to the dropped object
               description: foundry.utils.deepClone(itemObject.system.description),
               attributes: foundry.utils.deepClone(itemObject.system.attributes),
-              isRanked: itemObject.system.ranked,
+              isRanked: itemObject.system.ranks.ranked,
               isForceTalent: itemObject.system.isForceTalent,
               isConflictTalent: itemObject.system.isConflictTalent,
             },

@@ -45,6 +45,26 @@ export class ActorFFG extends Actor {
     return super.create(createData, options);
   }
 
+  /** @override **/
+  async _preCreate(data, operation, user) {
+    const defaultImages = {
+      character: "systems/starwarsffg/images/defaults/actors/character.png",
+      minion: "systems/starwarsffg/images/defaults/actors/minion.png",
+      nemesis: "systems/starwarsffg/images/defaults/actors/nemesis.png",
+      rival: "systems/starwarsffg/images/defaults/actors/rival.png",
+      vehicle: "systems/starwarsffg/images/defaults/actors/vehicle.png",
+    }
+    if (game.user.id === user.id && (!data?.img || data?.img === "icons/svg/mystery-man.svg")) {
+      if (Object.keys(defaultImages).includes(data.type)) {
+        this.updateSource({img: defaultImages[data.type]});
+      } else {
+        // fall back to the previous default
+        this.updateSource({img: "icons/svg/mystery-man.svg"});
+      }
+    }
+    return {data, operation, user};
+  }
+
 
   /** @override
    * We use this to update wounds, strain, and soak when characteristics are changed
@@ -102,19 +122,21 @@ export class ActorFFG extends Actor {
       const updatedWillpower = changes.system?.characteristics?.Willpower?.value;
       if (originalWillpower !== undefined && updatedWillpower !== undefined && originalWillpower !== updatedWillpower) {
         CONFIG.logger.debug(`Detected modified Willpower (${originalWillpower} -> ${updatedWillpower}, updating derived values`);
-        // get the soak without willpower modifying it, then add the new willpower value in
-        const originalStrain = this.system.stats?.strain.max;
-        const originalStrainWithoutWillpower = originalStrain - originalWillpower;
-        const updatedStrain = originalStrainWithoutWillpower + updatedWillpower;
-        CONFIG.logger.debug(`The character sheet showed ${originalStrain} strain, while that value without Willpower was ${originalStrainWithoutWillpower}. Updating to be ${updatedStrain}`);
-        changes.system.stats = foundry.utils.mergeObject(
-          changes.system.stats,
-          {
-            strain: {
-              max: updatedStrain,
+        if (this.system.stats?.strain) {
+          // get the soak without willpower modifying it, then add the new willpower value in
+          const originalStrain = this.system.stats?.strain.max;
+          const originalStrainWithoutWillpower = originalStrain - originalWillpower;
+          const updatedStrain = originalStrainWithoutWillpower + updatedWillpower;
+          CONFIG.logger.debug(`The character sheet showed ${originalStrain} strain, while that value without Willpower was ${originalStrainWithoutWillpower}. Updating to be ${updatedStrain}`);
+          changes.system.stats = foundry.utils.mergeObject(
+            changes.system.stats,
+            {
+              strain: {
+                max: updatedStrain,
+              }
             }
-          }
-        );
+          );
+        }
       }
     }
     await super._preUpdate(changes, options, user);
@@ -497,18 +519,20 @@ export class ActorFFG extends Actor {
               const skillName = change.key.split('.')[2].capitalize();
               const skillMod = change.key.split('.')[3];
               const modType = ModifierHelpers.getModTypeByModPath(change.key);
-              if (!Object.keys(actorData.system.skills[skillName]).includes(`${skillMod}source`)) {
-                actorData.system.skills[skillName][`${skillMod}source`] = [];
-              }
+              if (Object.keys(actorData.system.skills).includes(skillName)) {
+                if (!Object.keys(actorData.system.skills[skillName]).includes(`${skillMod}source`)) {
+                  actorData.system.skills[skillName][`${skillMod}source`] = [];
+                }
 
-              // this is an active effect modifying a skill, add the source
-              actorData.system.skills[skillName][`${skillMod}source`].push({
-                modtype: modType,
-                key: "purchased",
-                name: effect.parent.type,
-                value: change.value,
-                type: effect.parent.name,
-              });
+                // this is an active effect modifying a skill, add the source
+                actorData.system.skills[skillName][`${skillMod}source`].push({
+                  modtype: modType,
+                  key: "purchased",
+                  name: effect.parent.type,
+                  value: change.value,
+                  type: effect.parent.name,
+                });
+              }
             }
           }
         }
@@ -625,5 +649,27 @@ export class ActorFFG extends Actor {
     // Allow a hook to override these changes
     const allowed = Hooks.call("modifyTokenAttribute", {attribute, value, isDelta, isBar}, updates);
     return allowed !== false ? this.update(updates) : this;
+  }
+
+  /** @override **/
+  applyActiveEffects() {
+    // collect force pool modifications since it appears the stat value is without AEs active
+    let maxForceRating = parseInt(this.system?.stats?.forcePool?.max);
+    for (const effect of this.allApplicableEffects()) {
+      for (const change of effect.changes) {
+        if (change.key === "system.stats.forcePool.max") {
+          maxForceRating += parseInt(change.value);
+        }
+      }
+    }
+    // apply the resulting value (minus any committed dice)
+    for (const effect of this.allApplicableEffects()) {
+      for (const change of effect.changes) {
+        if (change.key.includes("system.skills") && change.key.includes(".force")) {
+          change.value = Math.max(maxForceRating - parseInt(this.system?.stats?.forcePool?.value), 0);
+        }
+      }
+    }
+    return super.applyActiveEffects();
   }
 }
