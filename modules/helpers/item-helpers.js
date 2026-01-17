@@ -47,7 +47,7 @@ export default class ItemHelpers {
     await this.object.update(formData);
     // sync the active effect state (if applicable). needs to be after the update so we have the updated state
     await ItemHelpers.syncAEStatus(this.object, this.object.getEmbeddedCollection("ActiveEffect"));
-    await this.render(true);
+    await this.render(); // v13: remove deprecated render(true) force parameter
 
     if (this.object.type === "talent") {
       if (this.object.flags?.clickfromparent?.length) {
@@ -79,11 +79,11 @@ export default class ItemHelpers {
               const item = await actor.items.get(ids[1]);
               foundry.utils.setProperty(updateData, `flags.starwarsffg.loaded`, false);
               await item.update(updateData);
-              await item.sheet.render(true);
+              await item.sheet.render(); // v13: remove deprecated render(true) force parameter
             } else {
               foundry.utils.setProperty(updateData, `flags.starwarsffg.loaded`, false);
               await spec.update(updateData);
-              await spec.sheet.render(true);
+              await spec.sheet.render(); // v13: remove deprecated render(true) force parameter
             }
           }
         }

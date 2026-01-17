@@ -306,7 +306,7 @@ export default class ModifierHelpers {
 
     new PopoutModifiers(this.object, {
       title,
-    }).render(true);
+    }).render(); // v13: remove deprecated render(true) force parameter
   }
 
   static async popoutModiferWindowUpgrade(event) {
@@ -329,7 +329,7 @@ export default class ModifierHelpers {
 
     new PopoutModifiers(data, {
       title,
-    }).render(true);
+    }).render(); // v13: remove deprecated render(true) force parameter
   }
 
   static async getDicePoolModifiers(pool, item, items) {

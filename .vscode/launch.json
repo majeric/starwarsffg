@@ -1,0 +1,35 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Foundry V13 (Electron Main)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "D:\\Development\\FoundryV13\\FoundryVTT.exe",
+      "runtimeArgs": [
+        "--dataPath=F:\\FoundryVtt",
+        "--remote-debugging-port=9222"
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "name": "Attach Renderer (9222)",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Launch Foundry (main.js)",
+      "type": "node",
+      "request": "launch",
+      "program": "D:\\Development\\FoundryV13\\main.js",
+      "args": [
+        "--dataPath=F:\\FoundryVtt"
+      ],
+      "cwd": "D:\\Development\\FoundryV13"
+    }
+  ]
+}

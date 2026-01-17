@@ -102,7 +102,7 @@ export class RollFFG extends Roll {
 
   async updateSymbols() {
     for (const addedResult of this.addedResults) {
-      addedResult.symbol = await TextEditor.enrichHTML(addedResult.symbol);
+      addedResult.symbol = await foundry.applications.ux.TextEditor.implementation.enrichHTML(addedResult.symbol);
     }
   }
 
@@ -176,7 +176,10 @@ export class RollFFG extends Roll {
     }
 
     // Step 4 - safely evaluate the final total
-    const total = Roll.safeEval(this.results.join(" + "));
+    //const total = foundry.utils.evaluate(this.results.join(" + ")); // v13: replace Roll.safeEval with foundry.utils.evaluate
+    const total = this.results.reduce((sum, n) => sum + Number(n), 0);
+
+
     if (!Number.isNumeric(total)) {
       throw new Error(game.i18n.format("DICE.ErrorNonNumeric", { formula: this.formula }));
     }
@@ -325,7 +328,8 @@ export class RollFFG extends Roll {
     if (chatData?.data?.flags?.starwarsffg.hasOwnProperty('crew')) {
       chatData.data.crew = chatData.data.flags.starwarsffg.crew;
     }
-    if (chatData.data.hasOwnProperty('data') && (chatData.data.data.adjusteditemmodifier === undefined || chatData.data.data.adjusteditemmodifier.length === 0)) {
+    const itemSystemData = chatData.data?.system ?? chatData.data?.data;
+    if (itemSystemData && (itemSystemData.adjusteditemmodifier === undefined || itemSystemData.adjusteditemmodifier.length === 0)) {
       // extended metadata is missing, lookup the actor ID so we can embed it for future lookups
       let candidate_actors = game.actors.filter(actor => actor.items.filter(item => item.id === chatData.data._id).length > 0);
       if (candidate_actors.length > 0) {
@@ -334,9 +338,11 @@ export class RollFFG extends Roll {
           // for whatever reason, sometimes the item we read doesn't have modifiers even though the chat item does
           // check if this is the case and correct it if it is
           try {
-            if (test_item.data?.data?.itemmodifier.length === 0 && chatData.data?.data?.itemmodifier) {
+            const testItemSystem = test_item.system ?? test_item.data?.data;
+            const chatItemSystem = chatData.data?.system ?? chatData.data?.data;
+            if (testItemSystem?.itemmodifier?.length === 0 && chatItemSystem?.itemmodifier) {
               // there aren't any modifiers on the object, try copying the temp object to it so the link works
-              test_item.data.data.itemmodifier = chatData.data.data.itemmodifier;
+              testItemSystem.itemmodifier = chatItemSystem.itemmodifier;
             }
           } catch (exception) {
             // required data was missing - best to just move along, citizen
@@ -356,22 +362,25 @@ export class RollFFG extends Roll {
   /* -------------------------------------------- */
   /** @override */
   async toMessage(messageData = {}, { rollMode = null, create = true } = {}) {
-    // Perform the roll, if it has not yet been rolled
-    if (!this._evaluated ) await this.evaluate();
+    if (!this._evaluated) await this.evaluate();
 
     const rMode = rollMode || messageData.rollMode || game.settings.get("core", "rollMode");
-
-    if (["gmroll", "blindroll"].includes(rMode)) {
-      messageData.whisper = ChatMessage.getWhisperRecipients("GM");
-    }
+    if (["gmroll", "blindroll"].includes(rMode)) messageData.whisper = ChatMessage.getWhisperRecipients("GM");
     if (rMode === "blindroll") messageData.blind = true;
     if (rMode === "selfroll") messageData.whisper = [game.user.id];
 
-    // Prepare chat data
+    const content = await this.render({
+      user: game.user.id,
+      flavor: messageData.flavor ?? null,
+      template: this.constructor.CHAT_TEMPLATE,
+      blind: false,
+      isPrivate: rMode === "blindroll",
+    });
+
     messageData = foundry.utils.mergeObject(
       {
         user: game.user.id,
-        content: this.total,
+        content,
         sound: CONFIG.sounds.dice,
       },
       messageData
@@ -380,13 +389,7 @@ export class RollFFG extends Roll {
 
     Hooks.call("ffgDiceMessage", this);
 
-    // Either create the message or just return the chat data
-    const cls = getDocumentClass("ChatMessage");
-    const msg = new cls(messageData);
-    if (rMode) msg.applyRollMode(rMode);
-
-    // Either create or return the data
-    return create ? await cls.create(msg) : msg;
+    return create ? await ChatMessage.create(messageData) : messageData;
   }
 
   /** @override */

@@ -61,7 +61,7 @@ export default class ActorOptions {
               }
 
               this.data.object.update(updateObject);
-              this.data.object.sheet.render(true);
+              this.data.object.sheet.render(); // v13: remove deprecated render(true) force parameter
             },
           },
           two: {
@@ -74,7 +74,7 @@ export default class ActorOptions {
         classes: ["dialog", "starwarsffg"],
         template: "systems/starwarsffg/templates/dialogs/ffg-sheet-options.hbs",
       }
-    ).render(true);
+    ).render(); // v13: remove deprecated render(true) force parameter
   }
 
   async register(optionName, options) {

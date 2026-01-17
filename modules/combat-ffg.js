@@ -124,7 +124,7 @@ export class CombatFFG extends Combat {
       },
       default: "submit",
     });
-    slotDialog.render(true);
+    slotDialog.render(); // v13: remove deprecated render(true) force parameter
   }
 
   debounceRender = foundry.utils.debounce(() => {
@@ -167,8 +167,9 @@ export class CombatFFG extends Combat {
   async rollInitiative(ids, { formula = null, updateTurn = true, messageOptions = {} } = {}) {
     let initiative = this;
 
-    let promise = new Promise(async function (resolve, reject) {
-      const id = foundry.utils.randomID();
+    let promise = new Promise(function (resolve, reject) {
+      const run = async () => {
+        const id = foundry.utils.randomID();
 
       let whosInitiative = initiative.combatant?.name;
       let dicePools = [];
@@ -217,11 +218,11 @@ export class CombatFFG extends Combat {
       }
 
       const diceSymbols = {
-        advantage: await TextEditor.enrichHTML("[AD]"),
-        success: await TextEditor.enrichHTML("[SU]"),
-        threat: await TextEditor.enrichHTML("[TH]"),
-        failure: await TextEditor.enrichHTML("[FA]"),
-        upgrade: await TextEditor.enrichHTML("[PR]"),
+        advantage: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[AD]"),
+        success: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[SU]"),
+        threat: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[TH]"),
+        failure: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[FA]"),
+        upgrade: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[PR]"),
       };
 
       const title = game.i18n.localize("SWFFG.InitiativeRoll") + ` ${whosInitiative}...`;
@@ -233,7 +234,7 @@ export class CombatFFG extends Combat {
         diceSymbols,
       });
 
-      new Dialog({
+        new Dialog({
         title,
         content,
         buttons: {
@@ -329,7 +330,10 @@ export class CombatFFG extends Combat {
             label: game.i18n.localize("SWFFG.Cancel"),
           },
         },
-      }).render(true);
+        }).render(); // v13: remove deprecated render(true) force parameter
+      };
+
+      run().catch(reject);
     });
 
     return await promise;
@@ -431,7 +435,7 @@ export class CombatFFG extends Combat {
             label: game.i18n.localize("SWFFG.Cancel"),
           },
         },
-      }).render(true);
+      }).render(); // v13: remove deprecated render(true) force parameter
     } else {
       await this.doRemoval(combatant, action);
     }
@@ -1123,7 +1127,9 @@ export class CombatTrackerFFG extends CombatTracker {
 
   /** @override */
   async _onCombatantHoverIn(event) {
-    event.preventDefault();
+// event    if (event.cancelable) {
+//       event.preventDefault();
+//     }
 
     if (!(event.currentTarget).classList.contains('claimed') && !(event.currentTarget).classList.contains('actor-header')) {
       return;
@@ -1133,7 +1139,7 @@ export class CombatTrackerFFG extends CombatTracker {
 
   /** @override */
   async _onCombatantMouseDown(event) {
-    event.preventDefault();
+    //event.preventDefault();
 
     if (!(event.currentTarget).classList.contains('claimed') && !(event.currentTarget).classList.contains('actor-header')) {
       return;
@@ -1201,7 +1207,7 @@ export default class CombatantFFG extends Combatant {
 export function updateCombatTracker() {
   // Used to force the tracker to re-render based on updated visibility state
   if (game.combat && game.settings.get("starwarsffg", "useGenericSlots")) {
-    ui.combat.render(true);
+    ui.combat.render(); // v13: remove deprecated render(true) force parameter
   }
 }
 

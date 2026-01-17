@@ -34,8 +34,8 @@ export async function createFFGMacro(bar, data, slot) {
       const actor = game.actors.get(data.actorId);
       const command = `
     const ffgactor = game.actors.get("${data.actorId}");
-    const skill = ffgactor.data.data.skills["${data.data.skill}"];
-    const characteristic = ffgactor.data.data.characteristics["${data.data.characteristic}"];
+    const skill = ffgactor.system.skills["${data.data.skill}"];
+    const characteristic = ffgactor.system.characteristics["${data.data.characteristic}"];
     const actorSheet = ffgactor.sheet.getData();
     game.ffg.DiceHelpers.rollSkillDirect(skill, characteristic, 2, actorSheet);`;
       macro = await createMacroItem({

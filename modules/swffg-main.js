@@ -500,7 +500,7 @@ Hooks.once("init", async function () {
     };
     if (canvas) {
       if (canvas?.groupmanager?.window) {
-        canvas.groupmanager.window.render(true);
+        canvas.groupmanager.window.render(); // v13: remove deprecated render(true) force parameter
       }
     }
   }
@@ -624,14 +624,24 @@ Hooks.once("init", async function () {
   FFG.configureVehicleRange();
 
   // Register sheet application classes
-  Actors.unregisterSheet("core", ActorSheet);
-  Actors.registerSheet("ffg", ActorSheetFFG, { label: "Actor Sheet v1" });
-  Actors.registerSheet("ffg", ActorSheetFFGV2, { makeDefault: true, label: "Actor Sheet v2" });
-  Actors.registerSheet("ffg", AdversarySheetFFG, { types: ["character"], label: "Adversary Sheet v1" });
-  Actors.registerSheet("ffg", AdversarySheetFFGV2, { types: ["character"], label: "Adversary Sheet v2" });
+  // v13: do not unregister core ActorSheet by symbol to avoid reference issues in ESM; our default sheet will take precedence
+  const allActorTypes = ["character","minion","vehicle","homestead","rival","nemesis"]; // v13: explicit types ensure visibility in Configure Sheet
+  Actors.registerSheet("starwarsffg", ActorSheetFFG, { types: allActorTypes, label: "Actor Sheet v1" }); // v13: use system id as scope for sheet registration
+  Actors.registerSheet("starwarsffg", ActorSheetFFGV2, { types: allActorTypes, makeDefault: true, label: "Actor Sheet v2" }); // v13
+  Actors.registerSheet("starwarsffg", AdversarySheetFFG, { types: ["character"], label: "Adversary Sheet v1" }); // v13
+  Actors.registerSheet("starwarsffg", AdversarySheetFFGV2, { types: ["character"], label: "Adversary Sheet v2" }); // v13
   Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("ffg", ItemSheetFFG, { label: "Item Sheet v1" });
-  Items.registerSheet("ffg", ItemSheetFFGV2, { makeDefault: true, label: "Item Sheet v2" });
+  Items.registerSheet("starwarsffg", ItemSheetFFG, { label: "Item Sheet v1" }); // v13
+  Items.registerSheet("starwarsffg", ItemSheetFFGV2, { makeDefault: true, label: "Item Sheet v2" }); // v13
+
+  // Also register under legacy scope to preserve existing per-actor sheet overrides referencing "ffg.*"
+  // v13: compatibility for existing flags.core.sheetClass values
+  Actors.registerSheet("ffg", ActorSheetFFG, { types: allActorTypes, label: "Actor Sheet v1 (legacy scope)" });
+  Actors.registerSheet("ffg", ActorSheetFFGV2, { types: allActorTypes, label: "Actor Sheet v2 (legacy scope)" });
+  Actors.registerSheet("ffg", AdversarySheetFFG, { types: ["character"], label: "Adversary Sheet v1 (legacy scope)" });
+  Actors.registerSheet("ffg", AdversarySheetFFGV2, { types: ["character"], label: "Adversary Sheet v2 (legacy scope)" });
+  Items.registerSheet("ffg", ItemSheetFFG, { label: "Item Sheet v1 (legacy scope)" });
+  Items.registerSheet("ffg", ItemSheetFFGV2, { label: "Item Sheet v2 (legacy scope)" });
 
   // Add utilities to the global scope, this can be useful for macro makers
   window.DicePoolFFG = DicePoolFFG;
@@ -771,7 +781,8 @@ Hooks.once("init", async function () {
 });
 
 Hooks.on("renderSidebarTab", (app, html, data) => {
-  html.find(".chat-control-icon").click(async (event) => {
+  const $html = $(html);
+  $html.find(".chat-control-icon").click(async (event) => {
     const dicePool = new DicePoolFFG();
 
     let user = {
@@ -790,15 +801,16 @@ Hooks.on("renderActorDirectory", (app, html, data) => {
   const npcImportButton = $('<button class="og-npc">NPC</button>');
   div.append(divider, characterImportButton, npcImportButton);
 
-  html.find(".directory-footer").append(div);
+  const $html = $(html);
+  $html.find(".directory-footer").append(div);
 
-  html.find(".og-character").click(async (event) => {
+  $html.find(".og-character").click(async (event) => {
     event.preventDefault();
-    new CharacterImporter().render(true);
+    new CharacterImporter().render(); // v13: remove deprecated render(true) force parameter
   });
-  html.find(".og-npc").click(async (event) => {
+  $html.find(".og-npc").click(async (event) => {
     event.preventDefault();
-    new NPCImporter().render(true);
+    new NPCImporter().render(); // v13: remove deprecated render(true) force parameter
   });
 });
 
@@ -810,26 +822,28 @@ Hooks.on("renderCompendiumDirectory", (app, html, data) => {
     const datasetImportButton2 = $('<button class="swa-character">Adversaries Dataset Importer</button>');
 
     div.append(divider, datasetImportButton, datasetImportButton2);
-    html.find(".directory-footer").append(div);
+    const $html = $(html);
+    $html.find(".directory-footer").append(div);
 
-    html.find(".og-character").click(async (event) => {
+    $html.find(".og-character").click(async (event) => {
       event.preventDefault();
-      new DataImporter().render(true);
+      new DataImporter().render(); // v13: remove deprecated render(true) force parameter
     });
 
-    html.find(".swa-character").click(async (event) => {
+    $html.find(".swa-character").click(async (event) => {
       event.preventDefault();
-      new SWAImporter().render(true);
+      new SWAImporter().render(); // v13: remove deprecated render(true) force parameter
     });
   }
 });
 
 // Update chat messages with dice images
 Hooks.on("renderChatMessage", async (app, html, messageData) => {
-  const content = html.find(".message-content");
+  const $html = $(html);
+  const content = $html.find(".message-content");
   content[0].innerHTML = await PopoutEditor.renderDiceImages(content[0].innerHTML);
 
-  html.on("click", ".ffg-pool-to-player", () => {
+  $html.on("click", ".ffg-pool-to-player", () => {
     const poolData = messageData.message.flags.starwarsffg;
 
     const dicePool = new DicePoolFFG(poolData.dicePool);
@@ -838,7 +852,7 @@ Hooks.on("renderChatMessage", async (app, html, messageData) => {
   });
 
   // collapse / expand item details
-  html.find(".starwarsffg.item-card .summary").on("click", async (event) => {
+  $html.find(".starwarsffg.item-card .summary").on("click", async (event) => {
     event.preventDefault();
     const li = $(event.currentTarget);
     const details = li.parent().children(".collapsible-content");
@@ -856,7 +870,7 @@ Hooks.on("renderChatMessage", async (app, html, messageData) => {
   });
 
   // item card tooltips
-  html.find(".starwarsffg.item-card .item-pill, .starwarsffg .specials .hover-tooltip").on("mouseover", (event) => {
+  $html.find(".starwarsffg.item-card .item-pill, .starwarsffg .specials .hover-tooltip").on("mouseover", (event) => {
     itemPillHover(event);
   });
 });
@@ -912,7 +926,7 @@ Hooks.once("ready", async () => {
       },
       default: "one",
     });
-    d.render(true);
+    d.render(); // v13: remove deprecated render(true) force parameter
   }
 
   if ((isAlpha || isCurrentVersionNullOrBlank(currentVersion) || parseFloat(currentVersion) < parseFloat(game.system.version)) && game.user.isGM) {
@@ -1024,7 +1038,7 @@ Hooks.once("ready", async () => {
       game.actors.forEach((actor) => {
         let update_data = [];
         actor.items.forEach((item) => {
-          let updated_item = item.toObject(true);
+          let updated_item = item.toObject(); // v13: toObject(true) -> toObject()
           if (["weapon", "armour", "shipweapon"].includes(item.type)) {
             // iterate over attachments and modifiers on the item
             updated_item.system.itemmodifier.map((modifier) => {
@@ -1052,7 +1066,7 @@ Hooks.once("ready", async () => {
       // move on to items in the world
       game.items.forEach((item) => {
         let updated = false;
-        let updated_item = item.toObject(true);
+        let updated_item = item.toObject(); // v13: toObject(true) -> toObject()
         if (["weapon", "armour", "shipweapon"].includes(item.type)) {
           // iterate over attachments and modifiers on the item
           updated_item.system.itemmodifier.map((modifier) => {
@@ -1131,7 +1145,7 @@ Hooks.once("ready", async () => {
     const command = `
       const testing = import('/systems/starwarsffg/tests/ffg-tests.js').then((mod) => {
       const tester = new mod.default();
-      tester.render(true);
+      tester.render(); // v13: remove deprecated render(true) force parameter
     });
     `;
 
@@ -1229,7 +1243,7 @@ Hooks.once("ready", async () => {
       name: game.i18n.localize("SWFFG.GroupManager"),
       icon: '<i class="fas fa-users"></i>',
       callback: () => {
-        new GroupManager().render(true);
+        new GroupManager().render(); // v13: remove deprecated render(true) force parameter
       },
       minimumRole: CONST.USER_ROLES.GAMEMASTER,
     },
@@ -1255,7 +1269,7 @@ Hooks.once("ready", async () => {
   ];
   const dTracker = new DestinyTracker(undefined, { menu: defaultDestinyMenu });
 
-  dTracker.render(true);
+  dTracker.render(); // v13: remove deprecated render(true) force parameter
 
   await registerCrewRoles();
   registerTokenControls();
@@ -1534,7 +1548,7 @@ Hooks.once("diceSoNiceReady", (dice3d) => {
 });
 
 Hooks.on("pauseGame", () => {
-  if (game.data.paused) {
+  if (game.paused) { // v13: game.data.paused replaced with game.paused
     const pausedImage = game.settings.get("starwarsffg", "ui-pausedImage");
     if (pausedImage) {
       $("#pause img").css("content", `url(${pausedImage})`);

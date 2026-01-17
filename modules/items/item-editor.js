@@ -21,7 +21,7 @@ export class itemEditor extends FormApplication  {
         title: `Embedded Item Editor`, // should not be seen by anyone, as it is dynamically set on getData()
         //height: 720,
         width: 520,
-        template: "systems/starwarsffg/templates/items/dialogs/ffg-embedded-itemattachment.html",
+        template: "systems/starwarsffg/templates/items/dialogs/ffg-embedded-itemattachment.hbs",
         closeOnSubmit: false,
         submitOnClose: true,
         submitOnChange: true,
@@ -36,7 +36,7 @@ export class itemEditor extends FormApplication  {
   /** @override */
   get template() {
     const path = "systems/starwarsffg/templates/items/dialogs";
-    return `${path}/ffg-embedded-${this.data.clickedObject.type}.html`;
+    return `${path}/ffg-embedded-${this.data.clickedObject.type}.hbs`;
   }
 
   /** @override */
@@ -59,9 +59,9 @@ export class itemEditor extends FormApplication  {
    */
   async _enrichData() {
     let enriched = this.data;
-    enriched.clickedObject.system.enrichedDescription = await TextEditor.enrichHTML(this.data.clickedObject.system.description);
+    enriched.clickedObject.system.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.data.clickedObject.system.description);
     for (let modification of enriched.clickedObject.system.itemmodifier) {
-      modification.system.enrichedDescription = await TextEditor.enrichHTML(modification.system.description);
+      modification.system.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(modification.system.description);
     }
     return enriched;
   }
@@ -120,7 +120,7 @@ export class itemEditor extends FormApplication  {
         }
       }
       await this.data.sourceObject.update({system: {itemattachment: updateData}});
-      this.render(true);
+      this.render(); // v13: remove deprecated render(true) force parameter
     }
   }
 
@@ -148,7 +148,7 @@ export class itemEditor extends FormApplication  {
       CONFIG.logger.debug(`expected new mod mod is ${modifierChoices[Object.keys(modifierTypes)[0]]}`);
 
       let rendered = await renderTemplate(
-        'systems/starwarsffg/templates/items/dialogs/ffg-mod.html',
+        'systems/starwarsffg/templates/items/dialogs/ffg-mod.hbs',
         {
           modifierTypes: modifierTypes,
           modifierChoices: modifierChoices,
@@ -195,7 +195,7 @@ export class itemEditor extends FormApplication  {
       const modTypeChoices = CONFIG.FFG.allowableModifierTypes;
       const modChoices = CONFIG.FFG.allowableModifierChoices;
       let rendered = await renderTemplate(
-        'systems/starwarsffg/templates/items/dialogs/ffg-modification.html',
+        'systems/starwarsffg/templates/items/dialogs/ffg-modification.hbs',
         {
           modTypeChoices: modTypeChoices,
           modChoices: modChoices,
@@ -261,7 +261,7 @@ export class itemEditor extends FormApplication  {
     }
 
     // re-render the form so we see the updated dropdown selections/options
-    this.render(true);
+    this.render(); // v13: remove deprecated render(true) force parameter
   }
 
   /**
@@ -513,7 +513,7 @@ export class itemEditor extends FormApplication  {
       await this.data.sourceObject.update({system: {itemmodifier: updateData}});
     }
     // needed to re-render the mod form (as the input can change types based on the selected modType)
-    this.render(true)
+    this.render(); // v13: remove deprecated render(true) force parameter
   }
 }
 
@@ -544,7 +544,7 @@ export class talentEditor extends itemEditor {
   /** @override */
   get template() {
     const path = "systems/starwarsffg/templates/items/dialogs";
-    return `${path}/ffg-embedded-talent.html`;
+    return `${path}/ffg-embedded-talent.hbs`;
   }
 
     /** @override */
@@ -586,7 +586,7 @@ export class talentEditor extends itemEditor {
       CONFIG.logger.debug(`expected new mod mod is ${modifierChoices[Object.keys(modifierTypes)[0]]}`);
 
       let rendered = await renderTemplate(
-        'systems/starwarsffg/templates/items/dialogs/ffg-mod.html',
+        'systems/starwarsffg/templates/items/dialogs/ffg-mod.hbs',
         { // TODO: this should probably be a new item of the correct type so it assumes any changes to the data model automatically
           modifierTypes: modifierTypes,
           modifierChoices: modifierChoices,
@@ -621,7 +621,7 @@ export class talentEditor extends itemEditor {
    */
   async _enrichData() {
     let enriched = this.data;
-    enriched.clickedObject.enrichedDescription = await TextEditor.enrichHTML(this.data.clickedObject.description);
+    enriched.clickedObject.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.data.clickedObject.description);
     return enriched;
   }
 
@@ -792,7 +792,7 @@ export class forcePowerEditor extends itemEditor {
       CONFIG.logger.debug(`expected new mod mod is ${modifierChoices[Object.keys(modifierTypes)[0]]}`);
 
       let rendered = await renderTemplate(
-        'systems/starwarsffg/templates/items/dialogs/ffg-mod.html',
+        'systems/starwarsffg/templates/items/dialogs/ffg-mod.hbs',
         {
           modifierTypes: modifierTypes,
           modifierChoices: modifierChoices,
@@ -827,7 +827,7 @@ export class forcePowerEditor extends itemEditor {
    */
   async _enrichData() {
     let enriched = this.data;
-    enriched.clickedObject.enrichedDescription = await TextEditor.enrichHTML(this.data.clickedObject.description);
+    enriched.clickedObject.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.data.clickedObject.description);
     return enriched;
   }
 

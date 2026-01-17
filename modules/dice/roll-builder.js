@@ -18,7 +18,10 @@ export default class RollBuilderFFG extends FormApplication {
       id: "roll-builder",
       classes: ["starwarsffg", "roll-builder-dialog"],
       template: "systems/starwarsffg/templates/dice/roll-options-ffg.hbs",
-      width: 350
+      width: 350,
+      popOut: true,
+      minimizable: true,
+      resizable: false,
     });
   }
 
@@ -32,15 +35,15 @@ export default class RollBuilderFFG extends FormApplication {
     //get all possible sounds
     let sounds = [];
     const diceSymbols = {
-      advantage: await TextEditor.enrichHTML("[AD]"),
-      success: await TextEditor.enrichHTML("[SU]"),
-      threat: await TextEditor.enrichHTML("[TH]"),
-      failure: await TextEditor.enrichHTML("[FA]"),
-      upgrade: await TextEditor.enrichHTML("[PR]"),
-      triumph: await TextEditor.enrichHTML("[TR]"),
-      despair: await TextEditor.enrichHTML("[DE]"),
-      light: await TextEditor.enrichHTML("[LI]"),
-      dark: await TextEditor.enrichHTML("[DA]"),
+      advantage: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[AD]"),
+      success: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[SU]"),
+      threat: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[TH]"),
+      failure: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[FA]"),
+      upgrade: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[PR]"),
+      triumph: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[TR]"),
+      despair: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[DE]"),
+      light: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[LI]"),
+      dark: await foundry.applications.ux.TextEditor.implementation.enrichHTML("[DA]"),
     };
 
     let canUserAddAudio = await game.settings.get("starwarsffg", "allowUsersAddRollAudio");
@@ -120,7 +123,7 @@ export default class RollBuilderFFG extends FormApplication {
             let entity;
             let entityData;
             if (!this?.roll?.item?.flags?.starwarsffg?.uuid) {
-              entity = game.actors.get(this.roll.data.actor._id);
+              entity = game.actors.get(this.roll.actor?._id || this.roll.data?.actor?._id); // v13: prefer roll.actor over roll.data.actor
               entityData = {
                 _id: this.roll.item.id,
               };
@@ -134,7 +137,7 @@ export default class RollBuilderFFG extends FormApplication {
                 };
               }
             }
-            setProperty(entityData, "flags.starwarsffg.ffgsound", sound);
+            foundry.utils.setProperty(entityData, "flags.starwarsffg.ffgsound", sound); // v13: use foundry.utils.setProperty
             entity.update(entityData);
           }
         }
@@ -219,7 +222,7 @@ export default class RollBuilderFFG extends FormApplication {
         await roll.toMessage({
           user: game.user.id,
           speaker: {
-            actor: game.actors.get(this.roll.data?.actor?._id),
+            actor: game.actors.get(this.roll.actor?._id || this.roll.data?.actor?._id), // v13: prefer roll.actor over roll.data.actor
             alias: this.roll.data?.token?.name,
             token: this.roll.data?.token?._id,
           },

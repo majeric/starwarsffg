@@ -202,7 +202,7 @@ export default class EmbeddedItemHelpers {
       let readonlyItemJournalEntry = await new JournalEntry(readonlyItem, {
         temporary: true,
       });
-      readonlyItemJournalEntry.sheet.render(true)
+      readonlyItemJournalEntry.sheet.render(); // v13: remove deprecated render(true) force parameter
     } catch (err) {
       ui.notifications.warn(`The item or quality has been removed or can not be found!`);
       CONFIG.logger.warn(`Error loading Read-Only Journal Item`, err);
@@ -224,7 +224,7 @@ export default class EmbeddedItemHelpers {
     if (!isNaN(modifierId)) {
       modifierIndex = modifierId;
     } else {
-      modifierIndex = ownedItem.data.data[modifierType].findIndex((i) => i.id === modifierId);
+      modifierIndex = ownedItem.system[modifierType].findIndex((i) => i.id === modifierId);
     }
 
     let item;
@@ -274,7 +274,7 @@ export default class EmbeddedItemHelpers {
     delete temp._id;
     delete temp.id;
     let tempItem = await new Item(temp, { temporary: true });
-    tempItem.sheet.render(true);
+    tempItem.sheet.render(); // v13: remove deprecated render(true) force parameter
   }
 
   static async createNewEmbeddedItem(type, data, flags) {

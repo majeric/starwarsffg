@@ -68,9 +68,12 @@ export class ItemSheetFFG extends ItemSheet {
       data.item = foundry.utils.mergeObject(data.item, options.data);
     } else if (options?.action === "ffgUpdate") {
       delete options?.data?.system?.description;
-      if (options?.data?.data) {
-        data.data = foundry.utils.mergeObject(data.data, options.data.data);
+      const updateSystem = options?.data?.system ?? options?.data?.data;
+      if (updateSystem) {
+        data.data = foundry.utils.mergeObject(data.data, updateSystem);
+        data.item.system = data.data;
         // we are going to merge options.data into data.item and can't set data.item.data this way
+        delete options.data.system;
         delete options.data.data;
       } else {
         data.data = foundry.utils.mergeObject(data.data, options.data);
@@ -91,11 +94,11 @@ export class ItemSheetFFG extends ItemSheet {
     }
 
     if (data?.data?.description) {
-      data.data.enrichedDescription = await TextEditor.enrichHTML(data.data.description);
+      data.data.enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(data.data.description);
     }
 
     if (data?.data?.longDesc !== undefined) {
-      data.data.enrichedLongDesc = await TextEditor.enrichHTML(data.data.longDesc);
+      data.data.enrichedLongDesc = await foundry.applications.ux.TextEditor.implementation.enrichHTML(data.data.longDesc);
       data.data.hasLongDesc = true;
     } else {
       data.data.hasLongDesc = false;
@@ -168,7 +171,7 @@ export class ItemSheetFFG extends ItemSheet {
           data.isReadOnly = true;
         }
         for (let x = 0; x < 16; x++) {
-          data.data.upgrades[`upgrade${x}`].enrichedDescription = await TextEditor.enrichHTML(data.data.upgrades[`upgrade${x}`].description);
+          data.data.upgrades[`upgrade${x}`].enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(data.data.upgrades[`upgrade${x}`].description);
         }
         break;
       case "specialization":
@@ -189,7 +192,7 @@ export class ItemSheetFFG extends ItemSheet {
           this.item.flags.starwarsffg.loaded = true;
         }
         for (let x = 0; x < 20; x++) {
-          data.data.talents[`talent${x}`].enrichedDescription = await TextEditor.enrichHTML(data.data.talents[`talent${x}`].description);
+          data.data.talents[`talent${x}`].enrichedDescription = await foundry.applications.ux.TextEditor.implementation.enrichHTML(data.data.talents[`talent${x}`].description);
         }
         break;
       case "species":
@@ -533,7 +536,7 @@ export class ItemSheetFFG extends ItemSheet {
               clickedObject: clickedObject,
               typeChoices: typeChoices,
             }
-            new itemEditor(data).render(true);
+            new itemEditor(data).render(); // v13: remove deprecated render(true) force parameter
           }
         }
       });
@@ -639,7 +642,7 @@ export class ItemSheetFFG extends ItemSheet {
             item = await fromUuid(this.object.system.signatureabilities[itemId].source);
           }
         }
-        new Item(item).sheet.render(true);
+        new Item(item).sheet.render(); // v13: remove deprecated render(true) force parameter
       });
     } else if (this.object.type === "species") {
       try {
@@ -670,7 +673,7 @@ export class ItemSheetFFG extends ItemSheet {
           const itemId = $(event.target).data("talent-id");
           const itemType = $(event.target).data("item-type");
           let item = await fromUuid(this.object.system.talents[itemId].source);
-          new Item(item).sheet.render(true);
+          new Item(item).sheet.render(); // v13: remove deprecated render(true) force parameter
         });
       } catch (err) {
         CONFIG.logger.debug(err);
@@ -693,9 +696,9 @@ export class ItemSheetFFG extends ItemSheet {
 
       let data = event.currentTarget.dataset;
       if (data) {
-        let sheet = this.actor.data;
-        let skill = sheet.data.skills[data["skill"]];
-        let characteristic = sheet.data.characteristics[skill.characteristic];
+        let sheet = await this.actor.sheet.getData();
+        let skill = this.actor.system.skills[data["skill"]];
+        let characteristic = this.actor.system.characteristics[skill.characteristic];
         let difficulty = data["difficulty"];
         await DiceHelpers.rollSkillDirect(skill, characteristic, difficulty, sheet);
       }
@@ -883,7 +886,7 @@ export class ItemSheetFFG extends ItemSheet {
             classes: ["dialog", "starwarsffg"],
             template: `systems/starwarsffg/templates/items/dialogs/ffg-edit-${itemType}.hbs`,
           }
-        ).render(true);
+        ).render(); // v13: remove deprecated render(true) force parameter
       }
     });
 
@@ -951,7 +954,7 @@ export class ItemSheetFFG extends ItemSheet {
       }
       let tempItem = await new Item(temp, { temporary: true });
 
-      tempItem.sheet.render(true);
+      tempItem.sheet.render(); // v13: remove deprecated render(true) force parameter
     });
 
     html.find(".additional .modifier-active").on("click", async (event) => {
@@ -987,7 +990,7 @@ export class ItemSheetFFG extends ItemSheet {
         this.object.update(formData);
       }
 
-      this.object.sheet.render(true);
+      this.object.sheet.render(); // v13: remove deprecated render(true) force parameter
     });
 
     html.find(".additional .add-new-item").on("click", async (event) => {
@@ -1031,7 +1034,7 @@ export class ItemSheetFFG extends ItemSheet {
           }
         }
       );
-      this.object.sheet.render(true);
+      this.object.sheet.render(); // v13: remove deprecated render(true) force parameter
     });
   }
 
@@ -1117,7 +1120,7 @@ export class ItemSheetFFG extends ItemSheet {
       {
         classes: ["dialog", "starwarsffg"],
       }
-    ).render(true);
+    ).render(); // v13: remove deprecated render(true) force parameter
   }
 
   async _handleItemBuy(event) {
@@ -1176,7 +1179,7 @@ export class ItemSheetFFG extends ItemSheet {
       {
         classes: ["dialog", "starwarsffg"],
       }
-    ).render(true);
+    ).render(); // v13: remove deprecated render(true) force parameter
   }
 
   async _buySignatureAbilityUpgrade(event) {
@@ -1222,7 +1225,7 @@ export class ItemSheetFFG extends ItemSheet {
       {
         classes: ["dialog", "starwarsffg"],
       }
-    ).render(true);
+    ).render(); // v13: remove deprecated render(true) force parameter
   }
 
   async _buySpecializationUpgrade(event) {
@@ -1268,7 +1271,7 @@ export class ItemSheetFFG extends ItemSheet {
       {
         classes: ["dialog", "starwarsffg"],
       }
-    ).render(true);
+    ).render(); // v13: remove deprecated render(true) force parameter
   }
 
   /* -------------------------------------------- */
@@ -1304,7 +1307,7 @@ export class ItemSheetFFG extends ItemSheet {
         modifierTypes: modifierTypes,
         modifierChoices: modifierChoices,
       }
-      new forcePowerEditor(data).render(true);
+      new forcePowerEditor(data).render(); // v13: remove deprecated render(true) force parameter
     } else if (this.object.type === "specialization") {
       const clickedType = 'talents';
       const parentObject = await fromUuid(this.object.uuid);
@@ -1317,7 +1320,7 @@ export class ItemSheetFFG extends ItemSheet {
         modifierTypes: modifierTypes,
         modifierChoices: modifierChoices,
       }
-      new talentEditor(data).render(true);
+      new talentEditor(data).render(); // v13: remove deprecated render(true) force parameter
     } else if (this.object.type === "signatureability") {
       const clickedType = 'upgrades';
       const parentObject = await fromUuid(this.object.uuid);
@@ -1330,7 +1333,7 @@ export class ItemSheetFFG extends ItemSheet {
         modifierTypes: modifierTypes,
         modifierChoices: modifierChoices,
       }
-      new forcePowerEditor(data).render(true);
+      new forcePowerEditor(data).render(); // v13: remove deprecated render(true) force parameter
     }
   }
 
@@ -1485,7 +1488,7 @@ export class ItemSheetFFG extends ItemSheet {
       width: windowWidth,
       left: windowLeft,
       top: windowTop,
-    }).render(true);
+    }).render(); // v13: remove deprecated render(true) force parameter
   }
 
   _canDragStart(selector) {
@@ -1622,7 +1625,7 @@ export class ItemSheetFFG extends ItemSheet {
 
       await this._transferActiveEffects(itemObject);
 
-      this.render(true);
+      this.render(); // v13: remove deprecated render(true) force parameter
     }
   }
 

@@ -727,7 +727,7 @@ export default class ImportHelpers {
     type: "character",
     flags: {
     },
-    data: {
+    system: {
       attributes: {},
       characteristics: {
         "Brawn": {
@@ -958,8 +958,8 @@ export default class ImportHelpers {
   {
     adversaryData.Characteristics.CharCharacteristic.forEach((char) =>{
       const name = ImportHelpers.convertOGCharacteristic(char.Key);
-      if (!adversary.data.attributes?.[name]) {
-        adversary.data.attributes[name] = {
+      if (!adversary.system.attributes?.[name]) {
+        adversary.system.attributes[name] = {
           key: name,
           mod: name,
           modtype: "Characteristic",
@@ -968,12 +968,12 @@ export default class ImportHelpers {
       }
       if (char.Rank?.PurchasedRanks) {
         let val = parseInt(char.Rank.PurchasedRanks, 10) + parseInt(char.Rank.StartingRanks, 10);
-        adversary.data.characteristics[name].value = val;
-        adversary.data.attributes[name].value = val;
+        adversary.system.characteristics[name].value = val;
+        adversary.system.attributes[name].value = val;
       } else {
         let val = parseInt(char.Rank.StartingRanks, 10);
-        adversary.data.characteristics[name].value = val;
-        adversary.data.attributes[name].value = val;
+        adversary.system.characteristics[name].value = val;
+        adversary.system.attributes[name].value = val;
       }
     });
 
@@ -988,11 +988,11 @@ export default class ImportHelpers {
         adversaryData.Abilities.AdvAbility = [adversaryData.Abilities.AdvAbility];
       }
 
-      adversary.data.biography += "<p>&nbsp;</p>"
-      adversary.data.biography += "<h3>Abilities</h3>"
+      adversary.system.biography += "<p>&nbsp;</p>"
+      adversary.system.biography += "<h3>Abilities</h3>"
       adversaryData.Abilities.AdvAbility.forEach((ability) => {
-        adversary.data.biography += "<h4>"+ability.Name+"</h4>";
-        adversary.data.biography += "<p>"+ability.Description+"</p>";
+        adversary.system.biography += "<h4>"+ability.Name+"</h4>";
+        adversary.system.biography += "<p>"+ability.Description+"</p>";
       });
     }
     return adversary;
@@ -1004,17 +1004,17 @@ export default class ImportHelpers {
 
     if (attrs.DefenseMelee) {
       var meledef = parseInt(attrs.DefenceMelee, 10);
-      adversary.data.attributes["Defence-Melee"] = {value: meledef};
+      adversary.system.attributes["Defence-Melee"] = {value: meledef};
     }
 
     if (attrs.DefenseRanged) {
       var rangeddef = parseInt(attrs.DefenseRanged, 10);
-      adversary.data.attributes["Ranged-Melee"] = {value: rangeddef};
+      adversary.system.attributes["Ranged-Melee"] = {value: rangeddef};
     }
 
     if (attrs.ForceRating) {
       var forcerating = parseInt(attrs.ForceRating, 10);
-      adversary.data.attributes["ForcePool"] = {value: forcerating};
+      adversary.system.attributes["ForcePool"] = {value: forcerating};
     }
 
     var soak = 0;
@@ -1028,7 +1028,7 @@ export default class ImportHelpers {
     if(attrs.SoakValue?.PurchasedRanks) {
       soak += parseInt(attrs.SoakValue.PurchasedRanks, 10);
     }
-    adversary.data.attributes.Soak = {value: soak};
+    adversary.system.attributes.Soak = {value: soak};
 
     // Minions don't have strain so can skip in this case
     if(adversaryData.Type !== "Minion")
@@ -1046,7 +1046,7 @@ export default class ImportHelpers {
       if(attrs.StrainThreshold?.CharRanks) {
         strain += parseInt(attrs.StrainThreshold.CharRanks, 10);
       }
-      adversary.data.attributes.Strain = {value: strain};
+      adversary.system.attributes.Strain = {value: strain};
     }
 
     var wounds = 0;
@@ -1062,8 +1062,8 @@ export default class ImportHelpers {
     if(attrs.WoundThreshold?.CharRanks) {
       wounds += parseInt(attrs.WoundThreshold.CharRanks, 10);
     }
-    adversary.data.unit_wounds = {value: wounds};
-    adversary.data.attributes.Wounds = {value: wounds};
+    adversary.system.unit_wounds = {value: wounds};
+    adversary.system.attributes.Wounds = {value: wounds};
 
     return adversary;
   }
@@ -1084,7 +1084,7 @@ export default class ImportHelpers {
           if (weaponItems.length > 0) {
             for (let i = 0; i < adversary.items.length; i += 1) {
               if (adversary.items[i].type === "weapon" && adversary.items[i].flags.starwarsffg.ffgimportid === weapon.flags.starwarsffg.ffgimportid) {
-                adversary.items[i] = mergeObject(weapon, adversary.items[i]);
+                adversary.items[i] = foundry.utils.mergeObject(weapon, adversary.items[i]);
               }
             }
           } else {
@@ -1131,7 +1131,7 @@ export default class ImportHelpers {
           if (talentItems.length > 0) {
             for (let i = 0; i < adversary.items.length; i += 1) {
               if (adversary.items[i].type === "talent" && adversary.items[i].flags.starwarsffg.ffgimportid === talent.flags.starwarsffg.ffgimportid) {
-                adversary.items[i] = mergeObject(talent, adversary.items[i]);
+                adversary.items[i] = foundry.utils.mergeObject(talent, adversary.items[i]);
               }
             }
           } else {
@@ -1139,7 +1139,7 @@ export default class ImportHelpers {
               if(talent.data?.ranks)
               {
                 let ranks = parseInt(t.Ranks, 10);
-                talent.data.ranks.current = ranks;
+                talent.system.ranks.current = ranks;
               }
             }
             adversary.items.push(talent);
@@ -1170,7 +1170,7 @@ export default class ImportHelpers {
             if (armorItems.length > 0) {
               for (let i = 0; i < adversary.items.length; i += 1) {
                 if (adversary.items[i].type === "armor" && adversary.items[i].flags.starwarsffg.ffgimportid === armor.flags.starwarsffg.ffgimportid) {
-                  adversary.items[i] = mergeObject(armor, adversary.items[i]);
+                  adversary.items[i] = foundry.utils.mergeObject(armor, adversary.items[i]);
                 }
               }
             } else {
@@ -1211,14 +1211,14 @@ export default class ImportHelpers {
             let gearCount = 1;
             if (w?.Count) {
               gearCount = parseInt(w.Count, 10);
-              gear.data.quantity = {
+              gear.system.quantity = {
                 value: gearCount,
               };
             }
 
             if (gearItem) {
-              gearItem = mergeObject(gear, gearItem);
-              gear.data.quantity.value = gearCount;
+              gearItem = foundry.utils.mergeObject(gear, gearItem);
+              gear.system.quantity.value = gearCount;
             } else {
               adversary.items.push(gear);
             }
@@ -1254,13 +1254,13 @@ export default class ImportHelpers {
         let force = JSON.parse(JSON.stringify(comForceAbility));
         // Just add all upgrades since there's no good way of mapping the NPC upgrades to their Character-sheet Counterparts
         // todo : find a solution to this known issue.
-        Object.keys(force.data.upgrades).forEach((key) => {
-          force.data.upgrades[key].islearned = true;
+        Object.keys(force.system.upgrades).forEach((key) => {
+          force.system.upgrades[key].islearned = true;
         });
 
         let forceItem = adversary.items.find((s) => s.flags.starwarsffg.ffgimportid === force.flags.starwarsffg.ffgimportid);
         if (forceItem) {
-          forceItem = mergeObject(force, forceItem);
+          forceItem = foundry.utils.mergeObject(force, forceItem);
         } else {
           adversary.items.push(force);
         }
@@ -1275,7 +1275,7 @@ export default class ImportHelpers {
 
   static async appendKnownIssuesAndNotesToDesc(adversary)
   {
-    adversary.data.biography += `<p>&nbsp;</p>
+    adversary.system.biography += `<p>&nbsp;</p>
     <h1>Importer Notes</h1>
     <p>This Adversary sheet was imported from OggDude's GMTools with DrMattsuu's NPC importer for SWFVTT, there are currently a number of known issues with this process.&nbsp;</p>
     <ul>
@@ -1295,13 +1295,13 @@ export default class ImportHelpers {
   {
     const npcName = adversaryData.Name;
     const npcKey = adversaryData.Key;
-    const exists = game.data.actors.find((actor) => actor.flags.starwarsffg?.ffgimportid == npcKey);
+    const exists = game.actors.find((actor) => actor.flags.starwarsffg?.ffgimportid == npcKey);
 
     // copy template character json
     let adversary = JSON.parse(JSON.stringify(ImportHelpers.characterTemplate));
     adversary.name = npcName;
     if(adversaryData.Description)
-      adversary.data.biography = adversaryData.Description;
+      adversary.system.biography = adversaryData.Description;
     adversary.flags = {
       starwarsffg: {
         ffgimportid: npcKey
@@ -1319,10 +1319,10 @@ export default class ImportHelpers {
     {
       const skills = adversaryData.Skills.CharSkill;
       skills.forEach((skill) => {
-        let charSkill = Object.keys(adversary.data.skills).find((s) => adversary.data.skills[s].Key === skill.Key);
+        let charSkill = Object.keys(adversary.system.skills).find((s) => adversary.system.skills[s].Key === skill.Key);
 
-        if (!adversary.data.attributes?.[charSkill]) {
-          adversary.data.attributes[charSkill] = {
+        if (!adversary.system.attributes?.[charSkill]) {
+          adversary.system.attributes[charSkill] = {
             key: charSkill,
             mod: charSkill,
             modtype: "Skill Rank",
@@ -1333,13 +1333,13 @@ export default class ImportHelpers {
         // Characteristic override
         if(skill.CharKeyOverride) {
           const characteristicName = ImportHelpers.convertOGCharacteristic(skill.CharKeyOverride);
-          adversary.data.skills[charSkill].characteristic = characteristicName;
+          adversary.system.skills[charSkill].characteristic = characteristicName;
         }
 
         // add ranked skills
         if(skill.Rank) {
-          adversary.data.skills[charSkill].rank = parseInt(skill.Rank.PurchasedRanks, 10);
-          adversary.data.attributes[charSkill].value = parseInt(skill.Rank.PurchasedRanks, 10);
+          adversary.system.skills[charSkill].rank = parseInt(skill.Rank.PurchasedRanks, 10);
+          adversary.system.attributes[charSkill].value = parseInt(skill.Rank.PurchasedRanks, 10);
         }
         // don't need to bother with class skills, or specs/careers as adv don't have them.
       });
@@ -1392,7 +1392,7 @@ export default class ImportHelpers {
   {
     const npcName = adversaryData.Name;
     const npcKey = adversaryData.Key;
-    const exists = game.data.actors.find((actor) => actor.flags.starwarsffg?.ffgimportid == npcKey);
+    const exists = game.actors.find((actor) => actor.flags.starwarsffg?.ffgimportid == npcKey);
 
     // minion sheet data obtained from an export and reformed for importing here.
     // Deep copy our template so we don't have to have a bunch of json sat here
@@ -1400,7 +1400,7 @@ export default class ImportHelpers {
     //adversary.type = subType;
     adversary.name = npcName;
     if(adversaryData.Description)
-      adversary.data.biography = adversaryData.Description;
+      adversary.system.biography = adversaryData.Description;
     adversary.flags = {
       starwarsffg: {
         ffgimportid: npcKey
@@ -1413,10 +1413,10 @@ export default class ImportHelpers {
     {
       const skills = adversaryData.Skills.CharSkill;
       skills.forEach((skill) => {
-        let charSkill = Object.keys(adversary.data.skills).find((s) => adversary.data.skills[s].Key === skill.Key);
+        let charSkill = Object.keys(adversary.system.skills).find((s) => adversary.system.skills[s].Key === skill.Key);
 
-        if (!adversary.data.attributes?.[charSkill]) {
-          adversary.data.attributes[charSkill] = {
+        if (!adversary.system.attributes?.[charSkill]) {
+          adversary.system.attributes[charSkill] = {
             key: charSkill,
             mod: charSkill,
             modtype: "Skill Rank",
@@ -1427,18 +1427,18 @@ export default class ImportHelpers {
         // Characteristic override
         if(skill.CharKeyOverride) {
           const characteristicName = ImportHelpers.convertOGCharacteristic(skill.CharKeyOverride);
-          adversary.data.skills[charSkill].characteristic = characteristicName;
+          adversary.system.skills[charSkill].characteristic = characteristicName;
         }
 
         // check for purchased ranks, a sure sign of a rival class
         if(skill.Rank) {
-          adversary.data.skills[charSkill].rank = parseInt(skill.Rank.PurchasedRanks, 10);
-          adversary.data.attributes[charSkill].value = parseInt(skill.Rank.PurchasedRanks, 10);
-          adversary.data.skills[charSkill].careerskill = true;
+          adversary.system.skills[charSkill].rank = parseInt(skill.Rank.PurchasedRanks, 10);
+          adversary.system.attributes[charSkill].value = parseInt(skill.Rank.PurchasedRanks, 10);
+          adversary.system.skills[charSkill].careerskill = true;
         }
         else {
           // minion types don't expose data unless they are group skills
-          adversary.data.skills[charSkill].groupskill = true;
+          adversary.system.skills[charSkill].groupskill = true;
         }
       });
     }
@@ -1545,7 +1545,7 @@ export default class ImportHelpers {
 
       const characterName = characterData.Character.Description.CharName;
 
-      const exists = game.data.actors.find((actor) => actor.flags?.starwarsffg?.ffgimportid === characterData.Character.Key);
+      const exists = game.actors.find((actor) => actor.flags?.starwarsffg?.ffgimportid === characterData.Character.Key);
 
       console.log(`character exists: ${exists}`)
 
@@ -1562,19 +1562,19 @@ export default class ImportHelpers {
         }
       }
 
-      character.data.stats.credits.value = parseInt(characterData.Character.Credits, 10);
-      character.data.experience = {
+      character.system.stats.credits.value = parseInt(characterData.Character.Credits, 10);
+      character.system.experience = {
         total: parseInt(characterData.Character.Experience.ExperienceRanks.StartingRanks ?? 0, 10) + parseInt(characterData.Character.Experience.ExperienceRanks.SpeciesRanks ?? 0, 10) + parseInt(characterData.Character.Experience.ExperienceRanks.PurchasedRanks ?? 0, 10),
         available: parseInt(characterData.Character.Experience.ExperienceRanks.StartingRanks ?? 0, 10) + parseInt(characterData.Character.Experience.ExperienceRanks.SpeciesRanks ?? 0, 10) + parseInt(characterData.Character.Experience.ExperienceRanks.PurchasedRanks ?? 0, 10) - parseInt(characterData.Character.Experience.UsedExperience ?? 0, 10),
       };
-      character.data.morality = {
+      character.system.morality = {
         label: "Morality",
         strength: characterData.Character.Morality?.MoralityPairs?.MoralityPair?.StrengthKey,
         type: "Number",
         value: parseInt(characterData.Character.Morality.MoralityValue ?? 0, 10),
         weakness: characterData.Character.Morality?.MoralityPairs?.MoralityPair?.WeaknessKey,
       };
-      character.data.general = {
+      character.system.general = {
         age: characterData.Character.Description.Age,
         build: characterData.Character.Description.Build,
         eyes: characterData.Character.Description.Eyes,
@@ -1584,7 +1584,7 @@ export default class ImportHelpers {
         gender: characterData.Character.Description.Gender,
       }
 
-      character.data.biography = characterData.Character.Story;
+      character.system.biography = characterData.Character.Story;
 
       if(exists?.items)
       {
@@ -1594,8 +1594,8 @@ export default class ImportHelpers {
       characterData.Character.Characteristics.CharCharacteristic.forEach((char) => {
         const name = ImportHelpers.convertOGCharacteristic(char.Key);
 
-        if (!character.data.attributes?.[name]) {
-          character.data.attributes[name] = {
+        if (!character.system.attributes?.[name]) {
+          character.system.attributes[name] = {
             key: name,
             mod: name,
             modtype: "Characteristic",
@@ -1603,8 +1603,8 @@ export default class ImportHelpers {
           };
         }
         if (char.Rank?.PurchasedRanks) {
-          character.data.characteristics[name].value = parseInt(char.Rank.PurchasedRanks, 10);
-          character.data.attributes[name].value = parseInt(char.Rank.PurchasedRanks, 10);
+          character.system.characteristics[name].value = parseInt(char.Rank.PurchasedRanks, 10);
+          character.system.attributes[name].value = parseInt(char.Rank.PurchasedRanks, 10);
         }
       });
 
@@ -1613,14 +1613,14 @@ export default class ImportHelpers {
       let speciesSkills = [];
 
       skills.forEach((skill) => {
-        let charSkill = Object.keys(character.data.skills).find((s) => character.data.skills[s].Key === skill.Key);
+        let charSkill = Object.keys(character.system.skills).find((s) => character.system.skills[s].Key === skill.Key);
 
         if (skill.isCareer) {
-          character.data.skills[charSkill].careerskill = true;
+          character.system.skills[charSkill].careerskill = true;
         }
 
-        if (!character.data.attributes?.[charSkill]) {
-          character.data.attributes[charSkill] = {
+        if (!character.system.attributes?.[charSkill]) {
+          character.system.attributes[charSkill] = {
             key: charSkill,
             mod: charSkill,
             modtype: "Skill Rank",
@@ -1629,8 +1629,8 @@ export default class ImportHelpers {
         }
 
         if (skill.Rank?.PurchasedRanks) {
-          character.data.skills[charSkill].rank = parseInt(skill.Rank.PurchasedRanks, 10);
-          character.data.attributes[charSkill].value = parseInt(skill.Rank.PurchasedRanks, 10);
+          character.system.skills[charSkill].rank = parseInt(skill.Rank.PurchasedRanks, 10);
+          character.system.attributes[charSkill].value = parseInt(skill.Rank.PurchasedRanks, 10);
         } else if (skill.Rank?.SpeciesRanks) {
           const speciesSkill = {
             key: charSkill,
@@ -1640,8 +1640,8 @@ export default class ImportHelpers {
           };
           speciesSkills.push(speciesSkill);
         } else {
-          character.data.skills[charSkill].rank = 0;
-          character.data.attributes[charSkill].value = 0;
+          character.system.skills[charSkill].rank = 0;
+          character.system.attributes[charSkill].value = 0;
         }
       });
 
@@ -1703,7 +1703,7 @@ export default class ImportHelpers {
               magnitude: CharObligation.Size,
               description: CharObligation.Notes,
             };
-            character.data.obligationlist[charobligation.key] = charobligation;
+            character.system.obligationlist[charobligation.key] = charobligation;
             if (parseInt(CharObligation.Size, 10)) {
               obligation += parseInt(CharObligation.Size, 10);
             }
@@ -1716,7 +1716,7 @@ export default class ImportHelpers {
             magnitude: characterData.Character.Obligations.CharObligation.Size,
             description: characterData.Character.Obligations.CharObligation.Notes,
           };
-          character.data.obligationlist[charobligation.key] = charobligation;
+          character.system.obligationlist[charobligation.key] = charobligation;
           if (parseInt(characterData.Character.Obligations.CharObligation.Size, 10)) {
             obligation += parseInt(characterData.Character.Obligations.CharObligation.Size, 10);
           }
@@ -1734,7 +1734,7 @@ export default class ImportHelpers {
               type: CharDuty.Name,
               magnitude: CharDuty.Size,
             };
-            character.data.dutylist[charduty.key] = charduty;
+            character.system.dutylist[charduty.key] = charduty;
             if (parseInt(CharDuty.Size, 10)) {
               duty += parseInt(CharDuty.Size, 10);
             }
@@ -1746,7 +1746,7 @@ export default class ImportHelpers {
             type: characterData.Character.Duties.CharDuty.Name,
             magnitude: characterData.Character.Duties.CharDuty.Size,
           };
-          character.data.dutylist[charduty.key] = charduty;
+          character.system.dutylist[charduty.key] = charduty;
           if (parseInt(characterData.Character.Duties.CharDuty.Size, 10)) {
             duty += parseInt(characterData.Character.Duties.CharDuty.Size, 10);
           }
@@ -1760,7 +1760,7 @@ export default class ImportHelpers {
         if (career) {
           if (characterData.Character.Career.CareerSkills?.Key) {
             characterData.Character.Career.CareerSkills.Key.forEach((key) => {
-              let charSkill = Object.keys(character.data.skills).find((s) => character.data.skills[s].Key === key);
+              let charSkill = Object.keys(character.system.skills).find((s) => character.system.skills[s].Key === key);
               let attrId = Object.keys(career.system.attributes).find((attr) => career.system.attributes[attr].modtype === "Skill Rank" && career.system.attributes[attr].mod === charSkill);
 
               if (career.system.attributes?.[attrId]?.value) {
@@ -1799,7 +1799,7 @@ export default class ImportHelpers {
         if (specialization) {
           if (characterData.Character.Career.CareerSpecSkills?.Key) {
             characterData.Character.Career.CareerSpecSkills.Key.forEach((key) => {
-              let charSkill = Object.keys(character.data.skills).find((s) => character.data.skills[s].Key === key);
+              let charSkill = Object.keys(character.system.skills).find((s) => character.system.skills[s].Key === key);
               let attrId = Object.keys(specialization.system.attributes).find((attr) => specialization.system.attributes[attr].modtype === "Skill Rank" && specialization.system.attributes[attr].mod === charSkill);
 
               if (specialization.system.attributes?.[attrId]?.value) {
@@ -2374,35 +2374,40 @@ export default class ImportHelpers {
         let updateData = data;
         updateData["_id"] = entry._id;
 
-        if (updateData?.data?.attributes) {
+        const updateSystem = updateData.system ?? updateData.data;
+        if (updateData.data && !updateData.system) {
+          updateData.system = updateData.data;
+          delete updateData.data;
+        }
+        if (updateSystem?.attributes) {
           // Remove and repopulate all modifiers
           if (entry.system?.attributes) {
             for (let k of Object.keys(entry.system.attributes)) {
-              if (!updateData.data.attributes.hasOwnProperty(k)) updateData.data.attributes[`-=${k}`] = null;
+              if (!updateSystem.attributes.hasOwnProperty(k)) updateSystem.attributes[`-=${k}`] = null;
             }
           }
         }
-        if (updateData?.data?.specializations) {
+        if (updateSystem?.specializations) {
           // Remove and repopulate all specializations
           if (entry.system?.specializations) {
             for (let k of Object.keys(entry.system.specializations)) {
-              if (!updateData.data.specializations.hasOwnProperty(k)) updateData.data.specializations[`-=${k}`] = null;
+              if (!updateSystem.specializations.hasOwnProperty(k)) updateSystem.specializations[`-=${k}`] = null;
             }
           }
         }
-        if (updateData?.data?.talents) {
+        if (updateSystem?.talents) {
           // Remove and repopulate all talents
           if (entry.system?.talents) {
             for (let k of Object.keys(entry.system.talents)) {
-              if (!updateData.data.talents.hasOwnProperty(k)) updateData.data.talents[`-=${k}`] = null;
+              if (!updateSystem.talents.hasOwnProperty(k)) updateSystem.talents[`-=${k}`] = null;
             }
           }
         }
-        if (updateData?.data?.abilities) {
+        if (updateSystem?.abilities) {
           // Remove and repopulate all abilities
           if (entry.system?.abilities) {
             for (let k of Object.keys(entry.system.abilities)) {
-              if (!updateData.data.abilities.hasOwnProperty(k)) updateData.data.abilities[`-=${k}`] = null;
+              if (!updateSystem.abilities.hasOwnProperty(k)) updateSystem.abilities[`-=${k}`] = null;
             }
           }
         }
@@ -3255,3 +3260,4 @@ function prep_for_v10(actor) {
   });
   return actor;
 }
+

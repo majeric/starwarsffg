@@ -6,7 +6,7 @@ export class GroupManagerLayer extends CanvasLayer {
   }
 
   static get layerOptions() {
-    return mergeObject(super.layerOptions, {
+    return foundry.utils.mergeObject(super.layerOptions, {
       canDragCreate: false,
     });
   }
@@ -214,7 +214,7 @@ export class GroupManager extends FormApplication {
         const actorId = li.data("character");
         const actor = game.actors.get(actorId);
         if (actor?.sheet) {
-          actor.sheet.render(true);
+          actor.sheet.render(); // v13: remove deprecated render(true) force parameter
         }
       }
     });
@@ -290,7 +290,7 @@ export class GroupManager extends FormApplication {
       characters.map(async (c) => {
         let token = await this._getCharacterToken(game.actors.get(c));
         if (token) {
-          if (!token._controlled && !token.inCombat) {
+          if (!token.controlled && !token.inCombat) {
             tokens.push(token);
           }
         } else {
@@ -358,7 +358,7 @@ export class GroupManager extends FormApplication {
           label: game.i18n.localize("SWFFG.Cancel"),
         },
       },
-    }).render(true);
+    }).render(); // v13: remove deprecated render(true) force parameter
   }
 
   async _bulkXP(characters) {
@@ -395,7 +395,7 @@ export class GroupManager extends FormApplication {
           label: game.i18n.localize("SWFFG.Cancel"),
         },
       },
-    }).render(true);
+    }).render(); // v13: remove deprecated render(true) force parameter
   }
 }
 

@@ -1,19 +1,19 @@
-import PopoutEditor from "../popout-editor.js";
 import RollBuilderFFG from "../dice/roll-builder.js";
 import ModifierHelpers from "../helpers/modifiers.js";
 import ImportHelpers from "../importer/import-helpers.js";
+import {DicePoolFFG} from "../dice/pool.js";
+
 
 export default class DiceHelpers {
   static async rollSkill(obj, event, type, flavorText, sound) {
+    console.debug("[SWFFG] rollSkill called", { type, flavorText, sound });
     const data = await obj.getData();
-    const row = event.target.parentElement.parentElement;
-    let skillName = row.parentElement.dataset["ability"];
-    if (skillName === undefined) {
-      skillName = row.dataset["ability"];
-      if (skillName === undefined) {
-        skillName = row.parentElement.parentElement.parentElement.dataset["ability"];
-      }
-    }
+    console.debug("[SWFFG] sheet data loaded", { actorId: data?.actor?._id, actorType: data?.actor?.type });
+    const buttonElement = event.currentTarget || event.target;
+    const skillContainer = buttonElement?.closest?.(".skill");
+    console.debug("[SWFFG] resolved skill container", { hasContainer: !!skillContainer });
+    let skillName = skillContainer?.dataset?.ability;
+    console.debug("[SWFFG] skill name from dataset", { skillName });
 
     let skills;
     const theme = await game.settings.get("starwarsffg", "skilltheme");
@@ -26,6 +26,17 @@ export default class DiceHelpers {
     }
 
     let skillData = skills?.[skillName];
+    if (!skillData && skillName) {
+      // fallback: dataset may contain localized label; map back to key
+      for (const [key, value] of Object.entries(skills || {})) {
+        if (game.i18n.localize(value.label) === skillName) {
+          skillName = key;
+          skillData = value;
+          break;
+        }
+      }
+    }
+    console.debug("[SWFFG] resolved skillData", { exists: !!skillData, resolvedSkillName: skillName });
 
     if (!skillData) {
       skillData = data.data[skillName];
@@ -54,31 +65,32 @@ export default class DiceHelpers {
       value: 0,
     };
 
-    if (data?.data?.skills?.[skillName]) {
+    if (skillName && data?.data?.skills?.[skillName]) {
       skill = data.data.skills[skillName];
     }
     if (data?.data?.characteristics?.[skill?.characteristic]) {
       characteristic = data.data.characteristics[skill.characteristic];
     }
+    console.debug("[SWFFG] skill & characteristic", { skill, characteristic });
 
     const actor = await game.actors.get(data.actor._id);
 
     // Determine if this roll is triggered by an item.
     let item;
-    if ($(row.parentElement).hasClass("item")) {
-      //Check if token is linked to actor
-      if (obj.actor.token === null) {
-        let itemID = row.parentElement.dataset["itemId"];
+    const itemElement = skillContainer?.closest?.(".item");
+    if (itemElement) {
+      const itemID = itemElement.dataset["itemId"];
+      if (!obj.actor?.token) {
         item = actor.items.get(itemID);
       } else {
-        //Rolls this if unlinked
-        let itemID = row.parentElement.dataset["itemId"];
         item = obj.actor.token.actor.items.get(itemID);
       }
     }
+    console.debug("[SWFFG] item context", { hasItem: !!item, itemId: item?.id, itemType: item?.type });
     const itemData = item || {};
     const status = this.getWeaponStatus(itemData);
     let defenseDice = this.getDefenseDice(skill, itemData);
+    console.debug("[SWFFG] status & defense", status, { defenseDice });
 
     // TODO: Get weapon specific modifiers from itemmodifiers and itemattachments
 
@@ -107,9 +119,12 @@ export default class DiceHelpers {
     } else if (type === "difficulty") {
       dicePool.upgradeDifficulty();
     }
+    console.debug("[SWFFG] dicePool after upgrades", dicePool);
 
     dicePool = new DicePoolFFG(await this.getModifiers(dicePool, itemData));
+    console.debug("[SWFFG] dicePool after modifiers", dicePool);
     await this.displayRollDialog(data, dicePool, `${game.i18n.localize("SWFFG.Rolling")} ${game.i18n.localize(skill.label)}`, skill.label, itemData, flavorText, sound);
+    console.debug("[SWFFG] roll dialog rendered");
   }
 
   static getDefenseDice(skill, itemData){
@@ -133,7 +148,7 @@ export default class DiceHelpers {
   }
 
   static async displayRollDialog(data, dicePool, description, skillName, item, flavorText, sound) {
-    return new RollBuilderFFG(data, dicePool, description, skillName, item, flavorText, sound).render(true);
+    return new RollBuilderFFG(data, dicePool, description, skillName, item, flavorText, sound).render();
   }
 
   static async addSkillDicePool(obj, elem) {
@@ -267,25 +282,26 @@ export default class DiceHelpers {
   }
 
   static async getModifiers(dicePool, item) {
+    let returnVal = dicePool;
     if (item.type === "weapon" || item.type === "shipweapon") {
-      dicePool = await ModifierHelpers.getDicePoolModifiers(dicePool, item, []);
+      returnVal = await ModifierHelpers.getDicePoolModifiers(returnVal, item, []);
 
       if (item?.system?.itemattachment) {
         await ImportHelpers.asyncForEach(item.system.itemattachment, async (attachment) => {
           //get base mods and additional mods totals
           const activeModifiers = attachment.system.itemmodifier.filter((i) => i.system?.active);
 
-          dicePool = await ModifierHelpers.getDicePoolModifiers(dicePool, attachment, activeModifiers);
+          returnVal = await ModifierHelpers.getDicePoolModifiers(returnVal, attachment, activeModifiers);
         });
       }
       if (item?.system?.itemmodifier) {
         await ImportHelpers.asyncForEach(item.system.itemmodifier, async (modifier) => {
-          dicePool = await ModifierHelpers.getDicePoolModifiers(dicePool, modifier, []);
+          returnVal = await ModifierHelpers.getDicePoolModifiers(returnVal, modifier, []);
         });
       }
     }
 
-    return dicePool;
+    return returnVal;
   }
 }
 
@@ -302,7 +318,7 @@ export function get_dice_pool(actor_id, skill_name, incoming_roll) {
   const skill = actor.system.skills[parsed_skill_name];
   const characteristic = actor.system.characteristics[skill.characteristic];
 
-  const dicePool = new DicePoolFFG({
+  return new DicePoolFFG({
     ability: Math.max(characteristic.value, skill.rank) + incoming_roll.ability - (Math.min(characteristic.value, skill.rank) + incoming_roll.proficiency),
     proficiency: Math.min(characteristic.value, skill.rank) + incoming_roll.proficiency,
     boost: skill.boost + incoming_roll.boost,
@@ -321,7 +337,6 @@ export function get_dice_pool(actor_id, skill_name, incoming_roll) {
     difficulty: +incoming_roll.difficulty,
     challenge: +incoming_roll.challenge,
   });
-  return dicePool;
 }
 
 /**
@@ -330,21 +345,21 @@ export function get_dice_pool(actor_id, skill_name, incoming_roll) {
  * @returns {null|string}
  */
 function convert_skill_name(pool_skill_name) {
-  CONFIG.logger.debug(`Converting ${pool_skill_name} to skill name`);
+  CONFIG.logger.debug(`Converting ${pool_skill_name} to skill name`, null);
   const skills = CONFIG.FFG.skills;
-  for (var skill in skills) {
-    if (game.i18n.localize(skills[skill]['label']) === pool_skill_name) {
-      CONFIG.logger.debug(`Found mapping to ${skill}`);
-      return skill;
+  for (let skill1 in skills) {
+    if (game.i18n.localize(skills[skill1]['label']) === pool_skill_name) {
+      CONFIG.logger.debug(`Found mapping to ${skill1}`, null);
+      return skill1;
     }
   }
   // it would appear that sometimes it's value instead of label
-  for (var skill in skills) {
-    if (skills[skill]['value'] === pool_skill_name) {
-      CONFIG.logger.debug(`Found mapping to ${skill}`);
-      return skill;
+  for (let skill2 in skills) {
+    if (skills[skill2]['value'] === pool_skill_name) {
+      CONFIG.logger.debug(`Found mapping to ${skill2}`, null);
+      return skill2;
     }
   }
-  CONFIG.logger.debug('WARNING: Found no mapping!');
+  CONFIG.logger.debug('WARNING: Found no mapping!', null);
   return null;
 }

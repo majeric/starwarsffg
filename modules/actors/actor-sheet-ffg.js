@@ -41,7 +41,7 @@ export class ActorSheetFFG extends ActorSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["starwarsffg", "sheet", "actor"],
-      template: "systems/starwarsffg/templates/actors/ffg-character-sheet.html",
+      template: "systems/starwarsffg/templates/actors/ffg-character-sheet.hbs",
       width: 710,
       height: 650,
       tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "characteristics" }],
@@ -52,7 +52,7 @@ export class ActorSheetFFG extends ActorSheet {
   /** @override */
   get template() {
     const path = "systems/starwarsffg/templates/actors";
-    return `${path}/ffg-${this.actor.type}-sheet.html`;
+    return `${path}/ffg-${this.actor.type}-sheet.hbs`; // v13: ensure correct .hbs template extension
   }
 
   /** @override */
@@ -128,7 +128,7 @@ export class ActorSheetFFG extends ActorSheet {
           {
             classes: ["dialog", "starwarsffg"],
           }
-        ).render(true);
+        ).render(); // v13: remove deprecated render(true) force parameter
         }
       }
 
@@ -190,7 +190,12 @@ export class ActorSheetFFG extends ActorSheet {
     data.items = this.actor.items;
 
     if (options?.action === "update" && this.object.compendium) {
-      data.item = foundry.utils.mergeObject(data.actor, options.data);
+      // Guard against undefined or non-object options.data to prevent merge errors during render
+      if (options?.data && typeof options.data === "object") {
+        data.item = foundry.utils.mergeObject(data.actor, options.data);
+      } else {
+        data.item = data.actor;
+      }
     }
 
     data.dtypes = ["String", "Number", "Boolean"];
@@ -233,13 +238,13 @@ export class ActorSheetFFG extends ActorSheet {
         if (data.data.stats.credits.value > 999) {
           data.data.stats.credits.value = data.data.stats.credits.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
-        data.data.enrichedBio = await TextEditor.enrichHTML(this.actor.system.biography, {secrets: !data.limited});
-        data.data.general.enrichedNotes = await TextEditor.enrichHTML(this.actor.system.general?.notes) || "";
-        data.data.general.enrichedFeatures = await TextEditor.enrichHTML(this.actor.system.general?.features) || "";
+        data.data.enrichedBio = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.actor.system.biography, {secrets: !data.limited});
+        data.data.general.enrichedNotes = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.actor.system.general?.notes) || "";
+        data.data.general.enrichedFeatures = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.actor.system.general?.features) || "";
         data.maxAttribute = game.settings.get("starwarsffg", "maxAttribute");
         break;
-      case "vehicle":
-        data.data.enrichedBio = await TextEditor.enrichHTML(this.actor.system.biography);
+      case "vehicle": {
+        data.data.enrichedBio = await foundry.applications.ux.TextEditor.implementation.enrichHTML(this.actor.system.biography);
         // add the crew to the items of the vehicle
         data.crew = [];
         // look up the flag data
@@ -272,6 +277,8 @@ export class ActorSheetFFG extends ActorSheet {
             })
           }
         }
+        break;
+      }
       default:
     }
 
@@ -346,6 +353,30 @@ export class ActorSheetFFG extends ActorSheet {
       DiceHelpers.addSkillDicePool(this, elem);
       const filters = this._filters.skills;
     });
+
+    // Allow rolling skills even when the sheet is not in edit mode
+    html
+      .find(".roll-button")
+      .on("click", async (event) => {
+        event.stopPropagation();
+        try {
+          console.debug("[SWFFG] roll-button click", {
+            ctrl: event.ctrlKey,
+            shift: event.shiftKey,
+            target: event.target,
+          });
+          let upgradeType = null;
+          if (event.ctrlKey && !event.shiftKey) {
+            upgradeType = "ability";
+          } else if (!event.ctrlKey && event.shiftKey) {
+            upgradeType = "difficulty";
+          }
+          await DiceHelpers.rollSkill(this, event, upgradeType);
+          console.debug("[SWFFG] roll-button handled successfully");
+        } catch (err) {
+          console.error("[SWFFG] Error handling roll-button click", err);
+        }
+      });
 
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;
@@ -716,7 +747,7 @@ export class ActorSheetFFG extends ActorSheet {
               {
                   classes: ["dialog", "starwarsffg"],
               }
-          ).render(true);
+          ).render(); // v13: remove deprecated render(true) force parameter
       } else if (game.settings.get("starwarsffg", "HealingItemAction") === '1') {
         // rest
         let updateData = {};
@@ -762,7 +793,7 @@ export class ActorSheetFFG extends ActorSheet {
             }
           }
           if (item?.sheet) {
-            if (item?.type == "species" || item?.type == "career" || item?.type == "specialization" || item?.type == "forcepower" || item?.type == "signatureability") item.sheet.render(true);
+            if (item?.type == "species" || item?.type == "career" || item?.type == "specialization" || item?.type == "forcepower" || item?.type == "signatureability") item.sheet.render(); // v13: remove deprecated render(true) force parameter
             else this._itemDisplayDetails(item, ev);
           }
         }
@@ -790,7 +821,7 @@ export class ActorSheetFFG extends ActorSheet {
               }
             };
             const tempItem = await new Item(itemData, { temporary: true });
-            tempItem.sheet.render(true);
+            tempItem.sheet.render(); // v13: remove deprecated render(true) force parameter
           } else {
             CONFIG.logger.debug(`Unknown item type: ${itemType}, or lacking new embed system`);
             let itemId = li.dataset.itemId;
@@ -888,7 +919,7 @@ export class ActorSheetFFG extends ActorSheet {
         }
       }
       if (item?.sheet) {
-        item.sheet.render(true);
+        item.sheet.render(); // v13: remove deprecated render(true) force parameter
       }
     });
 
@@ -936,7 +967,7 @@ export class ActorSheetFFG extends ActorSheet {
       const rolesInUse = crewMemberRoles.map(role => role.role);
 
       const content = await renderTemplate(
-        "systems/starwarsffg/templates/dialogs/ffg-crew-change.html",
+        "systems/starwarsffg/templates/dialogs/ffg-crew-change.hbs",
         {
           actor: crew_member,
           roles: registeredRoles,
@@ -958,7 +989,7 @@ export class ActorSheetFFG extends ActorSheet {
             }
           }
         },
-      ).render(true);
+      ).render(); // v13: remove deprecated render(true) force parameter
     });
 
     html.find(".item-info").click((ev) => {
@@ -1000,9 +1031,9 @@ export class ActorSheetFFG extends ActorSheet {
         },
         {
           classes: ["dialog", "starwarsffg"],
-          template: "systems/starwarsffg/templates/actors/dialogs/ffg-talent-selector.html",
+          template: "systems/starwarsffg/templates/actors/dialogs/ffg-talent-selector.hbs",
         }
-      ).render(true);
+      ).render(); // v13: remove deprecated render(true) force parameter
     });
 
     // Edit Gear Quantities
@@ -1039,18 +1070,7 @@ export class ActorSheetFFG extends ActorSheet {
     });
 
     // Roll Skill
-    html
-      .find(".roll-button")
-      .on("click", async (event) => {
-        event.stopPropagation();
-        let upgradeType = null;
-        if (event.ctrlKey && !event.shiftKey) {
-          upgradeType = "ability";
-        } else if (!event.ctrlKey && event.shiftKey) {
-          upgradeType = "difficulty";
-        }
-        await DiceHelpers.rollSkill(this, event, upgradeType);
-      });
+    // (Removed duplicate roll handler; now bound above to work in view mode)
 
     // Roll crew
     html.find(".roll-button-crew").children().on("click", async (event) => {
@@ -1140,7 +1160,7 @@ export class ActorSheetFFG extends ActorSheet {
             content: `<p>${game.i18n.localize("SWFFG.Crew.Roles.Gunner.Description")}</p>`,
             buttons: weapons,
           },
-        ).render(true);
+        ).render(); // v13: remove deprecated render(true) force parameter
       } else {
         // update the pool with actor information
         pool = get_dice_pool(crew_id, role_info[0].role_skill, pool);
@@ -1201,7 +1221,7 @@ export class ActorSheetFFG extends ActorSheet {
             content: `<p>${game.i18n.localize("SWFFG.Crew.Roles.Weapon.Description")}</p>`,
             buttons: crewMembers,
           },
-        ).render(true);
+        ).render(); // v13: remove deprecated render(true) force parameter
       } else {
         await this.vehicleCrewGunneryRoll(weapon, weaponSkill, crewGunners[0]);
       }
@@ -1393,7 +1413,7 @@ export class ActorSheetFFG extends ActorSheet {
       let details = li.children(".item-details");
       details.slideUp(200, () => details.remove());
     } else {
-      let div = $(`<div class="item-details">${await TextEditor.enrichHTML(desc)}</div>`);
+      let div = $(`<div class="item-details">${await foundry.applications.ux.TextEditor.implementation.enrichHTML(desc)}</div>`);
       li.append(div.hide());
       div.slideDown(200);
     }
@@ -1445,7 +1465,7 @@ export class ActorSheetFFG extends ActorSheet {
       };
     }
 
-    const template = "systems/starwarsffg/templates/chat/item-card.html";
+    const template = "systems/starwarsffg/templates/chat/item-card.hbs";
     const html = await renderTemplate(template, { itemDetails, item });
 
     const messageData = {
@@ -1475,7 +1495,7 @@ export class ActorSheetFFG extends ActorSheet {
     }
 
     const itemDetails = { "desc": desc, "name": name };
-    const template = "systems/starwarsffg/templates/chat/force-power-card.html";
+    const template = "systems/starwarsffg/templates/chat/force-power-card.hbs";
     const html = await renderTemplate(template, { itemDetails, item });
 
     const messageData = {
@@ -1521,7 +1541,7 @@ export class ActorSheetFFG extends ActorSheet {
               CONFIG.logger.debug(`Updating ${ability} Characteristic from ${characteristic} to ${newCharacteristic}`);
 
               let updateData = {};
-              setProperty(updateData, `system.skills.${ability}.characteristic`, newCharacteristic);
+              foundry.utils.setProperty(updateData, `system.skills.${ability}.characteristic`, newCharacteristic); // v13: use foundry.utils.setProperty
 
               this.object.update(updateData);
             },
@@ -1534,9 +1554,9 @@ export class ActorSheetFFG extends ActorSheet {
       },
       {
         classes: ["dialog", "starwarsffg"],
-        template: "systems/starwarsffg/templates/actors/dialogs/ffg-skill-characteristic-selector.html",
+        template: "systems/starwarsffg/templates/actors/dialogs/ffg-skill-characteristic-selector.hbs",
       }
-    ).render(true);
+    ).render(); // v13: remove deprecated render(true) force parameter
   }
 
   /**
@@ -1589,9 +1609,9 @@ export class ActorSheetFFG extends ActorSheet {
       },
       {
         classes: ["dialog", "starwarsffg"],
-        template: "systems/starwarsffg/templates/actors/dialogs/ffg-skill-new.html",
+        template: "systems/starwarsffg/templates/actors/dialogs/ffg-skill-new.hbs",
       }
-    ).render(true);
+    ).render(); // v13: remove deprecated render(true) force parameter
   }
 
   /**
@@ -1634,7 +1654,7 @@ export class ActorSheetFFG extends ActorSheet {
       {
         classes: ["dialog", "starwarsffg"],
       }
-    ).render(true);
+    ).render(); // v13: remove deprecated render(true) force parameter
   }
 
   /**
@@ -1723,7 +1743,7 @@ export class ActorSheetFFG extends ActorSheet {
         {
           classes: ["dialog", "starwarsffg"],
         }
-      ).render(true);
+      ).render(); // v13: remove deprecated render(true) force parameter
     } else {
       CONFIG.logger.warn(`Could not locate purchase with ID ${purchaseId}`);
     }
@@ -1756,7 +1776,7 @@ export class ActorSheetFFG extends ActorSheet {
       useSkillForInitiative = true;
     }
 
-    setProperty(updateData, `system.skills.${skill}.useForInitiative`, useSkillForInitiative);
+    foundry.utils.setProperty(updateData, `system.skills.${skill}.useForInitiative`, useSkillForInitiative); // v13: use foundry.utils.setProperty
     this.object.update(updateData);
   }
 
@@ -1886,7 +1906,6 @@ export class ActorSheetFFG extends ActorSheet {
    */
   async _suspendActiveEffects(droppedItem) {
     // Note: this function is currently placeholder. I may implement it - if we get better support for holding attachments
-    return;
     const droppedType = droppedItem.type;
     const myType = this.object.type;
     const toSuspend = [];
@@ -1983,7 +2002,7 @@ export class ActorSheetFFG extends ActorSheet {
       width: windowWidth,
       left: windowLeft,
       top: windowTop,
-    }).render(true);
+    }).render(); // v13: remove deprecated render(true) force parameter
   }
 
   /**
@@ -2051,7 +2070,7 @@ export class ActorSheetFFG extends ActorSheet {
 
   async _buyCore(event) {
     const action = $(event.target).data("buy-action");
-    const template = "systems/starwarsffg/templates/dialogs/ffg-confirm-purchase.html";
+    const template = "systems/starwarsffg/templates/dialogs/ffg-confirm-purchase.hbs";
     let content;
     const availableXP = this.object.system.experience.available;
     const totalXP = this.object.system.experience.total;
@@ -2329,7 +2348,7 @@ export class ActorSheetFFG extends ActorSheet {
       {
         classes: ["dialog", "starwarsffg"],
       }
-    ).render(true);
+    ).render(); // v13: remove deprecated render(true) force parameter
   }
 
   async _buyCharacteristicRank(characteristic) {
@@ -2360,7 +2379,7 @@ export class ActorSheetFFG extends ActorSheet {
             callback: async (that) => {
               const statusId = await this._spendXp(`system.characteristics.${characteristic}.value`, 1, cost);
               await xpLogSpend(game.actors.get(this.object.id), `characteristic ${characteristic} level ${characteristicValue} --> ${characteristicValue + 1}`, cost, availableXP - cost, totalXP, statusId);
-              await this.render(true);
+              await this.render(); // v13: remove deprecated render(true) force parameter
             },
           },
           cancel: {
@@ -2372,7 +2391,7 @@ export class ActorSheetFFG extends ActorSheet {
       {
         classes: ["dialog", "starwarsffg"],
       }
-    ).render(true);
+    ).render(); // v13: remove deprecated render(true) force parameter
   }
 
   /**
@@ -2421,7 +2440,7 @@ export class ActorSheetFFG extends ActorSheet {
             const updatedTotalXP = totalXP + adjustAmount;
             const statusId = await this._spendXp("system.experience.total", adjustAmount, adjustAmount * -1);
             await xpLogEarn(this.object, adjustAmount, updatedAvailableXP, updatedTotalXP, adjustReason, "Self", statusId);
-            await this.render(true);
+            await this.render(); // v13: remove deprecated render(true) force parameter
          }
       },
       two: {
@@ -2430,7 +2449,7 @@ export class ActorSheetFFG extends ActorSheet {
       }
      },
     });
-    d.render(true);
+    d.render(); // v13: remove deprecated render(true) force parameter
   }
 }
 

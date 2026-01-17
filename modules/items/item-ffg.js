@@ -21,7 +21,7 @@ export class ItemFFG extends ItemBaseFFG {
     if (this.isEmbedded && this.actor) {
       // If this is a weapon or armour item we must ensure its modifier-adjusted values are saved to the database
       if (["weapon", "shipweapon", "armour"].includes(this.type)) {
-        let that = this.toObject(true);
+        let that = this.toObject(); // v13: toObject(true) -> toObject()
         delete that._id;
         await this.update(that);
       }
@@ -237,8 +237,8 @@ export class ItemFFG extends ItemBaseFFG {
   /**
    * Augment the basic Item data model with additional dynamic data.
    */
-  async prepareData() {
-    await super.prepareData();
+  prepareData() { // v13: prepareData should be synchronous; removed async
+    super.prepareData(); // v13: super.prepareData is synchronous in v13
 
     CONFIG.logger.debug(`Preparing Item Data ${this.type} ${this.name}`);
 
@@ -248,7 +248,7 @@ export class ItemFFG extends ItemBaseFFG {
     const data = item.system;
 
     if (!item.flags.starwarsffg) {
-      await item.updateSource({
+      item.updateSource({ // v13: prepareData must be synchronous; do not await here
         flags: {
           starwarsffg: {
             isCompendium: !!this.compendium,
@@ -676,7 +676,7 @@ export class ItemFFG extends ItemBaseFFG {
         } else {
           upgradeDescriptions.push({
             name: up.name,
-            description: await TextEditor.enrichHTML(up.description),
+            description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(up.description),
             rank: 1,
           });
         }
@@ -702,7 +702,7 @@ export class ItemFFG extends ItemBaseFFG {
         const qualities = [];
         for (const modifier of modifiers) {
           qualities.push(`
-          <div class='item-pill-hover hover-tooltip' data-item-type="itemmodifier" data-item-embed-name="${ modifier.name }" data-item-embed-img="${ modifier.img }" data-desc="${ (await TextEditor.enrichHTML(modifier.description)).replaceAll('"', "'") }" data-item-ranks="${ modifier.totalRanks }" data-tooltip="Loading...">
+          <div class='item-pill-hover hover-tooltip' data-item-type="itemmodifier" data-item-embed-name="${ modifier.name }" data-item-embed-img="${ modifier.img }" data-desc="${ (await foundry.applications.ux.TextEditor.implementation.enrichHTML(modifier.description)).replaceAll('"', "'") }" data-item-ranks="${ modifier.totalRanks }" data-tooltip="Loading...">
             ${modifier.name} ${modifier.totalRanks === null || modifier.totalRanks === 0 ? "" : modifier.totalRanks}
           </div>
           `);

@@ -123,7 +123,7 @@ export class ActorFFG extends Actor {
   /**
    * Augment the basic actor data with additional dynamic data.
    */
-  prepareDerivedData() {
+  prepareDerivedData() { // v13: keep using prepareDerivedData(); this is called by the v13 data prep pipeline
     CONFIG.logger.debug(`Preparing Actor Data ${this.type}`);
     const actor = this;
     const data = actor.system;

@@ -134,7 +134,7 @@ export async function updateRoles(vehicle_actor, crew_member_id, new_crew_roles)
       'actor_id': crew_member.id,
       'actor_name': crew_member.name,
       'role': newRole,
-      'link':  await TextEditor.enrichHTML(crew_member?.link) || null,
+      'link':  await foundry.applications.ux.TextEditor.implementation.enrichHTML(crew_member?.link) || null,
     });
   }
 
@@ -305,5 +305,5 @@ export async function selectRoles(vehicle, crew_member_id) {
         }
       }
     },
-  ).render(true);
+  ).render(); // v13: remove deprecated render(true) force parameter
 }
