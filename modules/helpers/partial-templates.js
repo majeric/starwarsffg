@@ -3,6 +3,8 @@ export default class TemplateHelpers {
     const templatePaths = [
       "systems/starwarsffg/templates/parts/shared/ffg-modifiers.html",
       "systems/starwarsffg/templates/parts/shared/ffg-sources.html",
+      "systems/starwarsffg/templates/parts/shared/ffg-tags.html",
+      "systems/starwarsffg/templates/parts/shared/ffg-effects.html",
       "systems/starwarsffg/templates/parts/actor/ffg-skills.html",
       "systems/starwarsffg/templates/parts/actor/ffg-weapon-armor-gear.html",
       "systems/starwarsffg/templates/parts/actor/ffg-vehicle-weapon-attachments.html",
@@ -25,11 +27,16 @@ export default class TemplateHelpers {
       "systems/starwarsffg/templates/chat/roll-vehicle-card.html",
       "systems/starwarsffg/templates/parts/shared/ffg-tabs.html",
       "systems/starwarsffg/templates/parts/actor/ffg-healingitem.html",
-      "systems/starwarsffg/templates/dialogs/combat-tracker.html",
+      "systems/starwarsffg/templates/combat/ffg-combat-tracker-header.html",
+      "systems/starwarsffg/templates/combat/ffg-combat-tracker-body.html",
+      "systems/starwarsffg/templates/combat/ffg-combat-tracker-footer.html",
       "systems/starwarsffg/templates/chat/parts/item/ffg-header.html",
       "systems/starwarsffg/templates/chat/parts/item/ffg-footer.html",
+      "systems/starwarsffg/templates/wizards/char_creator/actor_preview.html",
+      "systems/starwarsffg/templates/wizards/char_creator/preview/skills.html",
+      "systems/starwarsffg/templates/wizards/char_creator/preview/specialization.html",
+      "systems/starwarsffg/templates/wizards/char_creator/preview/forcepower.html",
     ];
-
-    return loadTemplates(templatePaths);
+    return foundry.applications.handlebars.loadTemplates(templatePaths);
   }
 }

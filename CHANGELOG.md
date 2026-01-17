@@ -1,6 +1,39 @@
-`1.911`
+`2.0.0`
+* Enhancements:
+  * Suppressing AE popups from items equipping
+  * Weapons now have an ammo option, fantastic for Grenades and Launchers! ([#1984](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1984))
+  * Specializations can now be set as universal via their sheets ([#2028](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2028))
+  * Item sources can now be added and removed ([#2028](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2028))
+  * Item tags can now be viewed, added, and removed ([#2028](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2028))
+    * These tags can be used by macros and will be used by the Enhancements module
+    * Additionally, they're used by the NPC generator
+  * Expanding talents on actor sheets or sending to chat now displays the long description instead of the short ([#2029](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2029))
+  * Added "Active Effects" tab to character sheet ([#2060](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2060))
+* Notes:
+  * The OggDude _Character_ Importer has been retired ([#1988](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1988))
+    * The _Data_ importer is still supported and is still recommended to import things like species, specializations, and items
 * Fixes:
+  * Fix armor adjusted values was not considering all modifiers for soak, defence and encumbrance ([#1991](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1991)
   * Fix species talents/abilities being added/removed by each player online leading to duplicates if GM is online. ([#1832](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1832))
+  * Fix for defence not applied during combat checks as setback dice ([#2009](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2009)()
+  * Fix for defence mods to distinguish between melee and ranged ([#1985](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1985))
+  * Fix uncontrolled active effect messing with actor stats while in Edit Mode - disable any change instead of the base stats ([#1976](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1976))
+  * Fix for handling wasn't affecting piloting pool ([#1983](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1983))
+  * Fix defence and soak is not applying from armour if created within actor sheet ([#2011](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2011))
+  * Fix characteristics not applying damage to item
+  * Bump dice simulation library version to bring in a fix where two dice faces were wrong
+  * Mods and Modifiers can now target custom skills on actors ([#1973](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1973))
+  * Imported species now correctly set Encumbrance without having to open/close them ([#1982](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1982))
+  * Fix for inability to add a modifier to a talent after creating it, closing the sheet, and re-opening it ([#1972](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1972))
+  * Fix vehicle sheets not opening if skill is missing from assigned crew ([#1978](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1978))
+  * Max characteristic setting is now properly enforced when manually editing sheets ([#1994](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1994))
+  * Purchasing a talent in a specialization now properly activates any modifiers for tha talent
+  * Manually adjusting XP can be submitted with the enter key ([#2036](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2036))
+  * Fix for AEs on items dragged onto actors being active despite the item not being equipped ([#2037](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2037))
+  * Fix for editing specialization top description not showing current text ([#2041](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2041))
+  * the OggDude Dataset importer now uses custom default images if images are not provided ([#2044](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2044))
+  * Removed the `Stat All` modifier option, which was a union of `Stat`, `Weapon Stat`, `Vehicle Stat`, and `Amor Stat` ([#1986](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/1986))
+  * Fix universal specializations costing more XP when purchased via drag-and-drop ([2057](https://github.com/StarWarsFoundryVTT/StarWarsFFG/issues/2057))
 
 `1.910`
 * Fixes:

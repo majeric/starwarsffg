@@ -7,6 +7,15 @@ import ModifierHelpers from "../helpers/modifiers.js";
  */
 export class ActorFFG extends Actor {
 
+  // returns true if EditMode is not enabled, false otherwise. sends warning notification if EditMode is enabled and sendWarn is true
+  verifyEditModeIsNotEnabled(sendWarn = true){
+    const result = !this.getFlag("starwarsffg", "config.enableEditMode");
+    if(sendWarn && !result) {
+      ui.notifications.warn("Can't do this while EditMode is enabled");
+    }
+      return result;
+  }
+
   static async create(data, options) {
     const createData = data;
 
@@ -20,18 +29,33 @@ export class ActorFFG extends Actor {
         createData.prototypeToken = {
           actorLink: false,
           disposition: CONST.TOKEN_DISPOSITIONS.HOSTILE,
+          bar1: {
+            attribute: "stats.wounds",
+          },
         };
         break;
       case "character":
         createData.prototypeToken = {
           actorLink: true,
           disposition: CONST.TOKEN_DISPOSITIONS.FRIENDLY,
+          bar1: {
+            attribute: "stats.wounds",
+          },
+          bar2: {
+            attribute: "stats.strain",
+          },
         };
         break;
       case "rival":
         createData.prototypeToken = {
           actorLink: false,
           disposition: CONST.TOKEN_DISPOSITIONS.HOSTILE,
+          bar1: {
+            attribute: "stats.wounds",
+          },
+          bar2: {
+            attribute: "stats.strain",
+          },
           prependAdjective: game.settings.get("starwarsffg", "RivalTokenPrepend"),
         };
         break;
@@ -39,6 +63,23 @@ export class ActorFFG extends Actor {
         createData.prototypeToken = {
           actorLink: true,
           disposition: CONST.TOKEN_DISPOSITIONS.HOSTILE,
+          bar1: {
+            attribute: "stats.wounds",
+          },
+          bar2: {
+            attribute: "stats.strain",
+          },
+        };
+        break;
+      case "vehicle":
+        createData.prototypeToken = {
+          actorLink: true,
+          bar1: {
+            attribute: "stats.hullTrauma",
+          },
+          bar2: {
+            attribute: "stats.systemStrain",
+          },
         };
         break;
     }
@@ -91,7 +132,7 @@ export class ActorFFG extends Actor {
         // get the wounds without brawn modifying it, then add the new brawn value in
         const originalWounds = this.system.stats?.wounds.max;
         const originalWoundsWithoutBrawn = originalWounds - originalBrawn;
-        const updatedWounds = originalWoundsWithoutBrawn + updatedBrawn;
+        const updatedWounds = originalWoundsWithoutBrawn + parseInt(updatedBrawn);
         if (!Object.keys(changes.system).includes("stats")) {
           changes.system.stats = {};
         }
@@ -146,7 +187,6 @@ export class ActorFFG extends Actor {
    * Augment the basic actor data with additional dynamic data.
    */
   prepareDerivedData() {
-    CONFIG.logger.debug(`Preparing Actor Data ${this.type}`);
     const actor = this;
     const data = actor.system;
     const flags = actor.flags;
@@ -220,6 +260,12 @@ export class ActorFFG extends Actor {
         data.skills[skill].label = localizedField;
       }
     }
+    
+    // Create list of active effects changing this actor
+    data.effects = actorData.effects.contents;
+    actorData.items.forEach(item => {
+      data.effects.push(...item.effects.contents);
+    });
 
     if (["character", "nemesis", "rival", "minion"].includes(actorData.type)) {
       if (game.settings.get("starwarsffg", "enableSoakCalc")) {
@@ -453,7 +499,7 @@ export class ActorFFG extends Actor {
           obligation += parseInt(item.magnitude, 10);
         }
       });
-      data.obligation.value = obligation;
+      data.obligations.value = obligation;
     }
 
     if (data?.dutylist && Object.keys(data.dutylist).length > 0) {

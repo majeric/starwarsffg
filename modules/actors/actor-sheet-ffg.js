@@ -10,6 +10,7 @@ import ModifierHelpers from "../helpers/modifiers.js";
 import ActorHelpers, {xpLogEarn, xpLogSpend} from "../helpers/actor-helpers.js";
 import ItemHelpers from "../helpers/item-helpers.js";
 import EmbeddedItemHelpers from "../helpers/embeddeditem-helpers.js";
+import EffectHelpers from "../helpers/effects.js";
 import {
   change_role,
   deregister_crew,
@@ -22,7 +23,7 @@ import {DicePoolFFG} from "../dice/pool.js";
 import {get_dice_pool} from "../helpers/dice-helpers.js";
 import {itemPillHover} from "../swffg-main.js";
 
-export class ActorSheetFFG extends ActorSheet {
+export class ActorSheetFFG extends foundry.appv1.sheets.ActorSheet {
   constructor(...args) {
     super(...args);
     /**
@@ -57,6 +58,8 @@ export class ActorSheetFFG extends ActorSheet {
 
   /** @override */
   async _onDropItem(event, data) {
+    if(!this.actor.verifyEditModeIsNotEnabled()) return false;
+
     if (data?.type === "Item") {
       // this is the stock implementation, except that we do not pass "true" to item.toObject
       if ( !this.actor.isOwner ) return false;
@@ -102,6 +105,8 @@ export class ActorSheetFFG extends ActorSheet {
                 icon: '<i class="fas fa-hourglass"></i>',
                 label: game.i18n.localize("SWFFG.DragDrop.PurchaseItem"),
                 callback: async (that) => {
+                  if(!this.actor.verifyEditModeIsNotEnabled()) return false;
+
                   if (cost > 0) {
                     const AEState = await ActorHelpers.beginEditMode(this.actor, true);
                     const updatedAvailableXP = this.actor.system.experience.available;
@@ -135,6 +140,15 @@ export class ActorSheetFFG extends ActorSheet {
         }
       }
 
+      if (Object.keys(itemData).includes("effects") && ["gear", "armour", "weapon"].includes(itemData.type)) {
+        // make sure all non-inherent AEs are disabled on the item before the drag-and-drop
+        for (const effect of itemData.effects) {
+          if (effect.name !== "(inherent)") {
+            effect.disabled = true;
+          }
+        }
+      }
+
       // Create the owned item
       return this._onDropItemCreate(itemData);
     } else {
@@ -158,7 +172,7 @@ export class ActorSheetFFG extends ActorSheet {
         }
         const specializationCount = (this.actor.items.filter(i => i.type === "specialization") || []).length;
         cost = (specializationCount + 1) * 10;
-        if (!inCareer) {
+        if (!inCareer && !itemData.system.universal) {
           cost += 10;
         }
         return cost;
@@ -236,47 +250,64 @@ export class ActorSheetFFG extends ActorSheet {
         if (data.data.stats.credits.value > 999) {
           data.data.stats.credits.value = data.data.stats.credits.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
-        data.data.enrichedBio = await TextEditor.enrichHTML(this.actor.system.biography, {secrets: !data.limited});
-        data.data.general.enrichedNotes = await TextEditor.enrichHTML(this.actor.system.general?.notes) || "";
-        data.data.general.enrichedFeatures = await TextEditor.enrichHTML(this.actor.system.general?.features) || "";
+        data.data.enrichedBio = await foundry.applications.ux.TextEditor.enrichHTML(this.actor.system.biography, {secrets: !data.limited});
+        data.data.general.enrichedNotes = await foundry.applications.ux.TextEditor.enrichHTML(this.actor.system.general?.notes) || "";
+        data.data.general.enrichedFeatures = await foundry.applications.ux.TextEditor.enrichHTML(this.actor.system.general?.features) || "";
         data.maxAttribute = game.settings.get("starwarsffg", "maxAttribute");
+        data.obligationItems = {
+          obligations: data.items.filter(i => i.system?.type === "obligation"),
+          duties: data.items.filter(i => i.system?.type === "duty"),
+          moralities: data.items.filter(i => i.system?.type === "morality"),
+        };
         break;
       case "vehicle":
-        data.data.enrichedBio = await TextEditor.enrichHTML(this.actor.system.biography);
+        data.data.enrichedBio = await foundry.applications.ux.TextEditor.enrichHTML(this.actor.system.biography);
         // add the crew to the items of the vehicle
         data.crew = [];
         // look up the flag data
         const crew = this.actor.getFlag('starwarsffg', 'crew');
         if (crew) {
           for (let i = 0; i < crew.length; i++) {
-            // iterate over the crew members in the flag data
-            const actor = game.actors.get(crew[i].actor_id);
-            // pull the image from the actor to display it
-            const img = actor?.img || 'icons/svg/mystery-man.svg';
+            try {
+              // iterate over the crew members in the flag data
+              const actor = game.actors.get(crew[i].actor_id);
+              // pull the image from the actor to display it
+              const img = actor?.img || 'icons/svg/mystery-man.svg';
 
-            // add them to the items, so we can render them on the sheet
-            let roll;
-            if (actor) {
-              if (crew[i].role !== "Pilot") {
-                roll = build_crew_roll(this.actor.id, crew[i].actor_id, crew[i].role);
+              // add them to the items, so we can render them on the sheet
+              let roll;
+              if (actor) {
+                if (crew[i].role !== "Pilot") {
+                  roll = build_crew_roll(this.actor.id, crew[i].actor_id, crew[i].role);
+                } else {
+                  roll = (await buildPilotRoll(this.actor.id, crew[i].actor_id, 0)).renderPreview().innerHTML;
+                }
               } else {
-                roll = (await buildPilotRoll(this.actor.id, crew[i].actor_id, 0)).renderPreview().innerHTML;
+                deregister_crew(this.actor, crew[i].actor_id, crew[i].role);
               }
-            } else {
-              deregister_crew(this.actor, crew[i].actor_id, crew[i].role);
+              if (!roll) {
+                roll = 'N/A';
+              }
+              data.crew.push({
+                'type': 'shipcrew',
+                'id': crew[i].actor_id,
+                'name': crew[i].actor_name,
+                'role': crew[i].role,
+                'img': img,
+                'roll': roll,
+                'link': crew[i]?.link,
+              });
+            } catch (e) {
+              data.crew.push({
+                'type': 'shipcrew',
+                'id': crew[i].actor_id,
+                'name': crew[i].actor_name,
+                'role': crew[i].role,
+                'img': '',
+                'roll': '(broken role)',
+                'link': '',
+              });
             }
-            if (!roll) {
-              roll = 'N/A';
-            }
-            data.crew.push({
-              'type': 'shipcrew',
-              'id': crew[i].actor_id,
-              'name': crew[i].actor_name,
-              'role': crew[i].role,
-              'img': img,
-              'roll': roll,
-              'link': crew[i]?.link,
-            })
           }
         }
       default:
@@ -291,9 +322,6 @@ export class ActorSheetFFG extends ActorSheet {
       data.data.skilllist = this._createSkillColumns(data);
     }
 
-    if (this.actor.flags?.config?.enableObligation === false && this.actor.flags?.config?.enableDuty === false && this.actor.flags?.config?.enableMorality === false && this.actor.flags?.config?.enableConflict === false) {
-      data.hideObligationDutyMoralityConflictTab = true;
-    }
     if (this.actor.flags?.starwarsffg?.xpLog) {
       data.xpLog = this.object.getFlag("starwarsffg", "xpLog") || [];
     }
@@ -304,6 +332,9 @@ export class ActorSheetFFG extends ActorSheet {
     data.modTypeSelected = "all"; // TODO: should this be something else?
     data.modifierTypes = CONFIG.FFG.allowableModifierTypes;
     data.modifierChoices = CONFIG.FFG.allowableModifierChoices;
+
+    // Include active effects
+    data.effects = actorData.system.effects.map(EffectHelpers.transformEffects);
 
     return data;
   }
@@ -324,11 +355,13 @@ export class ActorSheetFFG extends ActorSheet {
   /** @override */
   activateListeners(html) {
     super.activateListeners(html);
+    // convert jquery element to HTMLElement for usage with Foundry calls
+    const htmlElement = html.get(0);
 
     // Activate tabs
     let tabs = html.find(".tabs");
     let initial = this._sheetTab;
-    new Tabs(tabs, {
+    new foundry.applications.ux.Tabs(tabs, {
       initial: initial,
       callback: (clicked) => {
         this._sheetTab = clicked.data("tab");
@@ -349,8 +382,8 @@ export class ActorSheetFFG extends ActorSheet {
     html.find(".popout-editor .popout-editor-button").on("click", this._onPopoutEditor.bind(this));
 
     // Setup dice pool image and hide filtered skills
-    html.find(".skill").each((_, elem) => {
-      DiceHelpers.addSkillDicePool(this, elem);
+    html.find(".skill").each(async (_, elem) => {
+      await DiceHelpers.addSkillDicePool(await this.getData({}), elem);
       const filters = this._filters.skills;
     });
 
@@ -444,16 +477,18 @@ export class ActorSheetFFG extends ActorSheet {
           name: game.i18n.localize("SWFFG.Actors.Sheets.Purchase.SkillRank.ContextMenuText"),
           icon: '<i class="fa-regular fa-circle-up"></i>',
           callback: (li) => {
+            if(!this.actor.verifyEditModeIsNotEnabled()) return false;
             this._buySkillRank(li);
           },
         },
       );
     }
 
-    new ContextMenu(
-        html,
+    new foundry.applications.ux.ContextMenu(
+        htmlElement,
         ".skillsGrid .skill",
         contextMenuOptions,
+      {jQuery: false},
     );
 
     html.find(".skill-purchase").click(async (ev) => {
@@ -469,7 +504,7 @@ export class ActorSheetFFG extends ActorSheet {
       await this._handleKillMinion(ev);
     });
 
-    new ContextMenu(html, "div.skillsHeader", [
+    new foundry.applications.ux.ContextMenu(htmlElement, "div.skillsHeader", [
       {
         name: game.i18n.localize("SWFFG.SkillAddContextItem"),
         icon: '<i class="fas fa-plus-circle"></i>',
@@ -477,7 +512,7 @@ export class ActorSheetFFG extends ActorSheet {
           this._onCreateSkill(li);
         },
       },
-    ]);
+    ], {jQuery: false});
 
     html.find(".ffg-purchase").click(async (ev) => {
       await this._buyCore(ev)
@@ -497,8 +532,8 @@ export class ActorSheetFFG extends ActorSheet {
     const sendToChatContextItem = {
       name: game.i18n.localize("SWFFG.SendToChat"),
       icon: '<i class="far fa-comment"></i>',
-      callback: (li) => {
-        let itemId = li.data("itemId");
+      callback: (el) => {
+        let itemId = el.getAttribute("data-item-id");
         this._itemDetailsToChat(itemId);
       },
     };
@@ -506,8 +541,8 @@ export class ActorSheetFFG extends ActorSheet {
     const rollForceToChatContextItem = {
       name: game.i18n.localize("SWFFG.SendForceRollToChat"),
       icon: '<i class="fas fa-dice-d20"></i>',
-      callback: async (li) => {
-        let itemId = li.data("itemId");
+      callback: async (el) => {
+        let itemId = el.getAttribute("data-item-id");
         let item = this.actor.items.get(itemId);
         if (!item) {
           item = game.items.get(itemId);
@@ -528,9 +563,9 @@ export class ActorSheetFFG extends ActorSheet {
       },
     };
 
-    new ContextMenu(html, "li.item:not(.forcepower)", [sendToChatContextItem]);
-    new ContextMenu(html, "li.item.forcepower", [sendToChatContextItem, rollForceToChatContextItem]);
-    new ContextMenu(html, "div.item", [sendToChatContextItem]);
+    new foundry.applications.ux.ContextMenu(htmlElement, "li.item:not(.forcepower)", [sendToChatContextItem], {jQuery: false});
+    new foundry.applications.ux.ContextMenu(htmlElement, "li.item.forcepower", [sendToChatContextItem, rollForceToChatContextItem], {jQuery: false});
+    new foundry.applications.ux.ContextMenu(htmlElement, "div.item", [sendToChatContextItem], {jQuery: false});
 
     if (["nemesis", "rival"].includes(this.actor.type)) {
       this.sheetoptions = new ActorOptions(this, html);
@@ -560,30 +595,6 @@ export class ActorSheetFFG extends ActorSheet {
         hint: game.i18n.localize("SWFFG.MedicalItemNameHint"),
         type: "String",
         default: game.settings.get("starwarsffg", "medItemName"),
-      });
-      this.sheetoptions.register("enableObligation", {
-        name: game.i18n.localize("SWFFG.EnableObligation"),
-        hint: game.i18n.localize("SWFFG.EnableObligationHint"),
-        type: "Boolean",
-        default: true,
-      });
-      this.sheetoptions.register("enableDuty", {
-        name: game.i18n.localize("SWFFG.EnableDuty"),
-        hint: game.i18n.localize("SWFFG.EnableDutyHint"),
-        type: "Boolean",
-        default: true,
-      });
-      this.sheetoptions.register("enableMorality", {
-        name: game.i18n.localize("SWFFG.EnableMorality"),
-        hint: game.i18n.localize("SWFFG.EnableMoralityHint"),
-        type: "Boolean",
-        default: true,
-      });
-      this.sheetoptions.register("enableConflict", {
-        name: game.i18n.localize("SWFFG.EnableConflict"),
-        hint: game.i18n.localize("SWFFG.EnableConflictHint"),
-        type: "Boolean",
-        default: true,
       });
       this.sheetoptions.register("enableForcePool", {
         name: game.i18n.localize("SWFFG.EnableForcePool"),
@@ -741,6 +752,10 @@ export class ActorSheetFFG extends ActorSheet {
 
     // Toggle item equipped
     html.find(".items .item a.toggle-equipped").click((ev) => {
+      if(!this.actor.verifyEditModeIsNotEnabled()) {
+        return;
+      }
+
       const li = $(ev.currentTarget);
       const item = this.actor.items.get(li.data("itemId"));
       if (item) {
@@ -846,6 +861,9 @@ export class ActorSheetFFG extends ActorSheet {
 
     // Add Inventory Item
     html.find(".item-add").click((ev) => {
+      if(!this.actor.verifyEditModeIsNotEnabled()) {
+        return;
+      }
 
       let itemType = "";
       switch (ev.currentTarget.classList[1]) {
@@ -877,6 +895,10 @@ export class ActorSheetFFG extends ActorSheet {
 
     // Delete Inventory Item
     html.find(".item-delete").click((ev) => {
+      if(!this.actor.verifyEditModeIsNotEnabled()) {
+        return;
+      }
+
       const li = $(ev.currentTarget).parents(".item");
       this.actor.items.get(li.data("itemId"))?.delete();
       li.slideUp(200, () => this.render(false));
@@ -884,6 +906,10 @@ export class ActorSheetFFG extends ActorSheet {
 
     // Edit Inventory Item
     html.find(".item-edit").click(async (ev) => {
+      if(!this.actor.verifyEditModeIsNotEnabled()) {
+        return;
+      }
+
       const li = $(ev.currentTarget).parents(".item");
       let itemId = li.data("itemId");
       let item = this.actor.items.get(itemId);
@@ -933,6 +959,9 @@ export class ActorSheetFFG extends ActorSheet {
 
     // Edit Crew
     html.find(".crew-edit").click(async (ev) => {
+      if(!this.actor.verifyEditModeIsNotEnabled()) {
+        return;
+      }
       const crew_member_id = $(ev.currentTarget).parents(".item").data("actor-id");
       const crew_member = game.actors.get(crew_member_id);
       const registeredRoles = game.settings.get('starwarsffg', 'arrayCrewRoles');
@@ -942,7 +971,7 @@ export class ActorSheetFFG extends ActorSheet {
       const crewMemberRoles = vehicleRoles.filter(role => role.actor_id === crew_member_id);
       const rolesInUse = crewMemberRoles.map(role => role.role);
 
-      const content = await renderTemplate(
+      const content = await foundry.applications.handlebars.renderTemplate(
         "systems/starwarsffg/templates/dialogs/ffg-crew-change.html",
         {
           actor: crew_member,
@@ -959,6 +988,9 @@ export class ActorSheetFFG extends ActorSheet {
             confirm: {
               label: game.i18n.localize("SWFFG.Crew.Role.Update"),
               callback: async (html) => {
+                if(!this.actor.verifyEditModeIsNotEnabled()) {
+                  return;
+                }
                 const newRoles = html.find('[name="select-many-things"]').val();
                 await updateRoles(actor, crew_member_id, newRoles);
               }
@@ -969,6 +1001,9 @@ export class ActorSheetFFG extends ActorSheet {
     });
 
     html.find(".item-info").click((ev) => {
+      if(!this.actor.verifyEditModeIsNotEnabled()) {
+        return;
+      }
       ev.stopPropagation();
       const li = $(ev.currentTarget).parents(".item");
       const itemId = li.data("itemId");
@@ -990,6 +1025,9 @@ export class ActorSheetFFG extends ActorSheet {
               icon: '<i class="fas fa-check"></i>',
               label: game.i18n.localize("SWFFG.ButtonAccept"),
               callback: (html) => {
+                if(!this.actor.verifyEditModeIsNotEnabled()) {
+                  return;
+                }
                 const talentsToRemove = $(html).find("input[type='checkbox']:checked");
                 CONFIG.logger.debug(`Removing ${talentsToRemove.length} talents`);
 
@@ -1233,7 +1271,7 @@ export class ActorSheetFFG extends ActorSheet {
     html.find(".attributes").on("click", ".attribute-control", ModifierHelpers.onClickAttributeControl.bind(this));
 
     // transfer items between owned actor objects
-    const dragDrop = new DragDrop({
+    const dragDrop = new foundry.applications.ux.DragDrop({
       dragSelector: ".items-list .item",
       dropSelector: ".sheet-body",
       permissions: { dragstart: this._canDragStart.bind(this), drop: this._canDragDrop.bind(this) },
@@ -1242,7 +1280,7 @@ export class ActorSheetFFG extends ActorSheet {
 
     dragDrop.bind(html[0]);
 
-    const dragDrop1 = new DragDrop({
+    const dragDrop1 = new foundry.applications.ux.DragDrop({
       dragSelector: ".skill",
       dropSelector: ".macro",
       permissions: { dragstart: this._canDragStart.bind(this), drop: this._canDragDrop.bind(this) },
@@ -1272,23 +1310,68 @@ export class ActorSheetFFG extends ActorSheet {
       }
     });
 
-    html.find(".add-obligation").on("click", async (event) => {
+    html.find(".edit-item").on("click", async (event) => {
       event.preventDefault();
       const a = event.currentTarget;
-      const form = this.form;
-
-      const nk = randomID();
-      let newKey = document.createElement("div");
-      newKey.innerHTML = `<input type="text" name="data.obligationlist.${nk}.type" value="" style="display:none;"/><input class="attribute-value" type="text" name="data.obligationlist.${nk}.magnitude" value="0" data-dtype="Number" placeholder="0"/>`;
-      form.appendChild(newKey);
-      await this._onSubmit(event);
+      const itemId = a.dataset["id"];
+      let item = this.actor.items.get(itemId);
+      if (!item) {
+        return ui.notifications.warn("Unable to locate item on actor!");
+      }
+      if (item?.sheet) {
+        item.sheet.render(true);
+      }
     });
 
-    html.find(".remove-obligation").on("click", async (event) => {
+    html.find(".add-obligation").on("click", async (event) => {
+      event.preventDefault();
+      const itemData = {
+        name: "new Obligation",
+        type: "obligation",
+        system: {
+          type: "obligation",
+          description: "Newly-created obligation",
+          magnitude: 0,
+        },
+      };
+      await this.actor.createEmbeddedDocuments("Item", [itemData]);
+    });
+
+    html.find(".add-motivation").on("click", async (event) => {
+      event.preventDefault();
+      const itemData = {
+        name: "new Motivation",
+        type: "motivation",
+        system: {
+          type: "Ambition",
+          description: "Newly-created motivation",
+        },
+      };
+      await this.actor.createEmbeddedDocuments("Item", [itemData]);
+    });
+
+    html.find(".add-background").on("click", async (event) => {
+      event.preventDefault();
+      const itemData = {
+        name: "new Background",
+        type: "background",
+        system: {
+          type: "hook",
+          description: "Newly-created background",
+        },
+      };
+      await this.actor.createEmbeddedDocuments("Item", [itemData]);
+    });
+
+    html.find(".remove-item").on("click", async (event) => {
       event.preventDefault();
       const a = event.currentTarget;
       const id = a.dataset["id"];
-      this.object.update({ "system.obligationlist": { ["-=" + id]: null } });
+      const item = this.object.items.find(i => i.id === id);
+      if (!item) {
+        return ui.notifications.warn("Unable to remove item: cannot find it!");
+      }
+      await this.object.deleteEmbeddedDocuments("Item", [id]);
     });
 
     html.find(".add-duty").on("click", async (event) => {
@@ -1321,6 +1404,18 @@ export class ActorSheetFFG extends ActorSheet {
       itemsToDelete.forEach((i) => {
           this.actor.items.get(i.id).delete();
       });
+    });
+
+    html.find(".effect-row").on("click", async (event) => {
+      event.preventDefault();
+      let effectRow = html.find(`#${event.currentTarget.id}`);
+      effectRow.toggleClass("expanded");
+      if (effectRow.hasClass("expanded")) {
+        html.find(`#${event.currentTarget.id} .expand-icon`).text("-");
+      } else {
+        html.find(`#${event.currentTarget.id} .expand-icon`).text("+");
+      }
+      html.find(`.change-row.${event.currentTarget.id}`).toggleClass("hidden");
     });
   }
 
@@ -1365,8 +1460,8 @@ export class ActorSheetFFG extends ActorSheet {
    */
   async _itemDisplayDetails(item, event) {
     event.preventDefault();
-    let li = $(event.currentTarget),
-      itemDetails = await item.getItemDetails();
+    let li = $(event.currentTarget);
+    const itemDetails = await item.getItemDetails();
 
     // Toggle summary
     if (li.hasClass("expanded")) {
@@ -1400,7 +1495,7 @@ export class ActorSheetFFG extends ActorSheet {
       let details = li.children(".item-details");
       details.slideUp(200, () => details.remove());
     } else {
-      let div = $(`<div class="item-details">${await TextEditor.enrichHTML(desc)}</div>`);
+      let div = $(`<div class="item-details">${await foundry.applications.ux.TextEditor.enrichHTML(desc)}</div>`);
       li.append(div.hide());
       div.slideDown(200);
     }
@@ -1452,8 +1547,12 @@ export class ActorSheetFFG extends ActorSheet {
       };
     }
 
+    if (item.type === "talent") {
+      itemDetails.prettyDesc = item.system.longDesc;
+    }
+
     const template = "systems/starwarsffg/templates/chat/item-card.html";
-    const html = await renderTemplate(template, { itemDetails, item });
+    const html = await foundry.applications.handlebars.renderTemplate(template, { itemDetails, item });
 
     const messageData = {
       user: game.user.id,
@@ -1483,7 +1582,7 @@ export class ActorSheetFFG extends ActorSheet {
 
     const itemDetails = { "desc": desc, "name": name };
     const template = "systems/starwarsffg/templates/chat/force-power-card.html";
-    const html = await renderTemplate(template, { itemDetails, item });
+    const html = await foundry.applications.handlebars.renderTemplate(template, { itemDetails, item });
 
     const messageData = {
       user: game.user.id,
@@ -1629,6 +1728,8 @@ export class ActorSheetFFG extends ActorSheet {
             icon: '<i class="fa-regular fa-circle-up"></i>',
             label: game.i18n.localize("SWFFG.Actors.Sheets.Purchase.ConfirmPurchase"),
             callback: async (that) => {
+              if(!this.actor.verifyEditModeIsNotEnabled()) return;
+
               const id = await this._spendXp(`system.skills.${skill}.rank`, 1, cost);
               await xpLogSpend(game.actors.get(this.object.id), `skill rank ${skill} ${curRank} --> ${curRank + 1}`, cost, availableXP - cost, totalXP, id);
             },
@@ -1703,6 +1804,8 @@ export class ActorSheetFFG extends ActorSheet {
               icon: '<i class="fa-solid fa-check"></i>',
               label: game.i18n.localize("SWFFG.Actors.Sheets.Refund.Confirm"),
               callback: async (that) => {
+                if(!this.actor.verifyEditModeIsNotEnabled()) return;
+
                 await this.object.deleteEmbeddedDocuments("ActiveEffect", [purchasedEffect.id]);
                 CONFIG.logger.debug("deleted AE, updating log");
                 let logEntries = this.object.getFlag("starwarsffg", "xpLog") || [];
@@ -1773,7 +1876,7 @@ export class ActorSheetFFG extends ActorSheet {
       useSkillForInitiative = true;
     }
 
-    setProperty(updateData, `system.skills.${skill}.useForInitiative`, useSkillForInitiative);
+    foundry.utils.setProperty(updateData, `system.skills.${skill}.useForInitiative`, useSkillForInitiative);
     this.object.update(updateData);
   }
 
@@ -2067,6 +2170,8 @@ export class ActorSheetFFG extends ActorSheet {
   }
 
   async _buyCore(event) {
+    if(!this.actor.verifyEditModeIsNotEnabled()) return;
+
     const action = $(event.target).data("buy-action");
     const template = "systems/starwarsffg/templates/dialogs/ffg-confirm-purchase.html";
     let content;
@@ -2120,7 +2225,7 @@ export class ActorSheetFFG extends ActorSheet {
       groups.push("Universal");
       groups.push("In Career");
       groups.push("Out of Career");
-      content = await renderTemplate(template, { inCareer, outCareer, universal, baseCost, increasedCost, itemType: itemType, itemCategory: "specialization", groups: groups });
+      content = await foundry.applications.handlebars.renderTemplate(template, { inCareer, outCareer, universal, baseCost, increasedCost, itemType: itemType, itemCategory: "specialization", groups: groups });
     } else if (action === "signatureability") {
       const sources = game.settings.get("starwarsffg", "signatureAbilityCompendiums").split(",");
       const rawSelectableItems =  this.object.items.find(i => i.type === "career").system.signatureabilities;
@@ -2206,7 +2311,7 @@ export class ActorSheetFFG extends ActorSheet {
 
       selectableItems = sortDataBy(selectableItems, "name");
       itemType = game.i18n.localize("TYPES.Item.signatureability");
-      content = await renderTemplate(template, { selectableItems, itemType: itemType, itemCategory: "signatureability" });
+      content = await foundry.applications.handlebars.renderTemplate(template, { selectableItems, itemType: itemType, itemCategory: "signatureability" });
     } else if (action === "forcepower") {
       const sources = game.settings.get("starwarsffg", "forcePowerCompendiums").split(",");
       let selectableItems = [];
@@ -2241,7 +2346,7 @@ export class ActorSheetFFG extends ActorSheet {
       selectableItems = sortDataBy(selectableItems, "name");
       itemType = game.i18n.localize("TYPES.Item.forcepower");
       groups.sort();
-      content = await renderTemplate(template, { selectableItems, itemType: itemType, itemCategory: "forcepower", groups: groups });
+      content = await foundry.applications.handlebars.renderTemplate(template, { selectableItems, itemType: itemType, itemCategory: "forcepower", groups: groups });
     } else if (action === "talent") {
       const purchasedItems = this.object.talentList;
       const sources = game.settings.get("starwarsffg", "talentCompendiums").split(",");
@@ -2284,7 +2389,7 @@ export class ActorSheetFFG extends ActorSheet {
         selectableItems.push({pack: pack.metadata.label, items: packItems});
       }
       itemType = game.i18n.localize("TYPES.Item.talent");
-      content = await renderTemplate(template, { selectableItems, itemType: itemType, itemCategory: "talent" });
+      content = await foundry.applications.handlebars.renderTemplate(template, { selectableItems, itemType: itemType, itemCategory: "talent" });
     } else if (action === "characteristic") {
       const characteristic = $(event.target).data("buy-characteristic");
       await this._buyCharacteristicRank(characteristic);
@@ -2306,6 +2411,8 @@ export class ActorSheetFFG extends ActorSheet {
             icon: '<i class="fa-regular fa-circle-up"></i>',
             label: game.i18n.localize("SWFFG.Actors.Sheets.Purchase.ConfirmPurchase"),
             callback: async (that) => {
+              if(!this.actor.verifyEditModeIsNotEnabled()) return;
+
               const cost = $("#ffgPurchase option:selected", that).data("cost");
               const selected_id = $("#ffgPurchase option:selected", that).data("id");
               const selected_source = $("#ffgPurchase option:selected", that).data("source");
@@ -2378,6 +2485,8 @@ export class ActorSheetFFG extends ActorSheet {
             icon: '<i class="fa-regular fa-circle-up"></i>',
             label: game.i18n.localize("SWFFG.Actors.Sheets.Purchase.ConfirmPurchase"),
             callback: async (that) => {
+              if(!this.actor.verifyEditModeIsNotEnabled()) return;
+
               const statusId = await this._spendXp(`system.characteristics.${characteristic}.value`, 1, cost);
               await xpLogSpend(game.actors.get(this.object.id), `characteristic ${characteristic} level ${characteristicValue} --> ${characteristicValue + 1}`, cost, availableXP - cost, totalXP, statusId);
               await this.render(true);
@@ -2451,13 +2560,14 @@ export class ActorSheetFFG extends ActorSheet {
               "Self"
             );
             await ActorHelpers.endEditMode(this.actor, AEState, true);
-         }
+          },
+        },
+        two: {
+          icon: '<i class="fas fa-times"></i>',
+          label: "Cancel",
+        },
       },
-      two: {
-       icon: '<i class="fas fa-times"></i>',
-       label: "Cancel",
-      }
-     },
+      default: "one",
     });
     d.render(true);
   }
@@ -2477,6 +2587,15 @@ export class ActorSheetFFG extends ActorSheet {
   render(force, options) {
     this.debounceRender(force, options);
   }
+
+  /** @override **/
+  async _onSubmit(event) {
+    const formValid = event?.target?.form?.reportValidity();
+    if (formValid === false) {
+      return;
+    }
+    return await super._onSubmit(event);
+  }
 }
 
 /**
@@ -2485,7 +2604,7 @@ export class ActorSheetFFG extends ActorSheet {
  * @param byKey
  * @returns {*}
  */
-function sortDataBy(data, byKey) {
+export function sortDataBy(data, byKey) {
  return data.sort((a, b) => {
     if (a[byKey] < b[byKey]) {
       return -1;
@@ -2503,7 +2622,7 @@ function sortDataBy(data, byKey) {
  * @param element
  * @returns {*}
  */
-function addIfNotExist(array, element) {
+export function addIfNotExist(array, element) {
   let index = array.indexOf(element);
   // Check if the object with the specified property value exists in the array
   if (index === -1) {

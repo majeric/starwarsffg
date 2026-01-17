@@ -37,6 +37,7 @@ export class ItemFFG extends ItemBaseFFG {
       // only run onCreate for the user actually performing the update
       return;
     }
+    let force = false;
     // Ensure we're dealing with an embedded item
     if (this.isEmbedded && this.actor) {
       // If this is a weapon or armour item we must ensure its modifier-adjusted values are saved to the database
@@ -44,6 +45,7 @@ export class ItemFFG extends ItemBaseFFG {
         let that = this.toObject(true);
         delete that._id;
         await this.update(that);
+        force = true;
       }
     }
 
@@ -64,7 +66,7 @@ export class ItemFFG extends ItemBaseFFG {
 
     await super._onCreate(data, options, user);
 
-    await this._onCreateAEs(options);
+    await this._onCreateAEs(options, force);
   }
 
   async _onCreateAEs(options, force=false) {
@@ -214,18 +216,20 @@ export class ItemFFG extends ItemBaseFFG {
     // iterate over the changed data to look for any changes to attributes
     if (changed?.system?.attributes) {
       for (const attrKey of Object.keys(changed.system.attributes)) {
-        const existingEffect = existingEffects.find(i => i.name === attrKey)
-        const explodedMods = ModifierHelpers.explodeMod(
-          this.system.attributes[attrKey].modtype,
-          this.system.attributes[attrKey].mod
-        );
+        const existingEffect = existingEffects.find(i => i.name === attrKey);
+        const attr = this.system.attributes[attrKey];
+        // Defensive: only explode mods if modtype and mod are defined
+        let explodedMods = [];
+        if (attr && typeof attr.modtype !== 'undefined' && typeof attr.mod !== 'undefined') {
+          explodedMods = ModifierHelpers.explodeMod(attr.modtype, attr.mod);
+        }
 
         const changes = [];
         for (const curMod of explodedMods) {
           changes.push({
             key: ModifierHelpers.getModKeyPath(curMod['modType'], curMod['mod']),
             mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            value: this.system.attributes[attrKey].value,
+            value: attr?.value,
           });
         }
 
@@ -259,8 +263,6 @@ export class ItemFFG extends ItemBaseFFG {
    */
   async prepareData() {
     await super.prepareData();
-
-    CONFIG.logger.debug(`Preparing Item Data ${this.type} ${this.name}`);
 
     // Get the Item's data
     const item = this;
@@ -296,7 +298,7 @@ export class ItemFFG extends ItemBaseFFG {
       }
     }
 
-    data.renderedDesc = PopoutEditor.renderDiceImages(data.description, actor);
+    data.renderedDesc = await PopoutEditor.renderDiceImages(data.description, actor);
 
     // perform localisation of dynamic values
     switch (this.type) {
@@ -311,7 +313,7 @@ export class ItemFFG extends ItemBaseFFG {
         data.hardpoints.value = parseInt(data.hardpoints.value, 10);
 
         data.range.adjusted = data.range.value;
-        data.damage.adjusted = parseInt(data.damage.value, 10);
+        data.damage.adjusted = 0;
         data.crit.adjusted = parseInt(data.crit.value, 10);
         data.encumbrance.adjusted = parseInt(data.encumbrance.value, 10);
         data.price.adjusted = parseInt(data.price.value, 10);
@@ -393,10 +395,9 @@ export class ItemFFG extends ItemBaseFFG {
             }
           }
           if (this.actor.type !== "vehicle") {
-            if (ModifierHelpers.applyBrawnToDamage(data)) {
-              const olddamage = data.damage.value;
-              data.damage.value = parseInt(actor.system.characteristics[data.characteristic.value].value, 10) + damageAdd;
-              data.damage.adjusted += parseInt(data.damage.value, 10) - olddamage;
+            if (ModifierHelpers.shouldApplyCharacteristicToDamage(data)) {
+              const extraDamage = parseInt(actor.system.characteristics[data.characteristic.value].value, 10) + damageAdd;
+              data.damage.adjusted += extraDamage + data.damage.value;
             } else {
               data.damage.value = parseInt(data.damage.value, 10);
               data.damage.adjusted += damageAdd;
@@ -476,8 +477,9 @@ export class ItemFFG extends ItemBaseFFG {
         if (this.isEmbedded && this.actor && this.actor.system) {
           let soakAdd = 0, defenceAdd = 0, encumbranceAdd = 0;
           for (let attr in data.attributes) {
-            if (data.attributes[attr].modtype === "Armor Stat") {
-              switch (data.attributes[attr].mod) {
+            let modtype = data.attributes[attr].modtype;
+            if (modtype === "Armor Stat" || modtype === "Stat" || modtype === "Stat All") {
+              switch (data.attributes[attr].mod.toLocaleLowerCase()) {
                 case "soak":
                   soakAdd += parseInt(data.attributes[attr].value, 10);
                   break;
@@ -678,6 +680,17 @@ export class ItemFFG extends ItemBaseFFG {
       data.doNotSubmit = (await this.sheet.getData()).data.doNotSubmit;
     }
 
+    if (["talent"].includes(this.type) && data.longDesc) {
+      data.description = data.longDesc;
+    }
+
+    if (this.type === "weapon") {
+      const ammoEnabled = this.getFlag("starwarsffg", "config.enableAmmo");
+      if (ammoEnabled) {
+        props.push(`Ammo: ${data.ammo.value}/${data.ammo.max}`);
+      }
+    }
+
     if (this.type === "forcepower" || this.type === "signatureability") {
       //Display upgrades
 
@@ -696,7 +709,7 @@ export class ItemFFG extends ItemBaseFFG {
         } else {
           upgradeDescriptions.push({
             name: up.name,
-            description: await TextEditor.enrichHTML(up.description),
+            description: await foundry.applications.ux.TextEditor.enrichHTML(up.description),
             rank: 1,
           });
         }
@@ -722,7 +735,7 @@ export class ItemFFG extends ItemBaseFFG {
         const qualities = [];
         for (const modifier of modifiers) {
           qualities.push(`
-          <div class='item-pill-hover hover-tooltip' data-item-type="itemmodifier" data-item-embed-name="${ modifier.name }" data-item-embed-img="${ modifier.img }" data-desc="${ (await TextEditor.enrichHTML(modifier.description)).replaceAll('"', "'") }" data-item-ranks="${ modifier.totalRanks }" data-tooltip="Loading...">
+          <div class='item-pill-hover hover-tooltip' data-item-type="itemmodifier" data-item-embed-name="${ modifier.name }" data-item-embed-img="${ modifier.img }" data-desc="${ (await foundry.applications.ux.TextEditor.enrichHTML(modifier.description)).replaceAll('"', "'") }" data-item-ranks="${ modifier.totalRanks }" data-tooltip="Loading...">
             ${modifier.name} ${modifier.totalRanks === null || modifier.totalRanks === 0 ? "" : modifier.totalRanks}
           </div>
           `);

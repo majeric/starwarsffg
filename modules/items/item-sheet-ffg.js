@@ -14,7 +14,8 @@ import {forcePowerEditor, itemEditor, talentEditor} from "./item-editor.js";
  * Extend the basic ItemSheet with some very simple modifications
  * @extends {ItemSheet}
  */
-export class ItemSheetFFG extends ItemSheet {
+
+export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
   /** @override */
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
@@ -91,11 +92,11 @@ export class ItemSheetFFG extends ItemSheet {
     }
 
     if (data?.data?.description) {
-      data.data.enrichedDescription = await TextEditor.enrichHTML(data.data.description);
+      data.data.enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(data.data.description);
     }
 
     if (data?.data?.longDesc !== undefined) {
-      data.data.enrichedLongDesc = await TextEditor.enrichHTML(data.data.longDesc);
+      data.data.enrichedLongDesc = await foundry.applications.ux.TextEditor.enrichHTML(data.data.longDesc);
       data.data.hasLongDesc = true;
     } else {
       data.data.hasLongDesc = false;
@@ -168,7 +169,7 @@ export class ItemSheetFFG extends ItemSheet {
           data.isReadOnly = true;
         }
         for (let x = 0; x < 16; x++) {
-          data.data.upgrades[`upgrade${x}`].enrichedDescription = await TextEditor.enrichHTML(data.data.upgrades[`upgrade${x}`].description);
+          data.data.upgrades[`upgrade${x}`].enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(data.data.upgrades[`upgrade${x}`].description);
         }
         break;
       case "specialization":
@@ -189,7 +190,7 @@ export class ItemSheetFFG extends ItemSheet {
           this.item.flags.starwarsffg.loaded = true;
         }
         for (let x = 0; x < 20; x++) {
-          data.data.talents[`talent${x}`].enrichedDescription = await TextEditor.enrichHTML(data.data.talents[`talent${x}`].description);
+          data.data.talents[`talent${x}`].enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(data.data.talents[`talent${x}`].description);
         }
         break;
       case "species":
@@ -286,10 +287,27 @@ export class ItemSheetFFG extends ItemSheet {
           data.data.isReadOnly = true;
         }
         for (let x = 0; x < 8; x++) {
-          data.data.upgrades[`upgrade${x}`].enrichedDescription = await TextEditor.enrichHTML(data.data.upgrades[`upgrade${x}`].description);
+          data.data.upgrades[`upgrade${x}`].enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(data.data.upgrades[`upgrade${x}`].description);
         }
         break;
       }
+      case "background": {
+        this.position.height = 545;
+        data.data.backgroundTypes = CONFIG.FFG.characterCreator.backgroundTypes;
+        break;
+      }
+      case "obligation": {
+        this.position.height = 545;
+        data.data.obligationTypes = CONFIG.FFG.characterCreator.obligationTypes;
+        data.data.subtypes = CONFIG.FFG.characterCreator.obligationSubTypes;
+        break;
+      }
+      case "motivation": {
+        this.position.height = 545;
+        data.data.motivationTypes = CONFIG.FFG.characterCreator.motivationTypes;
+        break;
+      }
+      break;
       default:
     }
 
@@ -328,6 +346,15 @@ export class ItemSheetFFG extends ItemSheet {
 
     data.modifierTypes = CONFIG.FFG.allowableModifierTypes;
     data.modifierChoices = CONFIG.FFG.allowableModifierChoices;
+    // allow modifiers to impact actor-specific custom skills, if present
+
+    if (this?.actor?.system?.skills) {
+      const updatedChoices = foundry.utils.deepClone(data.modifierChoices);
+      for (const modifierChoice of Object.keys(CONFIG.FFG.allowableModifierChoices).filter(i => i.indexOf("Skill") >= 0)) {
+        updatedChoices[modifierChoice] = this?.actor?.system?.skills;
+      }
+      data.modifierChoices = updatedChoices;
+    }
 
     return data;
   }
@@ -423,7 +450,16 @@ export class ItemSheetFFG extends ItemSheet {
   activateListeners(html) {
     super.activateListeners(html);
     html.find(".ffg-purchase").click(async (ev) => {
+      if(this.actor && !this.actor?.verifyEditModeIsNotEnabled()) return;
       await this._handleItemBuy(ev)
+    });
+
+    html.find(".source-control").click(async (ev) => {
+      await this._handleSourceControl(ev);
+    });
+
+    html.find(".tag-control").click(async (ev) => {
+      await this._handleTagControl(ev);
     });
 
     // register sheet options
@@ -441,13 +477,21 @@ export class ItemSheetFFG extends ItemSheet {
         type: "Boolean",
         default: true,
       });
+      if (this.object.type === "weapon") {
+        this.sheetoptions.register("enableAmmo", {
+          name: game.i18n.localize("SWFFG.SheetOptions2.enableAmmo.Name"),
+          hint: game.i18n.localize("SWFFG.SheetOptions2.enableAmmo.Hint"),
+          type: "Boolean",
+          default: false,
+        });
+      }
     }
 
     // TODO: This is not needed in Foundry 0.6.0
     // Activate tabs
     let tabs = html.find(".tabs");
     let initial = this._sheetTab;
-    new Tabs(tabs, {
+    new foundry.applications.ux.Tabs(tabs, {
       initial: initial,
       callback: (clicked) => (this._sheetTab = clicked.data("tab")),
     });
@@ -596,7 +640,7 @@ export class ItemSheetFFG extends ItemSheet {
       html.find(".talent-actions .fa-cog").on("click", ModifierHelpers.popoutModiferWindow.bind(this));
       html.find(".talent-modifiers .fa-cog").on("click", this._onClickUpgradeEdit.bind(this));
       try {
-        const dragDrop = new DragDrop({
+        const dragDrop = new foundry.applications.ux.DragDrop({
           dragSelector: ".item",
           dropSelector: ".specialization-talent",
           permissions: { dragstart: this._canDragStart.bind(this), drop: this._canDragDrop.bind(this) },
@@ -609,7 +653,7 @@ export class ItemSheetFFG extends ItemSheet {
       }
     } else if (this.object.type === "career") {
       try {
-        const dragDrop = new DragDrop({
+        const dragDrop = new foundry.applications.ux.DragDrop({
           dragSelector: ".item",
           dropSelector: ".tab.career",
           permissions: { dragstart: this._canDragStart.bind(this), drop: this._canDragDrop.bind(this) },
@@ -655,7 +699,7 @@ export class ItemSheetFFG extends ItemSheet {
       });
     } else if (this.object.type === "species") {
       try {
-        const dragDrop = new DragDrop({
+        const dragDrop = new foundry.applications.ux.DragDrop({
           dragSelector: ".item",
           dropSelector: ".tab.talents",
           permissions: { dragstart: this._canDragStart.bind(this), drop: this._canDragDrop.bind(this) },
@@ -714,7 +758,7 @@ export class ItemSheetFFG extends ItemSheet {
     });
 
     if (["weapon", "armour", "itemattachment", "shipweapon"].includes(this.object.type)) {
-      const itemToItemAssociation = new DragDrop({
+      const itemToItemAssociation = new foundry.applications.ux.DragDrop({
         dragSelector: ".item",
         dropSelector: null,
         permissions: { dragstart: true, drop: true },
@@ -1136,6 +1180,87 @@ export class ItemSheetFFG extends ItemSheet {
     ).render(true);
   }
 
+  async _handleSourceControl(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const action = $(event.currentTarget).data("action");
+    const sourceIndex = $(event.currentTarget).data("index");
+    if (action === "add") {
+      const addSource = new Dialog({
+        title: game.i18n.localize("SWFFG.Meta.Sources.AddSource.Title"),
+        content: `
+          <p>${game.i18n.localize("SWFFG.Meta.Sources.AddSource.Book")} :</p>
+          <input type="text" id="book" name="book" value="Force and Destiny Core Rulebook">
+          <p>${game.i18n.localize("SWFFG.Meta.Sources.AddSource.Page")}:</p>
+          <input type="number" id="page" name="page" value="0">
+        `,
+        buttons: {
+          submit: {
+            icon: '<i class="fas fa-check"></i>',
+            label: game.i18n.localize("SWFFG.Meta.Sources.AddSource.Submit"),
+            callback: async (obj, event) => {
+              const jObj = $(obj);
+              const bookName = jObj.find("#book").val();
+              const pageNum = jObj.find("#page").val();
+              await this.object.update({"system.metadata.sources": [...this.object.system.metadata.sources, `${bookName} pg. ${pageNum}`]});
+            }
+          },
+          cancel: {
+            icon: '<i class="fas fa-x"></i>',
+            label: game.i18n.localize("SWFFG.Meta.Sources.AddSource.Cancel"),
+          },
+        },
+        default: "submit",
+      });
+      addSource.render(true);
+    } else if (action === "remove") {
+      const sources = foundry.utils.deepClone(this.item.system.metadata.sources);
+      sources.splice(sourceIndex, 1);
+      await this.object.update({"system.metadata.sources": sources});
+    }
+    this.render(true);
+  }
+
+  async _handleTagControl(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const action = $(event.currentTarget).data("action");
+    const tagIndex = $(event.currentTarget).data("index");
+    if (action === "add") {
+      const addTag = new Dialog({
+        title: game.i18n.localize("SWFFG.Meta.Tags.AddTag.Title"),
+        content: `
+          <p>${game.i18n.localize("SWFFG.Meta.Tags.AddTag.Tag")} :</p>
+          <input type="text" id="tag" name="tag" value="">
+        `,
+        buttons: {
+          submit: {
+            icon: '<i class="fas fa-check"></i>',
+            label: game.i18n.localize("SWFFG.Meta.Tags.AddTag.Submit"),
+            callback: async (obj, event) => {
+              const jObj = $(obj);
+              const tag = jObj.find("#tag").val();
+              const updatedTags = this.item.system.metadata.tags || [];
+              updatedTags.push(tag);
+              await this.object.update({"system.metadata.tags": updatedTags});
+            }
+          },
+          cancel: {
+            icon: '<i class="fas fa-x"></i>',
+            label: game.i18n.localize("SWFFG.Meta.Tags.AddTag.Cancel"),
+          },
+        },
+        default: "submit",
+      });
+      addTag.render(true);
+    } else if (action === "remove") {
+      const tags = foundry.utils.deepClone(this.item.system.metadata.tags);
+      tags.splice(tagIndex, 1);
+      await this.object.update({"system.metadata.tags": tags});
+    }
+    this.render(true);
+  }
+
   async _handleItemBuy(event) {
     event.preventDefault();
     event.stopPropagation();
@@ -1287,13 +1412,13 @@ export class ItemSheetFFG extends ItemSheet {
               } catch (e) {
                 return;
               }
+              owner.update({system: {experience: {available: availableXP - cost}}});
+              await xpLogSpend(owner, `specialization ${baseName} upgrade ${upgradeName}`, cost, availableXPToLog - cost, totalXP);
+              await ActorHelpers.endEditMode(owner, AEState, true);
               // update the form because the fields are read when an update is performed
               const input = $(`[name="data.talents.${upgradeId}.islearned"]`, this.element)[0];
               input.checked = true;
               await this.object.sheet.submit({preventClose: true});
-              owner.update({system: {experience: {available: availableXP - cost}}});
-              await xpLogSpend(owner, `specialization ${baseName} upgrade ${upgradeName}`, cost, availableXPToLog - cost, totalXP);
-              await ActorHelpers.endEditMode(owner, AEState, true);
             },
           },
           cancel: {
@@ -1312,6 +1437,8 @@ export class ItemSheetFFG extends ItemSheet {
 
   /** @override */
   _updateObject(event, formData) {
+    if(this.actor && !this.actor?.verifyEditModeIsNotEnabled()) return;
+
     const itemUpdate = ItemHelpers.itemUpdate.bind(this);
     itemUpdate(event, formData);
   }
@@ -1323,6 +1450,8 @@ export class ItemSheetFFG extends ItemSheet {
    * @private
    */
   async _onClickUpgradeEdit(event) {
+    if(this.actor && !this.actor?.verifyEditModeIsNotEnabled()) return;
+
     // pull the item which the edit is on
     const li = $(event.currentTarget);
     const clickedId = li.closest('.talent-block').attr('id');
@@ -1379,6 +1508,8 @@ export class ItemSheetFFG extends ItemSheet {
    */
   async _onClickTalentControl(event) {
     event.preventDefault();
+    if(this.actor && !this.actor?.verifyEditModeIsNotEnabled()) return;
+
     const a = event.currentTarget;
     const action = a.dataset.action;
     const key = a.dataset.key;
@@ -1477,7 +1608,7 @@ export class ItemSheetFFG extends ItemSheet {
     }
 
     if (action === "img") {
-      const fp = new FilePicker({
+      const fp = new foundry.applications.apps.FilePicker({
         type: "image",
         callback: async (path) => {
           await this.object.update({img: path});
@@ -1943,7 +2074,7 @@ export class ItemSheetFFG extends ItemSheet {
       let details = li.children(".item-details");
       details.slideUp(200, () => details.remove());
     } else {
-      let div = $(`<div class="item-details">${await TextEditor.enrichHTML(desc)}</div>`);
+      let div = $(`<div class="item-details">${await foundry.applications.ux.TextEditor.enrichHTML(desc)}</div>`);
       li.append(div.hide());
       div.slideDown(200);
     }

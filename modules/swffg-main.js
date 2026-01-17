@@ -7,12 +7,14 @@
 // Import Modules
 import { FFG } from "./swffg-config.js";
 import { ActorFFG } from "./actors/actor-ffg.js";
+import { TokenFFG } from "./tokens/token-ffg.js";
 import CombatantFFG, {
   CombatFFG,
   CombatTrackerFFG,
   registerHandleCombatantRemoval,
   updateCombatTracker
 } from "./combat-ffg.js";
+import { ActiveEffectFFG} from "./active-effects/active-effect-ffg.js";
 import { ItemFFG } from "./items/item-ffg.js";
 import { ItemSheetFFG } from "./items/item-sheet-ffg.js";
 import { ItemSheetFFGV2 } from "./items/item-sheet-ffg-v2.js";
@@ -24,8 +26,6 @@ import { DicePoolFFG, RollFFG } from "./dice-pool-ffg.js";
 import { GroupManager } from "./groupmanager-ffg.js";
 import PopoutEditor from "./popout-editor.js";
 
-import CharacterImporter from "./importer/character-importer.js";
-import NPCImporter from "./importer/npc-importer.js";
 import DiceHelpers from "./helpers/dice-helpers.js";
 import Helpers from "./helpers/common.js";
 import TemplateHelpers from "./helpers/partial-templates.js";
@@ -48,6 +48,7 @@ import {register_dice_enricher, register_oggdude_tag_enricher, register_roll_tag
 import {drawAdversaryCount, drawMinionCount, registerTokenControls} from "./helpers/token.js";
 import {handleUpdate} from "./swffg-migration.js";
 import SWAImporter from "./importer/swa-importer.js";
+import {CharacterCreator} from "./helpers/character-creator.js";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -74,6 +75,7 @@ Hooks.once("init", async function () {
   // Place our classes in their own namespace for later reference.
   game.ffg = {
     ActorFFG,
+    TokenFFG,
     ItemFFG,
     CombatFFG,
     CombatantFFG,
@@ -85,6 +87,7 @@ Hooks.once("init", async function () {
       PopoutEditor,
     },
     diceterms: [AbilityDie, BoostDie, ChallengeDie, DifficultyDie, ForceDie, ProficiencyDie, SetbackDie],
+    ActiveEffectFFG,
   };
 
   // Define custom log prefix and logger
@@ -95,8 +98,7 @@ Hooks.once("init", async function () {
   // to instead use our extended version.
   CONFIG.Actor.documentClass = ActorFFG;
   CONFIG.Item.documentClass = ItemFFG;
-  CONFIG.Combat.documentClass = CombatFFG;
-  CONFIG.Combatant.documentClass = CombatantFFG;
+  CONFIG.ActiveEffect.documentClass = ActiveEffectFFG;
 
   // we do not want the legacy active effect transfer mode
   // also, reeeeeeeeeeeeeeeee
@@ -137,8 +139,18 @@ Hooks.once("init", async function () {
     onChange: (rule) => window.location.reload()
   });
 
+  // register turn marker reconfigurator
+  game.settings.register("starwarsffg", "configuredTurnMarker", {
+    name: "configuredTurnMarker",
+    hint: "configuredTurnMarker",
+    scope: "world",
+    config: false,
+    default: false,
+    type: Boolean,
+  });
+
   // Override the default Token _drawBar function to allow for FFG style wound and strain values.
-  Token.prototype._drawBar = function (number, bar, data) {
+  foundry.canvas.placeables.Token.prototype._drawBar = function (number, bar, data) {
     let val = Number(data.value);
     // FFG style behaviour for wounds and strain.
     let aboveThreshold = 0;
@@ -225,7 +237,7 @@ Hooks.once("init", async function () {
   };
 
   // Load character templates so that dynamic skills lists work correctly
-  loadTemplates(["systems/starwarsffg/templates/actors/ffg-character-sheet.html", "systems/starwarsffg/templates/actors/ffg-minion-sheet.html"]);
+  await foundry.applications.handlebars.loadTemplates(["systems/starwarsffg/templates/actors/ffg-character-sheet.html", "systems/starwarsffg/templates/actors/ffg-minion-sheet.html"]);
 
   SettingsHelpers.initLevelSettings();
 
@@ -253,6 +265,46 @@ Hooks.once("init", async function () {
     default: true,
     type: Boolean,
   });
+  game.settings.register("starwarsffg", "defaultObligation", {
+    name: game.i18n.localize("SWFFG.Settings.Obligation.Default.Name"),
+    hint: game.i18n.localize("SWFFG.Settings.Obligation.Default.Hint"),
+    scope: "world",
+    config: false,
+    default: 20,
+    type: Number,
+  });
+  game.settings.register("starwarsffg", "defaultDuty", {
+    name: game.i18n.localize("SWFFG.Settings.Duty.Default.Name"),
+    hint: game.i18n.localize("SWFFG.Settings.Duty.Default.Hint"),
+    scope: "world",
+    config: false,
+    default: 20,
+    type: Number,
+  });
+  game.settings.register("starwarsffg", "defaultMorality", {
+    name: game.i18n.localize("SWFFG.Settings.Morality.Default.Name"),
+    hint: game.i18n.localize("SWFFG.Settings.Morality.Default.Hint"),
+    scope: "world",
+    config: false,
+    default: 50,
+    type: Number,
+  });
+  game.settings.register("starwarsffg", "maxRarity", {
+    name: game.i18n.localize("SWFFG.Settings.CharCreator.Items.maxRarity.Name"),
+    hint: game.i18n.localize("SWFFG.Settings.CharCreator.Items.maxRarity.Hint"),
+    scope: "world",
+    config: false,
+    default: 6,
+    type: Number,
+  });
+  game.settings.register("starwarsffg", "allowRestricted", {
+    name: game.i18n.localize("SWFFG.Settings.CharCreator.Items.allowRestricted.Name"),
+    hint: game.i18n.localize("SWFFG.Settings.CharCreator.Items.allowRestricted.Hint"),
+    scope: "world",
+    config: false,
+    default: false,
+    type: Boolean,
+  });
 
   /**
    * Register the option to use generic slots for combat
@@ -269,6 +321,10 @@ Hooks.once("init", async function () {
 
   if (game.settings.get("starwarsffg", "useGenericSlots")) {
     CONFIG.ui.combat = CombatTrackerFFG;
+    CONFIG.Combat.documentClass = CombatFFG;
+    CONFIG.Combatant.documentClass = CombatantFFG;
+    // override the token placeable object so we can control turn indicators
+    CONFIG.Token.objectClass = TokenFFG;
   }
 
   /**
@@ -309,7 +365,7 @@ Hooks.once("init", async function () {
   });
 
   /**
-   * Register compendiums for sources for purchasing
+   * Register compendiums for sources for purchasing and character creation
    */
   game.settings.register("starwarsffg", "specializationCompendiums", {
     name: game.i18n.localize("SWFFG.Settings.Purchase.Specialization.Name"),
@@ -343,6 +399,61 @@ Hooks.once("init", async function () {
     default: "",
     type: String,
   });
+  // backgrounds
+  game.settings.register("starwarsffg", "backgroundCompendiums", {
+    name: game.i18n.localize("SWFFG.Settings.Purchase.Background.Name"),
+    hint: game.i18n.localize("SWFFG.Settings.Purchase.Background.Hint"),
+    scope: "world",
+    config: false,
+    default: "world.oggdudebackgrounds",
+    type: String,
+  });
+  // obligations
+  game.settings.register("starwarsffg", "obligationCompendiums", {
+    name: game.i18n.localize("SWFFG.Settings.Purchase.Obligation.Name"),
+    hint: game.i18n.localize("SWFFG.Settings.Purchase.Obligation.Hint"),
+    scope: "world",
+    config: false,
+    default: "world.oggdudeobligations",
+    type: String,
+  });
+  // species
+  game.settings.register("starwarsffg", "speciesCompendiums", {
+    name: game.i18n.localize("SWFFG.Settings.Purchase.Species.Name"),
+    hint: game.i18n.localize("SWFFG.Settings.Purchase.Species.Hint"),
+    scope: "world",
+    config: false,
+    default: "world.oggdudespecies",
+    type: String,
+  });
+  // careers
+  game.settings.register("starwarsffg", "careerCompendiums", {
+    name: game.i18n.localize("SWFFG.Settings.Purchase.Career.Name"),
+    hint: game.i18n.localize("SWFFG.Settings.Purchase.Career.Hint"),
+    scope: "world",
+    config: false,
+    default: "world.oggdudecareers",
+    type: String,
+  });
+  // motivations
+  game.settings.register("starwarsffg", "motivationCompendiums", {
+    name: game.i18n.localize("SWFFG.Settings.Purchase.Motivation.Name"),
+    hint: game.i18n.localize("SWFFG.Settings.Purchase.Motivation.Hint"),
+    scope: "world",
+    config: false,
+    default: "world.oggdudemotivations",
+    type: String,
+  });
+  // items
+  game.settings.register("starwarsffg", "itemCompendiums", {
+    name: game.i18n.localize("SWFFG.Settings.Purchase.Item.Name"),
+    hint: game.i18n.localize("SWFFG.Settings.Purchase.Item.Hint"),
+    scope: "world",
+    config: false,
+    default: "world.oggdudeweapons,world.oggdudearmor,world.oggdudegear,world.oggdudearmorattachments,world.oggdudegenericattachments,world.oggdudeweaponattachments,world.oggdudearmormods,world.oggdudegenericmods,world.oggdudeweaponmods",
+    type: String,
+  });
+  // defense dice setting
   game.settings.register("starwarsffg", "useDefense", {
     name: game.i18n.localize("SWFFG.Settings.UseDefense.Name"),
     hint: game.i18n.localize("SWFFG.Settings.UseDefense.Hint"),
@@ -698,11 +809,14 @@ Hooks.once("init", async function () {
     }
 
   // Register sheet application classes
-  Actors.unregisterSheet("core", ActorSheet);
-  Actors.registerSheet("ffg", ActorSheetFFGV2, { makeDefault: true, label: "Actor Sheet v2" });
-  Actors.registerSheet("ffg", AdversarySheetFFGV2, { types: ["character"], label: "Adversary Sheet v2" });
-  Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("ffg", ItemSheetFFGV2, { makeDefault: true, label: "Item Sheet v2" });
+  foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
+  foundry.documents.collections.Actors.registerSheet("ffg", ActorSheetFFG, { label: "Actor Sheet v1" });
+  foundry.documents.collections.Actors.registerSheet("ffg", ActorSheetFFGV2, { makeDefault: true, label: "Actor Sheet v2" });
+  foundry.documents.collections.Actors.registerSheet("ffg", AdversarySheetFFG, { types: ["character"], label: "Adversary Sheet v1" });
+  foundry.documents.collections.Actors.registerSheet("ffg", AdversarySheetFFGV2, { types: ["character"], label: "Adversary Sheet v2" });
+  foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
+  foundry.documents.collections.Items.registerSheet("ffg", ItemSheetFFG, { label: "Item Sheet v1" });
+  foundry.documents.collections.Items.registerSheet("ffg", ItemSheetFFGV2, { makeDefault: true, label: "Item Sheet v2" });
 
   // Add utilities to the global scope, this can be useful for macro makers
   window.DicePoolFFG = DicePoolFFG;
@@ -811,6 +925,21 @@ Hooks.once("init", async function () {
     }
   });
 
+  Handlebars.registerHelper("keylen", function (obj) {
+    try {
+      return Object.keys(obj).length;
+    } catch (e) {
+      return 0;
+    }
+  });
+
+  Handlebars.registerHelper("in", function (value, array) {
+    if (!Array.isArray(array)) {
+      return false;
+    }
+    return array.indexOf(value) >= 0;
+  });
+
   Handlebars.registerHelper("ffgDiceSymbols", function (text) {
     //return PopoutEditor.renderDiceImages(text);
     CONFIG.logger.warn("This function is no longer needed and should not be called. Please notify the devs if you see this message.");
@@ -841,54 +970,76 @@ Hooks.once("init", async function () {
   await TemplateHelpers.preload();
 });
 
-Hooks.on("renderSidebarTab", (app, html, data) => {
-  html.find(".chat-control-icon").click(async (event) => {
-    const dicePool = new DicePoolFFG();
+Hooks.on("renderChatInput", (app, html, data) => {
+  if (app.id === "chat") {
+    // add in the chat dice roller
+    const rollButtonId = "ffgChatRoll";
+    if (!document.querySelector(`#${rollButtonId}`)) {
 
-    let user = {
-      data: game.user.system,
-    };
+      const rollButton = document.createElement("button");
+      rollButton.id = rollButtonId;
+      rollButton.type = "button";
+      rollButton.classList.add("ui-control", "icon", "fa-light", "fa-dice-d20");
 
-    await DiceHelpers.displayRollDialog(user, dicePool, game.i18n.localize("SWFFG.RollingDefaultTitle"), "");
-  });
+      const rollPrivacyElement = document.querySelector("#roll-privacy");
+      rollPrivacyElement.appendChild(rollButton);
+
+      rollButton.onclick = async function () {
+        const dicePool = new DicePoolFFG();
+        let user = {
+          data: game.user.system,
+        };
+        await DiceHelpers.displayRollDialog(user, dicePool, game.i18n.localize("SWFFG.RollingDefaultTitle"), "");
+      }
+    }
+  }
 });
 
-Hooks.on("renderActorDirectory", (app, html, data) => {
-  // add character import button
-  const div = $(`<div class="og-character-import"></div>`);
-  const divider = $("<hr><h4>OggDude Import</h4>");
-  const characterImportButton = $('<button class="og-character">Character</button>');
-  const npcImportButton = $('<button class="og-npc">NPC</button>');
-  div.append(divider, characterImportButton, npcImportButton);
+Hooks.on("renderActorDirectory", (app, html) => {
+  if (app.id === "actors") {
+    const wizardId = "ffgCharacterWizard";
+    if (!document.querySelector(`#${wizardId}`)) {
+      const wizardButtonIcon = document.createElement("i");
+      wizardButtonIcon.classList.add("fa-solid", "fa-wand-magic-sparkles");
 
-  html.find(".directory-footer").append(div);
+      const wizardButtonText = document.createElement("span");
+      wizardButtonText.textContent = game.i18n.localize("SWFFG.CharacterCreator.Entry.Button");
 
-  html.find(".og-character").click(async (event) => {
-    event.preventDefault();
-    new CharacterImporter().render(true);
-  });
-  html.find(".og-npc").click(async (event) => {
-    event.preventDefault();
-    new NPCImporter().render(true);
-  });
+      const wizardButton = document.createElement("button");
+      wizardButton.id = wizardId;
+      wizardButton.type = "button";
+      wizardButton.classList.add("activate-wizard");
+      wizardButton.appendChild(wizardButtonIcon);
+      wizardButton.appendChild(wizardButtonText);
+
+      const folderElement = html.querySelector(".header-actions.action-buttons");
+      folderElement.appendChild(wizardButton);
+
+      wizardButton.onclick = async function () {
+        ui.notifications.info(game.i18n.localize("SWFFG.CharacterCreator.Entry.Loading"));
+        const create = new CharacterCreator();
+        create.render(true);
+      }
+    }
+  }
 });
 
 Hooks.on("renderCompendiumDirectory", (app, html, data) => {
   if (game.user.isGM) {
-    const div = $(`<div class="og-character-import"></div>`);
-    const divider = $("<hr><h4>Importers</h4>");
-    const datasetImportButton = $('<button class="og-character">OggDude Dataset Importer</button>');
-    const datasetImportButton2 = $('<button class="swa-character">Adversaries Dataset Importer</button>');
-
-    div.append(divider, datasetImportButton, datasetImportButton2);
-    html.find(".directory-footer").append(div);
-
-    html.find(".og-character").click(async (event) => {
+    let div;
+    // Native DOM (V13+)
+    div = document.createElement("div");
+    div.className = "og-character-import";
+    div.innerHTML = `<hr><h4>Importers</h4>
+    <button class="og-character" style="width:100%;margin-bottom:4px;">OggDude Dataset Importer</button>
+    <button class="swa-character" style="width:100%;">Adversaries Dataset Importer</button>`;
+    html.querySelector(".directory-footer")?.appendChild(div);
+    // add event handlers with addEventListener()
+    div.querySelector(".og-character")?.addEventListener("click", (event) => {
       event.preventDefault();
       new DataImporter().render(true);
     });
-
-    html.find(".swa-character").click(async (event) => {
+    div.querySelector(".swa-character")?.addEventListener("click", (event) => {
       event.preventDefault();
       new SWAImporter().render(true);
     });
@@ -944,22 +1095,6 @@ function isCurrentVersionNullOrBlank(currentVersion) {
 // Handle migration duties
 Hooks.once("ready", async () => {
   SettingsHelpers.readyLevelSetting();
-
-  if (!game.settings.get("starwarsffg", "token_configured")) {
-    const tokenData = {
-      bar1: {
-        attribute: "stats.wounds",
-      },
-      bar2: {
-        attribute: "stats.strain",
-      },
-      displayBars: 20, // hovered by owner
-    };
-    const existingSettings = game.settings.get("core", "defaultToken");
-    const updateData = foundry.utils.mergeObject(existingSettings, tokenData);
-    game.settings.set("core", "defaultToken", updateData);
-    game.settings.set("starwarsffg", "token_configured", true);
-  }
 
   // NOTE: the "currentVersion" will be updated in handleUpdate, preventing the code below from running in the future
   // this is intended to encourage migrating code to this file to clean up the main file
@@ -1042,7 +1177,7 @@ Hooks.once("ready", async () => {
       try {
         let skillList = [];
 
-        let data = await FilePicker.browse("data", `worlds/${game.world.id}`, { bucket: null, extensions: [".json", ".JSON"], wildcard: false });
+        let data = await foundry.applications.apps.FilePicker.browse("data", `worlds/${game.world.id}`, { bucket: null, extensions: [".json", ".JSON"], wildcard: false });
         if (data.files.includes(`worlds/${game.world.id}/skills.json`)) {
           // if the skills.json file is found AND the skillsList in setting is the default skill list then read the data from the file.
           // This will make sure that the data from the JSON file overwrites the data in the setting.
@@ -1382,6 +1517,14 @@ Hooks.once("ready", async () => {
         effect.update({changes: effect.changes});
     });
   }
+
+  const turnMarkerConfigured = game.settings.get("starwarsffg", "configuredTurnMarker");
+  const combatTrackerConfig = game.settings.get("core", "combatTrackerConfig");
+  if (combatTrackerConfig.turnMarker.enabled && !turnMarkerConfigured) {
+    await game.settings.set("starwarsffg", "configuredTurnMarker", true);
+    combatTrackerConfig.turnMarker.enabled = false;
+    await game.settings.set("core", "combatTrackerConfig", combatTrackerConfig);
+  }
 });
 
 Hooks.once("diceSoNiceReady", (dice3d) => {
@@ -1606,12 +1749,10 @@ Hooks.once("diceSoNiceReady", (dice3d) => {
   });
 });
 
-Hooks.on("pauseGame", () => {
-  if (game.data.paused) {
-    const pausedImage = game.settings.get("starwarsffg", "ui-pausedImage");
-    if (pausedImage) {
-      $("#pause img").css("content", `url(${pausedImage})`);
-    }
+Hooks.on("renderGamePause", function (_application, element, _context, _options) {
+  const pausedImage = game.settings.get("starwarsffg", "ui-pausedImage");
+  if (pausedImage) {
+    element.querySelector("img").src = pausedImage;
   }
 });
 
@@ -1728,12 +1869,8 @@ export function itemPillHover(event) {
   let embeddedContent = `
     <section class="chat-msg-tooltip content">
       <section class="header">
-        <div class="top">
-          <img class="tooltip-img" src="${itemImage}"/>
-          <div class="name name-stacked">
-            <span class="title">${itemName}</span>
-          </div>
-        </div>
+        <img class="tooltip-img" src="${itemImage}"/>
+        <div class="title">${itemName}</div>
       </section>
       <section class="description">
         ${desc}

@@ -102,7 +102,7 @@ export class RollFFG extends Roll {
 
   async updateSymbols() {
     for (const addedResult of this.addedResults) {
-      addedResult.symbol = await TextEditor.enrichHTML(addedResult.symbol);
+      addedResult.symbol = await foundry.applications.ux.TextEditor.enrichHTML(addedResult.symbol);
     }
   }
 
@@ -141,15 +141,16 @@ export class RollFFG extends Roll {
     // Step 3 - evaluate any remaining terms and return any non-FFG dice to the total.
     this.results = await Promise.all(this.terms.map(async (term) => {
       if (!game.ffg.diceterms.includes(term.constructor)) {
-        if (term.evaluate) {
-          if (!(term instanceof foundry.dice.terms.OperatorTerm)) {
-            this.hasStandard = true;
-            let result = await term.evaluate({ minimize, maximize });
-            return result.total;
-          } else {
-            return await term.evaluate({ minimize, maximize }).total;
-          }
-        } else return term;
+        if (term.evaluate && !(term instanceof foundry.dice.terms.OperatorTerm)) {
+          this.hasStandard = true;
+          let result = await term.evaluate({ minimize, maximize });
+          return result.total;
+        } else if (term instanceof foundry.dice.terms.OperatorTerm) {
+          // in APIv13+ OperatorTerm cannot be evaluated again once it it has been evaluated. Just return its operator
+          return term.operator;
+        } else {
+          return term;
+        }
       } else {
         if (term.evaluate) await term.evaluate({ minimize, maximize });
         this.hasFFG = true;
@@ -229,14 +230,14 @@ export class RollFFG extends Roll {
         rolls: d.results.map((r) => {
           return {
             result: d.getResultLabel(r),
-            classes: [cls.name.toLowerCase(), isFFG, "d" + d.faces, r.rerolled ? "rerolled" : null, r.exploded ? "exploded" : null, r.discarded ? "discarded" : null, r.result === 1 ? "min" : null, r.result === d.faces ? "max" : null].filterJoin(" "),
+            classes: [cls.name.toLowerCase(), isFFG, "d" + d.faces, r.rerolled ? "rerolled" : null, r.exploded ? "exploded" : null, r.discarded ? "discarded" : null].filterJoin(" "),
           };
         }),
       };
     });
     parts.addedResults = this.addedResults;
     parts.flavorText = this.flavorText;
-    return await renderTemplate(this.constructor.TOOLTIP_TEMPLATE, { parts });
+    return foundry.applications.handlebars.renderTemplate(this.constructor.TOOLTIP_TEMPLATE, { parts });
   }
 
   /* -------------------------------------------- */
@@ -336,7 +337,7 @@ export class RollFFG extends Roll {
     const v12ChatData = migrateDataToSystem(chatData);
 
     // Render the roll display template
-    return await renderTemplate(chatOptions.template, v12ChatData);
+    return foundry.applications.handlebars.renderTemplate(chatOptions.template, v12ChatData);
   }
 
   /* -------------------------------------------- */
