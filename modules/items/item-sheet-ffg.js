@@ -35,6 +35,13 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
 
   /* -------------------------------------------- */
 
+  static SIZE_TO_INT = {
+    "single": 1,
+    "double": 2,
+    "triple": 3,
+    "full": 4
+  }
+
   /** @override */
   async getData(options) {
     let data = super.getData(options);
@@ -170,6 +177,32 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
         }
         for (let x = 0; x < 16; x++) {
           data.data.upgrades[`upgrade${x}`].enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(data.data.upgrades[`upgrade${x}`].description);
+          let upgradeSize = ItemSheetFFG.SIZE_TO_INT[data.data.upgrades[`upgrade${x}`].size];
+          data.data.upgrades[`upgrade${x}`].sizeInt = upgradeSize;
+
+          // Check if top connections are learned
+          if (x - 4 < 0) {
+            // Top row, all true because basic power is always learned
+            for (let y = 1; y < upgradeSize + 1; y++) {
+              data.data.upgrades[`upgrade${x}`][`isTop${y}Learned`] = true;
+            }
+          } else {
+            // Other rows
+            for (let y = 1; y < upgradeSize + 1; y++) {
+              for (let z = 0; z < x % 4 + y; z++) {
+                if (data.data.upgrades[`upgrade${x-5+y-z}`].sizeInt >= z + 1) {
+                  data.data.upgrades[`upgrade${x}`][`isTop${y}Learned`] = data.data.upgrades[`upgrade${x-5+y-z}`]?.islearned ?? false;
+                }
+              }
+            }
+          }
+
+          // Check if right connection is learned
+          if ((x + upgradeSize) % 4 == 0) {
+            data.data.upgrades[`upgrade${x}`].isRightLearned = false;
+          } else {
+            data.data.upgrades[`upgrade${x}`].isRightLearned = data.data.upgrades[`upgrade${x+upgradeSize}`]?.islearned ?? false;
+          }
         }
         break;
       case "specialization":
@@ -191,6 +224,18 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
         }
         for (let x = 0; x < 20; x++) {
           data.data.talents[`talent${x}`].enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(data.data.talents[`talent${x}`].description);
+
+          if (x - 4 < 0) {
+            data.data.talents[`talent${x}`].isTopLearned = false;
+          } else {
+            data.data.talents[`talent${x}`].isTopLearned = data.data.talents[`talent${x-4}`]?.islearned ?? false;
+          }
+
+          if ((x + 1) % 4 == 0) {
+            data.data.talents[`talent${x}`].isRightLearned = false;
+          } else {
+            data.data.talents[`talent${x}`].isRightLearned = data.data.talents[`talent${x+1}`]?.islearned ?? false;
+          }
         }
         break;
       case "species":
@@ -288,6 +333,32 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
         }
         for (let x = 0; x < 8; x++) {
           data.data.upgrades[`upgrade${x}`].enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(data.data.upgrades[`upgrade${x}`].description);
+          let upgradeSize = ItemSheetFFG.SIZE_TO_INT[data.data.upgrades[`upgrade${x}`].size];
+          data.data.upgrades[`upgrade${x}`].sizeInt = upgradeSize;
+
+          // Check if top connections are learned
+          if (x - 4 < 0) {
+            // Top row, all true because basic power is always learned
+            for (let y = 1; y < upgradeSize + 1; y++) {
+              data.data.upgrades[`upgrade${x}`][`isTop${y}Learned`] = true;
+            }
+          } else {
+            // Other rows
+            for (let y = 1; y < upgradeSize + 1; y++) {
+              for (let z = 0; z < x % 4 + y; z++) {
+                if (data.data.upgrades[`upgrade${x-5+y-z}`].sizeInt >= z + 1) {
+                  data.data.upgrades[`upgrade${x}`][`isTop${y}Learned`] = data.data.upgrades[`upgrade${x-5+y-z}`]?.islearned ?? false;
+                }
+              }
+            }
+          }
+
+          // Check if right connection is learned
+          if ((x + upgradeSize) % 4 == 0) {
+            data.data.upgrades[`upgrade${x}`].isRightLearned = false;
+          } else {
+            data.data.upgrades[`upgrade${x}`].isRightLearned = data.data.upgrades[`upgrade${x+upgradeSize}`]?.islearned ?? false;
+          }
         }
         break;
       }
@@ -477,6 +548,20 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
         type: "Boolean",
         default: true,
       });
+
+      if (this.object.type === "gear") {
+        this.sheetoptions.register("medicalType", {
+          name: game.i18n.localize("SWFFG.SheetOptions2.isMedical.Name"),
+          hint: game.i18n.localize("SWFFG.SheetOptions2.isMedical.Hint"),
+          type: "Array",
+          default: 0,
+          options: {
+            0: game.i18n.localize("SWFFG.MedicalItemType.No"),
+            1: game.i18n.localize("SWFFG.MedicalItemType.Stimpack"),
+            2: game.i18n.localize("SWFFG.MedicalItemType.EmergencyRepairPatch"),
+          },
+        });
+      }
       if (this.object.type === "weapon") {
         this.sheetoptions.register("enableAmmo", {
           name: game.i18n.localize("SWFFG.SheetOptions2.enableAmmo.Name"),
@@ -622,6 +707,18 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
 
     // Add or Remove Attribute
     html.find(".attributes").on("click", ".attribute-control", ModifierHelpers.onClickAttributeControl.bind(this));
+
+    // Swap value input between checkbox and number when modtype changes
+    html.find(".attributes").on("change", ".flat_editor.dropdown.modtype", (event) => {
+      const new_value = event.currentTarget.value;
+      const valueName = event.currentTarget.name.replace(/\.modtype$/, '.value');
+      const $valueInput = $(event.currentTarget).parent().find(".modvalue");
+      if (new_value === "Career Skill") {
+        $valueInput.replaceWith(`<input name="${valueName}" type="checkbox" class="modvalue" data-attr-key="${$valueInput.data('attr-key')}">`);
+      } else if ($valueInput.attr('type') === 'checkbox') {
+        $valueInput.replaceWith(`<input name="${valueName}" type="number" class="modvalue" value="0" data-attr-key="${$valueInput.data('attr-key')}">`);
+      }
+    });
 
     if (["signatureability"].includes(this.object.type)) {
       html.find(".talent-action").on("click", this._onClickTalentControl.bind(this));
@@ -1117,13 +1214,13 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
       throw new Error("Refused to buy for item with no found owner actor");
     }
     const availableXPToLog = foundry.utils.deepClone(owner.system.experience.available);
-    const AEState = await ActorHelpers.beginEditMode(owner, true);
-    const availableXP = owner.system.experience.available;
     const totalXP = owner.system.experience.total;
-    if (cost > availableXP) {
+    if (cost > availableXPToLog) {
       ui.notifications.warn(game.i18n.localize("SWFFG.Actors.Sheets.Purchase.NotEnoughXP"));
       throw new Error("Not enough XP");
     }
+    const AEState = await ActorHelpers.beginEditMode(owner, true);
+    const availableXP = owner.system.experience.available;
     return {
       owner: owner,
       cost: cost,
@@ -1190,7 +1287,7 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
         title: game.i18n.localize("SWFFG.Meta.Sources.AddSource.Title"),
         content: `
           <p>${game.i18n.localize("SWFFG.Meta.Sources.AddSource.Book")} :</p>
-          <input type="text" id="book" name="book" value="Force and Destiny Core Rulebook">
+          <input type="text" id="book" name="book" value="Force and Destiny Core Rulebook" autofocus>
           <p>${game.i18n.localize("SWFFG.Meta.Sources.AddSource.Page")}:</p>
           <input type="number" id="page" name="page" value="0">
         `,
@@ -1203,7 +1300,7 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
               const bookName = jObj.find("#book").val();
               const pageNum = jObj.find("#page").val();
               await this.object.update({"system.metadata.sources": [...this.object.system.metadata.sources, `${bookName} pg. ${pageNum}`]});
-            }
+            },
           },
           cancel: {
             icon: '<i class="fas fa-x"></i>',
@@ -1212,7 +1309,7 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
         },
         default: "submit",
       });
-      addSource.render(true);
+      addSource.render(true, {focus: true, classes: ["app", "window-app", "dialog", "themed", "theme-light", "starwarsffg-dialog"]});
     } else if (action === "remove") {
       const sources = foundry.utils.deepClone(this.item.system.metadata.sources);
       sources.splice(sourceIndex, 1);
@@ -1231,7 +1328,7 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
         title: game.i18n.localize("SWFFG.Meta.Tags.AddTag.Title"),
         content: `
           <p>${game.i18n.localize("SWFFG.Meta.Tags.AddTag.Tag")} :</p>
-          <input type="text" id="tag" name="tag" value="">
+          <input type="text" id="tag" name="tag" value="" autofocus>
         `,
         buttons: {
           submit: {
@@ -1252,7 +1349,7 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
         },
         default: "submit",
       });
-      addTag.render(true);
+      addTag.render(true, {focus: true, classes: ["app", "window-app", "dialog", "themed", "theme-light", "starwarsffg-dialog"]});
     } else if (action === "remove") {
       const tags = foundry.utils.deepClone(this.item.system.metadata.tags);
       tags.splice(tagIndex, 1);
@@ -1402,7 +1499,6 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
             callback: async (that) => {
 
               try {
-                // this fixes the actual math bugs but the log shows incorrect values. need to fix that.
                 const basic_data = await this._buyHandleClick(cost, "specialization");
                 owner = basic_data.owner;
                 availableXP = basic_data.availableXP;
@@ -1854,6 +1950,10 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
         }
         case "itemattachment": {
           if (this.object.system.hardpoints.adjusted - itemObject.system.hardpoints.value >= 0) {
+            for (const mod of itemObject.system.itemmodifier) {
+              // mark the mods as active so they transfer to the parent item
+              mod.system.active = true;
+            }
             itemObject = await ItemHelpers.uniqueAttrs(itemObject, this.object);
             items.push(itemObject);
           } else {
@@ -1910,8 +2010,8 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
         toCreate.push(activeEffect);
       }
       CONFIG.logger.debug(toCreate);
-      await this.object.createEmbeddedDocuments("ActiveEffect", toCreate);
-      await ItemHelpers.syncAEStatus(this.object, toCreate);
+      const createdEffects = await this.object.createEmbeddedDocuments("ActiveEffect", toCreate);
+      await ItemHelpers.syncAEStatus(this.object, createdEffects);
     } else {
       CONFIG.logger.debug(`Rejected transferring AEs for drag-and-drop of ${droppedType} -> ${myType}`);
     }

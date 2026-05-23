@@ -6,6 +6,8 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
 
 export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) {
   // https://foundryvtt.wiki/en/development/api/applicationv2
+  _openCareerSection = "career-select-container";
+
   static PARTS = {
     header: { template: 'systems/starwarsffg/templates/wizards/char_creator/header.html' },
     tabs: { template: 'templates/generic/tab-navigation.hbs' },
@@ -102,7 +104,6 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     },
     actions: {
       selectRules: CharacterCreator.selectRules,
-      selectStartingBonus: this.selectStartingBonus,
     },
     position: {
       width: 950,
@@ -116,7 +117,9 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     this.data = {
       // items granted - either by the GM or by the starting bonus, etc
       grants: {
-        gm: {},
+        gm: {
+          credits: game.settings.get("starwarsffg", "defaultCredits"),
+        },
         bonus: {
           xp: 0,
           credits: 0,
@@ -165,6 +168,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         obligation: game.settings.get("starwarsffg", "defaultObligation"), // increased with starting bonuses
         morality: game.settings.get("starwarsffg", "defaultMorality"),     // increased or decreased with starting bonuses
       },
+      spendingCredits: Math.floor(Math.random() * 100) + 1,
     };
     this.builtin = {
       rules: {
@@ -175,6 +179,19 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     };
 
     this.compendiumData = {};
+
+    if (game.users.filter(u => u.isGM && u.active).length === 0) {
+      ui.notifications.error(game.i18n.localize("SWFFG.CharacterCreator.Checks.GM"));
+      return this.close();
+    }
+    // configure socket events
+    game.socket.on("system.starwarsffg", async (...args) => {
+      if (args[0]?.eventType === "pcWizard" && args[0]?.event === "createCharacterResponse") {
+        await this.showCharacterStatus(args[0].actorId);
+      } else if (args[0]?.eventType === "pcWizard" && args[0]?.event === "createFinalActorResponse") {
+        await this.createActor(args[0].actorId);
+      }
+    });
   }
 
   /** @override */
@@ -188,9 +205,6 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     // backgrounds
     const cultureSelector = new SlimSelect({
       select: '#culture',
-      cssClasses: {
-        option: "starwarsffg"
-      },
       events: {
         afterChange: async (newVal) => {
           // could be >1 but we only allow one here
@@ -201,9 +215,6 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     cultureSelector.setSelected(this.data.selected.background.culture?.uuid, false);
     const hookSelector = new SlimSelect({
       select: '#hook',
-      cssClasses: {
-        option: "starwarsffg"
-      },
       events: {
         afterChange: async (newVal) => {
           // could be >1 but we only allow one here
@@ -215,9 +226,6 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     if (this.data.selected.rules === "fad") {
       const forceAttitudeSelector = new SlimSelect({
         select: '#force_attitude',
-        cssClasses: {
-          option: "starwarsffg"
-        },
         events: {
           afterChange: async (newVal) => {
             // could be >1 but we only allow one here
@@ -228,12 +236,24 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       forceAttitudeSelector.setSelected(this.data.selected.background.forceAttitude?.uuid, false);
     }
 
+    // starting bonuses
+    const startingBonusSelector = new SlimSelect({
+        select: '#startingBonus',
+        events: {
+          afterChange: async (newVal) => {
+            // could be >1 but we only allow one here
+            this.selectStartingBonus(newVal[0].value);
+          }
+        }
+      });
+      startingBonusSelector.setSelected(this.data.selected.startingBonus, false);
+
     // obligations
     const obligationsTable = new DataTable(
       "#obligations",
     );
     obligationsTable.on("draw", () => {
-      $(".obligation-spend").on("click", async (event) => {
+      $(".obligation-spend").off("click").on("click", async (event) => {
         await this.handleObligationSelect(event);
       });
     });
@@ -249,7 +269,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       "#species",
     );
     speciesTable.on("draw", () => {
-      $(".species-spend").on("click", async (event) => {
+      $(".species-spend").off("click").on("click", async (event) => {
         await this.handleSpeciesSelect(event);
       });
     });
@@ -262,20 +282,23 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       "#careers",
     );
     careersTable.on("draw", () => {
-      $(".career-spend").on("click", async (event) => {
+      $(".career-spend").off("click").on("click", async (event) => {
         await this.handleCareerSelect(event);
       });
     });
     $(".career-spend").on("click", async (event) => {
       await this.handleCareerSelect(event);
     });
-    $(".career_tab-container").on("click", function(event) {
-      $(event.target).find(".career-selection").toggle('slow');
-      $(event.target).find(".career_skill_rank_select-selection").toggle('slow');
-      $(event.target).find(".specialization-selection").toggle('slow');
-      $(event.target).find(".specialization_skill_rank_select-selection").toggle('slow');
+    $(".career_tab-container").on("click", (event) => {
+      const $container = $(event.currentTarget);
+      const uniqueClass = $container.attr("class").split(/\s+/).find(c => c !== "career_tab-container");
+      this._openCareerSection = uniqueClass;
+      $container.next(".career-selection").toggle('slow');
+      $container.next(".career_skill_rank_select-selection").toggle('slow');
+      $container.next(".specialization-selection").toggle('slow');
+      $container.next(".specialization_skill_rank_select-selection").toggle('slow');
     });
-    $(".career-select-container").click();
+    $(`.${this._openCareerSection}`).next().show();
 
     // specializations
     const specializationsTable = new DataTable(
@@ -302,8 +325,8 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     $(".skills-container").on("click", function() {
       $(".skills-summary").toggle('slow');
     });
-    $(".specialization-container").on("click", function(event) {
-      $(event.target).find(".specialization-summary").toggle('slow');
+    $(".specialization-container").on("click", function() {
+      $(this).next(".specialization-summary").toggle('slow');
     });
     $(".specialization-remove").on("click", async (event) => {
       await this.handleRemoveSpecialization(event);
@@ -319,8 +342,8 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     $(".purchase-forcePower").on("click", async (event) => {
       await this.handleForcePowerPurchase(event);
     });
-    $(".forcePower-container").on("click", function(event) {
-      $(event.target).find(".forcePower-summary").toggle('slow');
+    $(".forcePower-container").on("click", function() {
+      $(this).next(".forcePower-summary").toggle('slow');
     });
     $(".forcePower-remove").on("click", async (event) => {
       await this.handleRemoveForcePower(event);
@@ -445,10 +468,10 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         }
       }
     );
-    gearTable.buttons('.weapon').trigger();
     gearTable.on("draw", async () => {
       await this.activateShopListeners();
     });
+    gearTable.buttons('.weapon').trigger();
 
     // motivations
     const purchasedMotivationTable = new DataTable(
@@ -458,7 +481,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       "#motivations",
     );
     availableMotivationTable.on("draw", async () => {
-      $(".motivation-spend").on("click", async (event) => {
+      $(".motivation-spend").off("click").on("click", async (event) => {
         await this.handleMotivationPurchase(event);
       });
     });
@@ -471,7 +494,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
 
     // create the actor!
     $(".create-actor").on("click", async (event) => {
-      await this.createActor(event);
+      await this.createActorShim(event);
     });
 
     CONFIG.logger.debug(`Current state: ${JSON.stringify(this.data)}`);
@@ -483,10 +506,10 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
    * @returns {Promise<void>}
    */
   async activateShopListeners() {
-    $(".credit-spend").on("click", async (event) => {
+    $(".credit-spend").off("click").on("click", async (event) => {
       await this.handleCreditPurchase(event);
     });
-    $(".credit-refund").on("click", async (event) => {
+    $(".credit-refund").off("click").on("click", async (event) => {
       await this.handleCreditRefund(event);
     });
   }
@@ -514,7 +537,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     context.availableBackgrounds = this.compendiumData['availableBackgrounds'];
-    context.startingBonusesRadio = CONFIG.FFG.characterCreator.startingBonusesRadio[this.data.selected.rules];
+    context.startingBonusesRadio = this.startingBonusForHTML();
     context.availableObligations = this.compendiumData['availableObligations'];
     context.availableSpecies = this.compendiumData['availableSpecies'];
     context.availableCareers = this.compendiumData['availableCareers'];
@@ -546,7 +569,12 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     context.obligationKey = obligation.key;
 
     // include career / specialization career ranks
-    const combinedPurchases = {};
+    let combinedPurchases = {};
+    if (this.tempActor) {
+      combinedPurchases = Object.fromEntries(
+        Object.keys(this.tempActor.system.skills).map(key => [key.replace(" ", " "), 0])
+      ); // default to 0 as 0 is not > undefined (for use in the template)
+    }
     const careerPurchases = {};
     const specializationPurchases = {};
     for (const skillName of this.data.selected.careerCareerSkillRanks) {
@@ -555,10 +583,6 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         careerPurchases[skillName] = 0;
       }
       careerPurchases[skillName]++;
-      // add to combined purchases
-      if (!Object.keys(combinedPurchases).includes(skillName)) {
-        combinedPurchases[skillName] = 0;
-      }
       combinedPurchases[skillName]++;
     }
     for (const skillName of this.data.selected.specializationCareerSkillRanks) {
@@ -567,10 +591,6 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         specializationPurchases[skillName] = 0;
       }
       specializationPurchases[skillName]++;
-      // add to combined purchases
-      if (!Object.keys(combinedPurchases).includes(skillName)) {
-        combinedPurchases[skillName] = 0;
-      }
       combinedPurchases[skillName]++;
     }
     context.careerSkillPurchases = careerPurchases;
@@ -607,6 +627,23 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     }
     context.tab = context.tabs[partId];
     return context;
+  }
+
+  /**
+   * Converts the config object into an object slimselect can use
+   * @returns {*[]}
+   */
+  startingBonusForHTML() {
+    const startingBonuses = CONFIG.FFG.characterCreator.startingBonusesRadio[this.data.selected.rules];
+    const options = [];
+    for (const value of Object.keys(startingBonuses)) {
+      const label = startingBonuses[value];
+      options.push({
+        value: value,
+        label: label,
+      });
+    }
+    return options;
   }
 
   /**
@@ -818,8 +855,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
   /**
   * Handler for the user selecting their starting bonus
   */
-  static selectStartingBonus(event, target) {
-    const choice = $(target).find(":checked")[0].value;
+  selectStartingBonus(choice) {
     CONFIG.logger.debug(`selected starting bonus ${choice}`);
     const ruleToBonusMap = {
       fad: 'conflict',
@@ -928,7 +964,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       return ui.notifications.warn(`Unable to find species!`);
     }
     this.data.selected.species = selectedSpecies;
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   async handleCareerSelect(event) {
@@ -953,7 +989,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       }
     }
 
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   async handleObligationEdit(event) {
@@ -995,7 +1031,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       return ui.notifications.warn(`Unable to find obligation!`);
     }
     this.data.selected.obligations.push(selectedObligation);
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   async handleSpecializationSelect(event) {
@@ -1006,29 +1042,46 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     }
     this.data.selected.specialization = selectedSpecialization;
     this.data.selected.specializationCareerSkillRanks = [];
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
-  async showCharacterStatus() {
-    // temporary: delete previous copies of the actor
-    const existingActor = game.actors.getName("temp actor");
-    if (existingActor) {
-      await existingActor.delete();
+  /**
+   * Initial handler for showCharacterStatus, since we need different code paths based on if a socket event is needed
+   * @returns {Promise<void>}
+   */
+  async showCharacterStatusShim() {
+    if (game.user.isGM) {
+      // temporary: delete previous copies of the actor
+      const existingActor = game.actors.getName(`temp actor - ${game.user.name}`);
+      if (existingActor) {
+        await existingActor.delete();
+      }
+      // temporary: create a new actor to add stuff to
+      const tempActor = await Actor.create(
+        {
+          name: `temp actor - ${game.user.name}`,
+          type: "character",
+          displaySheet: false,
+        },
+      );
+      await this.showCharacterStatus(tempActor.id);
+    } else {
+      game.socket.emit("system.starwarsffg", {
+        eventType: "pcWizard",
+        event: "createCharacterRequest",
+      });
+    }
+  }
+
+  async showCharacterStatus(actorId) {
+    const tempActor = game.actors.get(actorId);
+    if (!tempActor) {
+      ui.notifications.error(`Unable to find temp actor!`);
+      return;
     }
 
-    // temporary: create a new actor to add stuff to
-    console.log("creating temp actor...")
-    const tempActor = await Actor.create(
-      {
-        name: "temp actor",
-        type: "character",
-        displaySheet: false,
-      },
-    );
-
-    console.log("updating XP for temp actor")
-    const totalXp = 100;
-    const availableXp = 100;
+    CONFIG.logger.debug("updating XP for temp actor");
+    const { total: totalXp, available: availableXp } = this.calcXp();
     if (this.data.selected.species?.uuid) {
       await tempActor.update({
         "system.experience": {
@@ -1038,7 +1091,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       });
     }
 
-    console.log("applying XP purchases")
+    CONFIG.logger.debug("applying XP purchases");
     // apply purchases
     for (const characteristicPurchase of this.data.purchases.xp.characteristics) {
       const updateKey = `system.characteristics.${characteristicPurchase.key}.value`;
@@ -1084,28 +1137,64 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         items.push(item);
       }
     }
-    console.log("adding the following items to the temp actor")
-    console.log(items)
+    CONFIG.logger.debug("adding the following items to the temp actor");
+    CONFIG.logger.debug(items);
     await tempActor.createEmbeddedDocuments("Item", items);
 
-    console.log("assigning to local actor record")
-    this.tempActor = tempActor;
-    console.log("re-rendering")
-    this.render();
-
-    // TODO: add bonus stuff
-
     // apply career skill ranks from career and specialization
-    for (const skillPurchase of this.data.selected.careerCareerSkillRanks) {
-      const updateKey = `system.skills.${skillPurchase}.rank`;
-      const newValue = tempActor.system.skills[skillPurchase].rank + 1;
-      await tempActor.update({[updateKey]: newValue})
+    const careerItem = tempActor.items.find(i => i.type === "career");
+    if (careerItem) {
+      for (const skillPurchase of this.data.selected.careerCareerSkillRanks) {
+        const nk = new Date().getTime();
+        await careerItem.update({
+          "system.attributes": {
+            [`attr${nk}`]: {
+              modtype: "Skill Rank",
+              mod: skillPurchase,
+              value: 1,
+            },
+          }
+        });
+        const AE = {
+          name: `attr${nk}`,
+          changes: [{
+            key: `system.skills.${skillPurchase}.rank`,
+            mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+            value: 1,
+          }],
+        };
+        await careerItem.createEmbeddedDocuments("ActiveEffect", [AE]);
+      }
     }
-    for (const skillPurchase of this.data.selected.specializationCareerSkillRanks) {
-      const updateKey = `system.skills.${skillPurchase}.rank`;
-      const newValue = tempActor.system.skills[skillPurchase].rank + 1;
-      await tempActor.update({[updateKey]: newValue})
+
+    const specializationItem = tempActor.items.find(i => i.type === "specialization" && i.name === this.data.selected.specialization?.name);
+    if (specializationItem) {
+      for (const skillPurchase of this.data.selected.specializationCareerSkillRanks) {
+        const nk = new Date().getTime();
+        await specializationItem.update({
+          "system.attributes": {
+            [`attr${nk}`]: {
+              modtype: "Skill Rank",
+              mod: skillPurchase,
+              value: 1,
+            },
+          }
+        });
+        const AE = {
+          name: `attr${nk}`,
+          changes: [{
+            key: `system.skills.${skillPurchase}.rank`,
+            mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+            value: 1,
+          }],
+        };
+        await specializationItem.createEmbeddedDocuments("ActiveEffect", [AE]);
+      }
     }
+    CONFIG.logger.debug("assigning to local actor record");
+    this.tempActor = tempActor;
+    CONFIG.logger.debug("re-rendering");
+    this.render();
   }
 
   async handleCharacteristicModify(event) {
@@ -1128,12 +1217,12 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       this.data.purchases.xp.characteristics.splice(purchaseIndex, 1);
     }
     // rebuild the actor to apply the changes
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   async handleSkillModify(event) {
     const target = $(event.currentTarget);
-    const skill = target.data("target");
+    const skill = target.data("target").replace(" ", " ");
     const direction = target.data("direction");
     const curValue = target.data("value");
     const skillMode = target.data("mode");
@@ -1178,7 +1267,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       }
     }
     // rebuild the actor to apply the changes
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   async handleSpecializationPurchase(event) {
@@ -1297,7 +1386,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     // rebuild the actor to apply the changes
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   async handleRemoveForcePower(event) {
@@ -1321,7 +1410,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     // rebuild the actor to apply the changes
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   async handleForcePowerTalentPurchase(event) {
@@ -1351,7 +1440,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     // rebuild the actor to apply the changes
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   async handleSpecializationTalentPurchase(event) {
@@ -1386,7 +1475,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     // rebuild the actor to apply the changes
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   async showPurchaseConfirmation(itemType, content) {
@@ -1399,11 +1488,11 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
             icon: '<i class="fa-regular fa-circle-up"></i>',
             label: game.i18n.localize("SWFFG.Actors.Sheets.Purchase.ConfirmPurchase"),
             callback: async (purchaseWindow) => {
-              console.log(purchaseWindow)
+              CONFIG.logger.debug(purchaseWindow);
               const cost = $("#ffgPurchase option:selected", purchaseWindow).data("cost");
               const selectedUuid = $("#ffgPurchase option:selected", purchaseWindow).data("source");
 
-              console.log(cost, selectedUuid)
+              CONFIG.logger.debug(cost, selectedUuid);
 
               const selectedItem = await fromUuid(selectedUuid);
               if (!selectedItem) {
@@ -1415,7 +1504,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
                 cost: cost,
               });
               // rebuild the actor to apply the changes
-              await this.showCharacterStatus();
+              await this.showCharacterStatusShim();
             },
           },
           cancel: {
@@ -1515,7 +1604,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       cost: purchasedItem.system.price.value,
     });
     // rebuild the actor to apply the changes
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   async handleCreditRefund(event) {
@@ -1531,11 +1620,11 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     // rebuild the actor to apply the changes
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   calcCredits() {
-    const total = this.data.grants.bonus.credits;
+    const total = this.data.grants.gm.credits + this.data.grants.bonus.credits;
     let available = total;
 
     for (const purchase of this.data.purchases.credits) {
@@ -1559,7 +1648,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
       item: purchasedItem,
     });
     // rebuild the actor to apply the changes
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
   async handleMotivationRefund(event) {
@@ -1575,27 +1664,36 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     // rebuild the actor to apply the changes
-    await this.showCharacterStatus();
+    await this.showCharacterStatusShim();
   }
 
-  async createActor() {
-    CONFIG.logger.debug("Creating new actor...");
-    const actorName = `${game.user.name}'s new actor!`;
-    // TODO: validate state before creating actor
-    // temporary: delete previous copies of the actor
-    const existingActor = game.actors.getName(actorName);
-    if (existingActor) {
-      CONFIG.logger.debug("Deleting old actor");
-      await existingActor.delete();
+  async createActorShim() {
+    if (game.user.isGM) {
+      // temporary: create a new actor to add stuff to
+      CONFIG.logger.debug("creating final actor...");
+      const finalActor = await Actor.create(
+        {
+          name: `${game.user.name}'s new PC!`,
+          type: "character",
+          displaySheet: false,
+        },
+      );
+      await this.createActor(finalActor.id);
+    } else {
+      game.socket.emit("system.starwarsffg", {
+        eventType: "pcWizard",
+        event: "createFinalActorRequest",
+      });
     }
+  }
 
-    const newActor = await Actor.create(
-      {
-        name: actorName,
-        type: "character",
-        displaySheet: false,
-      },
-    );
+  async createActor(actorId) {
+    CONFIG.logger.debug("Creating new actor...");
+    const newActor = game.actors.get(actorId);
+    if (!newActor) {
+      ui.notifications.error("Actor not found.");
+      return;
+    }
 
     const xp = await this.calcXp();
     const totalXp = xp.total;
@@ -1669,7 +1767,7 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
     await newActor.createEmbeddedDocuments("Item", creditItems);
     await newActor.update({
       "system.stats.credits": {
-        value: credits.available,
+        value: credits.available + this.data.spendingCredits,
       }
     });
 
@@ -1732,6 +1830,9 @@ export class CharacterCreator extends HandlebarsApplicationMixin(ApplicationV2) 
         await specializationItem.createEmbeddedDocuments("ActiveEffect", [AE]);
       }
     }
+
+    await xpLogEarn(newActor, totalXp, totalXp, totalXp, "Initial State");
+    await xpLogSpend(newActor, "Character Creation Changes", totalXp - availableXp, availableXp, totalXp);
 
     newActor.sheet.render(true);
   }
