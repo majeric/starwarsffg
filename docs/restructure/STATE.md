@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-00-foundation
-**Current task:** 0.11 — Verify `npm run verify` runs end-to-end (even if some tests fail; that's documented)
-**Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** dca2ffa
+**Current task:** 0.12 — Verify Foundry V13 still loads the system after build
+**Last verified:** 2026-05-28T07:30:00Z (lint gate red as known failure; all other gates green)
+**Last commit on plan:** 47cbd29
 
 ---
 
@@ -40,8 +40,8 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 - [x] 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
 - [x] 0.9 — Add CI workflow (.github/workflows/ci.yml)
 - [x] 0.10 — Add .restructure/ to .gitignore
-- [ ] 0.11 — Verify `npm run verify` runs end-to-end (even if some tests fail; that's documented)   ← CURRENT
-- [ ] 0.12 — Verify Foundry V13 still loads the system after build
+- [x] 0.11 — Verify `npm run verify` runs end-to-end (even if some tests fail; that's documented)
+- [ ] 0.12 — Verify Foundry V13 still loads the system after build   ← CURRENT
 
 ---
 
@@ -111,6 +111,19 @@ See `phases/phase-00-foundation.md` for the full task definitions.
   `.restructure/sessions/test.md` was ignored via `.gitignore:17`. Attempting
   to remove that scratch test file afterwards was denied by the filesystem, but
   it remains ignored and untracked.
+- 2026-05-28 — Executor handoff. Codex paused after task 0.10 commit
+  (`dca2ffa`); Claude resumed and committed in-progress task 0.11 work
+  (lint known-failure entry + verify.mjs run-all behavior) as commit
+  `47cbd29`. Codex's verify.mjs behavior change (fail-fast → run-all-with-
+  summary) was accepted as in-scope for task 0.11 since it directly serves
+  the "verify runs end-to-end" goal. Operator directed continuous execution
+  through the next session window.
+- 2026-05-28 — Phase 0 task 0.11 verification note. `npm run verify` reports
+  typecheck PASS, lint FAIL (1023 warnings; known failure owned by Phase 12),
+  comments PASS, unit tests PASS (legacy suites quarantined), build PASS
+  (664ms), smoke load PASS (system.json parses, all ESM entries exist in
+  dist/), migration replay PASS (no fixtures yet). The verify summary now
+  reports every gate's status before exiting non-zero on the first failure.
 
 ---
 
