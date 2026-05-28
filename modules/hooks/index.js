@@ -1,4 +1,5 @@
 import { registerSetupHook } from "./setup.js";
+import { registerRenderChatInputHook } from "./render-chat-input.js";
 
 /**
  * Central entry point for Foundry hook registrations extracted out of
@@ -15,4 +16,5 @@ import { registerSetupHook } from "./setup.js";
  */
 export function registerAllHooks() {
   registerSetupHook();
+  registerRenderChatInputHook();
 }

@@ -701,30 +701,8 @@ Hooks.once("init", async function () {
   await TemplateHelpers.preload();
 });
 
-Hooks.on("renderChatInput", (app, html, data) => {
-  if (app.id === "chat") {
-    // add in the chat dice roller
-    const rollButtonId = "ffgChatRoll";
-    if (!document.querySelector(`#${rollButtonId}`)) {
-
-      const rollButton = document.createElement("button");
-      rollButton.id = rollButtonId;
-      rollButton.type = "button";
-      rollButton.classList.add("ui-control", "icon", "fa-light", "fa-dice-d20");
-
-      const rollPrivacyElement = document.querySelector("#roll-privacy");
-      rollPrivacyElement.appendChild(rollButton);
-
-      rollButton.onclick = async function () {
-        const dicePool = new DicePoolFFG();
-        let user = {
-          data: game.user.system,
-        };
-        await DiceHelpers.displayRollDialog(user, dicePool, game.i18n.localize("SWFFG.RollingDefaultTitle"), "");
-      }
-    }
-  }
-});
+// renderChatInput hook now lives in modules/hooks/render-chat-input.js
+// (Phase 3.3). Registered via registerAllHooks() above.
 
 Hooks.on("renderActorDirectory", (app, html) => {
   if (app.id === "actors") {
