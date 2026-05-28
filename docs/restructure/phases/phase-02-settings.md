@@ -90,15 +90,263 @@ If Phase 11 hasn't run yet (which it shouldn't have, given phase ordering),
 add it to the existing `modules/swffg-migration.js` for now and flag in
 `STATE.md` "Open issues" to relocate when Phase 11 runs.
 
-## Tasks (to be detailed before phase begins)
+## Tasks
 
-Suggested breakdown:
-- Task 2.1: Create `modules/settings/index.js` skeleton with empty `registerAllSettings()`
-- Tasks 2.2-2.7: One per grouping file (compendiums, combat, character, ui, modifiers, debug)
-- Task 2.8: Wire `swffg-main.js` to call `registerAllSettings()`; remove old calls
-- Task 2.9: Replace `arraySkillList` JSON-string pattern with typed setting + migration
-- Task 2.10: Verify all settings appear in Foundry UI unchanged
-- Task 2.11: Verify Phase 2 stop gate
+**Scoped narrowly:** Phase 2 extracts the ~30 `game.settings.register()` calls
+that currently live in `modules/swffg-main.js` only. The existing
+`modules/settings/settings-helpers.js`, `modules/settings/ui-settings.js`, and
+`modules/settings/crew-settings.js` are NOT modified by this phase; their
+settings stay where they are. Consolidating all settings files into the
+target-state layout is a follow-up concern (open issue at phase close).
+
+Many extracted settings have `onChange` callbacks referencing functions
+defined in `swffg-main.js` scope (e.g., `_setffgInitiative`). Per-task specs
+note when a helper must move alongside the setting OR when the callback is
+passed in via a parameter to the register function.
+
+### 2.1 — Create settings index
+
+**Files to create:**
+- `modules/settings/index.js` exporting `export function registerAllSettings(callbacks = {})`
+
+**Function spec:**
+```js
+export function registerAllSettings(callbacks = {}) {
+  registerCompendiumSettings();
+  registerCombatSettings(callbacks);
+  registerCharacterSettings();
+  registerSimulationSettings();
+  registerSkillListSettings();
+  registerCrewMainSettings();
+  registerDebugSettings();
+}
+```
+
+Each `register*` function is imported from its grouping file (created in
+later tasks). The `callbacks` param carries hook functions that can't be
+moved (e.g., the initiative re-setter).
+
+For task 2.1, all grouping files don't exist yet — wrap each call in a
+try/catch + console.warn so the index can be wired immediately even if a
+group hasn't been extracted yet, OR (preferred) leave the imports
+commented out and uncomment as each grouping task lands.
+
+**Verification:** lint + typecheck pass; importing index.js does nothing
+yet.
+
+**Commit:** `phase 02.1: scaffold modules/settings/index.js`
+
+---
+
+### 2.2 — Extract compendium settings
+
+**Source:** `modules/swffg-main.js:393-478` (10 *Compendiums settings)
+
+**Files to create:**
+- `modules/settings/compendiums.js` exporting `registerCompendiumSettings()`
+
+**Settings to move (verbatim):**
+specializationCompendiums, signatureAbilityCompendiums, forcePowerCompendiums,
+talentCompendiums, backgroundCompendiums, obligationCompendiums, speciesCompendiums,
+careerCompendiums, motivationCompendiums, itemCompendiums
+
+All are `scope: "world", config: false, type: String` with a default string of
+compendium pack ids. Move verbatim.
+
+**Steps:**
+1. Create `modules/settings/compendiums.js` with `registerCompendiumSettings()`
+   that contains each `game.settings.register(...)` call exactly as in source
+2. Import in `modules/settings/index.js`; call from `registerAllSettings()`
+3. Delete the 10 registration calls from `swffg-main.js:393-478`
+4. Add `import { registerCompendiumSettings } from "./settings/compendiums.js"`
+   at the top of swffg-main.js (or rely on index.js if it's already wired)
+5. Verify: `npm run verify` + manually confirm Foundry shows the settings
+
+**Commit:** `phase 02.2: extract compendium settings`
+
+---
+
+### 2.3 — Extract combat settings
+
+**Source:** `modules/swffg-main.js:335-368, 518-549, 158-165`
+(initiativeRule, useGenericSlots, removeCombatantAction, configuredTurnMarker)
+
+**Helper to move:** `_setffgInitiative(rule)` is defined inside the init hook
+in swffg-main.js. Move it to `modules/settings/combat.js` and export it for
+use as the `onChange` callback of `initiativeRule`.
+
+**Files to create:**
+- `modules/settings/combat.js` exporting `registerCombatSettings(callbacks)`
+  and `setFFGInitiative(rule)`
+
+**Settings to move:**
+- `useGenericSlots` (its onChange triggers `window.location.reload()`)
+- `removeCombatantAction`
+- `configuredTurnMarker`
+- `initiativeRule` (its onChange is `setFFGInitiative`)
+
+**Note:** `useGenericSlots` is read in swffg-main.js to gate registering
+`CombatTrackerFFG` etc. The READ stays in swffg-main.js; only the register
+moves.
+
+**Commit:** `phase 02.3: extract combat settings`
+
+---
+
+### 2.4 — Extract character settings
+
+**Source:** `modules/swffg-main.js:275-330, 373-388`
+
+**Files to create:**
+- `modules/settings/character.js` exporting `registerCharacterSettings()`
+
+**Settings to move:**
+notifyOnXpSpend, defaultObligation, defaultDuty, defaultMorality,
+maxRarity, allowRestricted, defaultCredits, maxAttribute, maxSkill
+
+All `scope: "world", config: false`. Plain value settings. Move verbatim.
+
+**Commit:** `phase 02.4: extract character settings`
+
+---
+
+### 2.5 — Extract simulation and miscellaneous settings
+
+**Source:** `modules/swffg-main.js:147-156, 480-512`
+
+**Files to create:**
+- `modules/settings/simulation.js` exporting `registerSimulationSettings()`
+
+**Settings to move:**
+- `additionalStatuses` (onChange triggers reload)
+- `useDefense` (scope: client)
+- `displaySimulation`
+- `rollSimulation`
+
+**Commit:** `phase 02.5: extract simulation settings`
+
+---
+
+### 2.6 — Extract skill-list settings and arraySkillList migration
+
+**Source:** `modules/swffg-main.js:557-602` (skill-list area) plus `parseSkillList()`
+function at lines 60-67 which JSON.parses the setting value.
+
+**Files to create:**
+- `modules/settings/skill-list.js` exporting `registerSkillListSettings()`
+  and `getSkillList()` (replacing the broken `parseSkillList()`)
+- `modules/migrations/<sha>-array-skill-list.js` migration that converts the
+  existing string-typed value to a typed Object setting
+
+**Settings to move:**
+- `addskilltheme` (registerMenu)
+- `addskilltheme` (the setting itself)
+- `arraySkillList` — CHANGE TYPE: was `type: String` storing JSON-serialized
+  data; convert to `type: Object` storing the data directly
+- `skilltheme`
+
+**Migration:**
+On first load with the new setting type, detect the stored string,
+`JSON.parse` it, and re-store as a typed Object. If parse fails (e.g.,
+already migrated), fall back to default.
+
+**getSkillList helper:** Reads the now-typed setting; no JSON.parse. Update
+the one caller of `parseSkillList()` in swffg-main.js to use this.
+
+**Commit:** `phase 02.6: extract skill-list settings and migrate arraySkillList type`
+
+---
+
+### 2.7 — Extract crew main settings
+
+**Source:** `modules/swffg-main.js:1888-1915`
+(arrayCrewRoles menu + setting, initiativeCrewRole)
+
+**Note:** `modules/settings/crew-settings.js` already exists with related
+crew logic. To avoid renaming or merging during this phase, the new file
+is named `crew-main-settings.js` so it sits next to the existing one
+without conflict. A follow-up task (after Phase 2 close) can consolidate.
+
+**Files to create:**
+- `modules/settings/crew-main-settings.js` exporting `registerCrewMainSettings()`
+
+**Settings to move:**
+- `arrayCrewRoles` (registerMenu + setting)
+- `initiativeCrewRole`
+
+**Commit:** `phase 02.7: extract crew main settings`
+
+---
+
+### 2.8 — Extract debug setting
+
+**Source:** `modules/swffg-main.js:134-142`
+
+**Files to create:**
+- `modules/settings/debug.js` exporting `registerDebugSettings()`
+
+**Settings to move:**
+- `enableDebug` (onChange triggers `this.debouncedReload`; verify this
+  reference still resolves — if it requires the init-hook `this`, switch
+  to `() => foundry.utils.debouncedReload()` if available or
+  `window.location.reload`)
+
+**Commit:** `phase 02.8: extract debug setting`
+
+---
+
+### 2.9 — Wire swffg-main.js to call registerAllSettings()
+
+**Source:** what's left in `swffg-main.js` after tasks 2.2-2.8
+
+**Files modified:**
+- `modules/swffg-main.js` — at the right point in the init hook (after
+  CONFIG namespacing, before things that depend on settings being
+  registered), call `registerAllSettings({ ... callbacks ... })`
+- Remove all `game.settings.register(...)` lines that have been moved
+- Verify no orphaned references to moved helpers
+
+**Verification:**
+- `grep -n "game.settings.register" modules/swffg-main.js` returns zero
+  matches for the extracted settings (the existing `settings-helpers.js`
+  remains; `crew-settings.js` remains; this only checks main is clean)
+- All settings still appear in Foundry's settings UI when the operator
+  manually verifies
+- `npm run verify` passes (lint may still fail on legacy size of
+  swffg-main.js — should be smaller now though)
+
+**Commit:** `phase 02.9: wire swffg-main.js to registerAllSettings()`
+
+---
+
+### 2.10 — Verify Phase 2 stop gate
+
+**Steps:**
+1. `npm run verify` — same green/lint pattern
+2. `npx vitest run` — all tests still pass
+3. Count moved settings:
+   `grep -c "game.settings.register" modules/settings/*.js` should reflect
+   the 30 extracted settings + the 30+ pre-existing in settings-helpers.js
+4. Future-maintainer check: pick `modules/settings/compendiums.js`; could
+   a contributor add a new compendium-list setting by editing only that
+   file? Yes.
+5. Manual smoke: operator launches Foundry, verifies all settings appear
+   with the same labels, hints, defaults, scopes.
+
+**Commit:** `phase 02.10: phase 2 stop gate verified`
+
+---
+
+## Out of scope for Phase 2 (open issues at close)
+
+- Consolidating `settings-helpers.js` (30+ registrations + many menus) into
+  the new per-group layout
+- Consolidating `ui-settings.js` and `crew-settings.js` into the new layout
+- Moving the token-display settings (`showMinionCount`, `showAdversaryCount`,
+  `adversaryItemName`) out of `modules/helpers/token.js` into
+  `modules/settings/`
+- Removing the redundant `crew-main-settings.js` / `crew-settings.js`
+  separation (intentional during Phase 2 to avoid mid-phase renames)
 
 ## Anti-creep notes
 
