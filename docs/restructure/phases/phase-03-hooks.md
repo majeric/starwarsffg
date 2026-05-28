@@ -62,14 +62,134 @@ imports them all and calls them in order from `registerAllHooks()`.
   doesn't actually matter (since Foundry fires hooks by event, not
   registration order), but follow the file naming order to keep it readable.
 
-## Tasks (to be detailed before phase begins)
+## Tasks
 
-Suggested breakdown:
-- Task 3.1: Create `modules/hooks/index.js` skeleton
-- Tasks 3.2-3.N: One file per hook concern, extracted from `swffg-main.js`
-- Task 3.N+1: Wire `swffg-main.js` to call `registerAllHooks()`
-- Task 3.N+2: Verify Phase 3 stop gate
+**Scoped narrowly:** Phase 3 extracts only the *top-level* `Hooks.on(...)`
+and `Hooks.once(...)` registrations from `swffg-main.js`. Hooks registered
+*inside* the init hook body (createActor, updateToken, preCreateCombatant,
+preDeleteCombatant) or *inside* the ready hook body (hotbarDrop,
+createMacro, closeItemSheetFFG, createItem, deleteItem, refreshToken,
+updateActiveEffect) stay where they are — they reference variables and
+callbacks scoped to their containing hook. A follow-up phase (Phase 3.5
+or part of Phase 5) will decompose the init/ready bodies further.
 
-Discover the hook list by grepping `swffg-main.js` for `Hooks.on` and `Hooks.once`.
-The number of files depends on how many distinct hook events are handled —
-estimate 10-15 based on the current code.
+Per-task pattern: create `modules/hooks/<event-name>.js` exporting
+`registerXxxHook()`, which contains the original `Hooks.on(...)` call
+verbatim with any imports it needs. Wire from `modules/hooks/index.js`'s
+`registerAllHooks()`. Delete the inline registration from swffg-main.js.
+
+### 3.1 — Scaffold modules/hooks/index.js
+
+Create `modules/hooks/index.js` with `export function registerAllHooks()`
+that is initially a no-op (matches the index.js pattern from Phase 2).
+Wire `swffg-main.js` to call `registerAllHooks()` once near the top of
+the init hook (after `registerAllSettings()`). Each subsequent task adds
+its import + call to `index.js`.
+
+**Commit:** `phase 03.1: scaffold modules/hooks/index.js`
+
+### 3.2 — Extract setup hook
+
+**Source:** `swffg-main.js:72-75` (Hooks.on("setup") that registers journal
+enrichers and system tours).
+
+**Files to create:** `modules/hooks/setup.js`
+
+The body imports `register_roll_tag_enricher`, `register_oggdude_tag_enricher`,
+`register_dice_enricher` from `../helpers/journal.js` and
+`register_system_tours` from `../helpers/tours.js`. Move those imports too.
+
+**Commit:** `phase 03.2: extract setup hook`
+
+### 3.3 — Extract renderChatInput hook
+
+**Source:** `swffg-main.js:703-` (registers click handlers for chat input).
+
+**Files to create:** `modules/hooks/render-chat-input.js`
+
+Carefully audit what helpers and imports the body needs; move them along.
+
+**Commit:** `phase 03.3: extract renderChatInput hook`
+
+### 3.4 — Extract renderActorDirectory hook
+
+**Source:** `swffg-main.js:728-`
+
+**Files to create:** `modules/hooks/render-actor-directory.js`
+
+**Commit:** `phase 03.4: extract renderActorDirectory hook`
+
+### 3.5 — Extract renderCompendiumDirectory hook
+
+**Source:** `swffg-main.js:757-`
+
+**Files to create:** `modules/hooks/render-compendium-directory.js`
+
+**Commit:** `phase 03.5: extract renderCompendiumDirectory hook`
+
+### 3.6 — Extract renderChatMessage hook
+
+**Source:** `swffg-main.js:780-`
+
+**Files to create:** `modules/hooks/render-chat-message.js`
+
+This hook is asynchronous; preserve the async signature.
+
+**Commit:** `phase 03.6: extract renderChatMessage hook`
+
+### 3.7 — Extract dropActorSheetData hook
+
+**Source:** `swffg-main.js:817-`
+
+**Files to create:** `modules/hooks/drop-actor-sheet-data.js`
+
+**Commit:** `phase 03.7: extract dropActorSheetData hook`
+
+### 3.8 — Extract diceSoNiceReady hook
+
+**Source:** `swffg-main.js:1354-`
+
+**Files to create:** `modules/hooks/dice-so-nice-ready.js`
+
+This is `Hooks.once`, not `Hooks.on`. Hook fires once when the Dice So Nice
+module is ready (it's an optional dependency). Preserve the `once`
+semantics in the extracted file.
+
+**Commit:** `phase 03.8: extract diceSoNiceReady hook`
+
+### 3.9 — Extract renderGamePause hook
+
+**Source:** `swffg-main.js:1576-`
+
+**Files to create:** `modules/hooks/render-game-pause.js`
+
+**Commit:** `phase 03.9: extract renderGamePause hook`
+
+### 3.10 — Verify Phase 3 stop gate
+
+**Steps:**
+1. `grep -n "^Hooks\." modules/swffg-main.js` returns only the init and
+   ready registrations (init line 80, ready line ~826)
+2. `npm run verify` — same green/lint pattern
+3. All hooks still fire and behave identically (manual smoke deferred to
+   operator)
+4. Future-maintainer check: pick `modules/hooks/render-chat-message.js`;
+   could a contributor add a new behavior to chat message rendering by
+   reading only that file plus 1-2 helpers? Yes.
+
+**Commit:** `phase 03.10: phase 3 stop gate verified`
+
+---
+
+## Out of scope for Phase 3 (open issues at close)
+
+- Decomposing the `Hooks.once("init", ...)` body itself — currently ~700 lines
+  of class registration, prototype patches, dice setup, etc. Some of this
+  naturally moves out in Phase 4 (prototype cleanup), Phase 5 (DataModels),
+  and as Phase 2 follow-ups (consolidating remaining settings files).
+- Decomposing the `Hooks.once("ready", ...)` body — also large, contains
+  multiple inline `Hooks.on(...)` for events like hotbarDrop, createItem,
+  etc. These reference ready-scoped state and can't be cleanly extracted
+  without first refactoring the ready body.
+- Top-level hooks registered inside the init body (createActor, updateToken,
+  preCreateCombatant, preDeleteCombatant) — same scope rationale.
