@@ -267,65 +267,10 @@ Hooks.once("init", async function () {
     }
   }
 
-  /**
-   * Register default XP spend notification
-   */
-  game.settings.register("starwarsffg", "notifyOnXpSpend", {
-    name: game.i18n.localize("SWFFG.Settings.Purchase.Notify.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Purchase.Notify.Hint"),
-    scope: "world",
-    config: false,
-    default: true,
-    type: Boolean,
-  });
-  game.settings.register("starwarsffg", "defaultObligation", {
-    name: game.i18n.localize("SWFFG.Settings.Obligation.Default.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Obligation.Default.Hint"),
-    scope: "world",
-    config: false,
-    default: 20,
-    type: Number,
-  });
-  game.settings.register("starwarsffg", "defaultDuty", {
-    name: game.i18n.localize("SWFFG.Settings.Duty.Default.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Duty.Default.Hint"),
-    scope: "world",
-    config: false,
-    default: 20,
-    type: Number,
-  });
-  game.settings.register("starwarsffg", "defaultMorality", {
-    name: game.i18n.localize("SWFFG.Settings.Morality.Default.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Morality.Default.Hint"),
-    scope: "world",
-    config: false,
-    default: 50,
-    type: Number,
-  });
-  game.settings.register("starwarsffg", "maxRarity", {
-    name: game.i18n.localize("SWFFG.Settings.CharCreator.Items.maxRarity.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.CharCreator.Items.maxRarity.Hint"),
-    scope: "world",
-    config: false,
-    default: 6,
-    type: Number,
-  });
-  game.settings.register("starwarsffg", "allowRestricted", {
-    name: game.i18n.localize("SWFFG.Settings.CharCreator.Items.allowRestricted.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.CharCreator.Items.allowRestricted.Hint"),
-    scope: "world",
-    config: false,
-    default: false,
-    type: Boolean,
-  });
-  game.settings.register("starwarsffg", "defaultCredits", {
-    name: game.i18n.localize("SWFFG.Settings.Credits.Default.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Credits.Default.Hint"),
-    scope: "world",
-    config: false,
-    default: 500,
-    type: Number,
-  });
+  // Character-defaults settings (notifyOnXpSpend, defaultObligation,
+  // defaultDuty, defaultMorality, maxRarity, allowRestricted,
+  // defaultCredits) now live in modules/settings/character.js (Phase 2.4).
+  // Registered via registerAllSettings() above.
 
   // useGenericSlots setting now lives in modules/settings/combat.js
   // (Phase 2.3). The READ below stays here because it gates registering
@@ -342,25 +287,9 @@ Hooks.once("init", async function () {
   // removeCombatantAction setting now lives in modules/settings/combat.js
   // (Phase 2.3). Registered via registerAllSettings() above.
 
-  /**
-   * Register the max value for characteristics and skills
-   */
-  game.settings.register("starwarsffg", "maxAttribute", {
-    name: game.i18n.localize("SWFFG.Settings.maxAttribute.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.maxAttribute.Hint"),
-    scope: "world",
-    config: false,
-    default: 7,
-    type: Number,
-  });
-  game.settings.register("starwarsffg", "maxSkill", {
-    name: game.i18n.localize("SWFFG.Settings.maxSkill.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.maxSkill.Hint"),
-    scope: "world",
-    config: false,
-    default: 6,
-    type: Number,
-  });
+  // maxAttribute and maxSkill settings now live in
+  // modules/settings/character.js (Phase 2.4). Registered via
+  // registerAllSettings() above.
 
   // Compendium-pack source settings now live in
   // modules/settings/compendiums.js (Phase 2.2). Registered via
