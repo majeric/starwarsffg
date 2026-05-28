@@ -1,7 +1,7 @@
 # Restructure State
 
 **Current phase:** phase-00-foundation
-**Current task:** 0.10 — Add .restructure/ to .gitignore
+**Current task:** 0.11 — Verify `npm run verify` runs end-to-end (even if some tests fail; that's documented)
 **Last verified:** never (Phase 0 has not started)
 **Last commit on plan:** 00fb003
 
@@ -39,8 +39,8 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 - [x] 0.7 — Add Foundry V13 type definitions
 - [x] 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
 - [x] 0.9 — Add CI workflow (.github/workflows/ci.yml)
-- [ ] 0.10 — Add .restructure/ to .gitignore   ← CURRENT
-- [ ] 0.11 — Verify `npm run verify` runs end-to-end (even if some tests fail; that's documented)
+- [x] 0.10 — Add .restructure/ to .gitignore
+- [ ] 0.11 — Verify `npm run verify` runs end-to-end (even if some tests fail; that's documented)   ← CURRENT
 - [ ] 0.12 — Verify Foundry V13 still loads the system after build
 
 ---
@@ -105,6 +105,12 @@ See `phases/phase-00-foundation.md` for the full task definitions.
   build` succeeded and produced ignored `dist/` artifact contents. Local `npm
   run verify` still passes typecheck and fails at the pre-existing lint gate
   with 1023 warnings.
+- 2026-05-28 — Phase 0 task 0.10 reconciliation note. `.gitignore` already
+  contained the `.restructure/` scratch-space block before the task started.
+  `git ls-files .restructure/` returned no tracked files, and
+  `.restructure/sessions/test.md` was ignored via `.gitignore:17`. Attempting
+  to remove that scratch test file afterwards was denied by the filesystem, but
+  it remains ignored and untracked.
 
 ---
 
