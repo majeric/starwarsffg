@@ -55,6 +55,7 @@ import {register_system_tours} from "./helpers/tours.js";
 import { registerAllSettings } from "./settings/index.js";
 import { registerSkillThemeSetting } from "./settings/skill-list.js";
 import { registerCrewMainSettings } from "./settings/crew-main-settings.js";
+import { registerAllHooks } from "./hooks/index.js";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -68,6 +69,11 @@ async function parseSkillList() {
     return await game.settings.get("starwarsffg", "arraySkillList");
   }
 }
+
+// Register hooks extracted by Phase 3 of the restructure (see
+// docs/restructure/phases/phase-03-hooks.md). Hooks still registered
+// inline below have not been extracted yet.
+registerAllHooks();
 
 Hooks.on("setup", function (){
   // add dice symbol rendering to the text editor for journal pages
