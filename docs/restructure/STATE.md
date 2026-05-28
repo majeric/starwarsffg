@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-01-calculators
-**Current task:** 1.0 — Detail Phase 1 atomic tasks before execution
+**Current task:** 1.1 — Create calculator and test directories
 **Last verified:** 2026-05-28T07:30:00Z (lint gate red as known failure; all other gates green)
-**Last commit on plan:** 47cbd29
+**Last commit on plan:** 5cc1e6d
 
 ---
 
@@ -29,11 +29,17 @@
 ## Current phase tasks (phase-01-calculators)
 
 See `phases/phase-01-calculators.md` for the full task definitions.
-Phase 1 atomic tasks are detailed in task 1.0; subsequent task numbering
-follows the result of that detailing.
 
-- [ ] 1.0 — Detail Phase 1 atomic tasks before execution   ← CURRENT
-- [ ] 1.1+ — Extract each calculator + tests (one task per calculator family)
+- [x] 1.0 — Detail Phase 1 atomic tasks (commit `5cc1e6d`)
+- [ ] 1.1 — Create calculator and test directories   ← CURRENT
+- [ ] 1.2 — Extract encumbrance calculator
+- [ ] 1.3 — Extract wounds-threshold calculator
+- [ ] 1.4 — Extract strain-threshold calculator
+- [ ] 1.5 — Extract soak calculator
+- [ ] 1.6 — Extract defense calculator
+- [ ] 1.7 — Extract force-pool calculator
+- [ ] 1.8 — Extract talent-list aggregator
+- [ ] 1.9 — Verify Phase 1 stop gate
 
 (Previous: phase 0 closed with task 0.12 verified automated; see Open
 issues for the manual Foundry smoke that the operator should run when
