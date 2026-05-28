@@ -1,6 +1,6 @@
 type AnyRecord = Record<string, any>;
 
-const root = globalThis as typeof globalThis & AnyRecord;
+const root = globalThis as AnyRecord;
 
 function isPlainObject(value: unknown): value is AnyRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);

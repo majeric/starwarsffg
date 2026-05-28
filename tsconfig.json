@@ -12,7 +12,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client", "fvtt-types"]
   },
   "include": ["modules/**/*", "scripts/**/*", "tests/**/*", "types/**/*"],
   "exclude": ["node_modules", "lib", "dist", "build"]

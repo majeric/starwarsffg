@@ -17,6 +17,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "eslint": "^9.0.0",
+    "fvtt-types": "npm:@league-of-foundry-developers/foundry-vtt-types@13.346.0-beta.20250812191140",
     "happy-dom": "^20.9.0",
     "prettier": "^3.3.0",
     "typescript": "^5.5.0",

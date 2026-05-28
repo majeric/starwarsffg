@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-00-foundation
-**Current task:** 0.7 — Add Foundry V13 type definitions
+**Current task:** 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
 **Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** eea401a
+**Last commit on plan:** dbd3473
 
 ---
 
@@ -35,8 +35,8 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 - [x] 0.4 — Add ESLint and Prettier configuration
 - [x] 0.5 — Add vitest configuration and global Foundry mocks
 - [x] 0.6 — Create scripts/verify.mjs orchestrator
-- [ ] 0.7 — Add Foundry V13 type definitions   ← CURRENT
-- [ ] 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
+- [x] 0.7 — Add Foundry V13 type definitions
+- [ ] 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)   ← CURRENT
 - [ ] 0.9 — Add CI workflow (.github/workflows/ci.yml)
 - [ ] 0.10 — Add .restructure/ to .gitignore
 - [ ] 0.11 — Verify `npm run verify` runs end-to-end (even if some tests fail; that's documented)
@@ -72,6 +72,24 @@ See `phases/phase-00-foundation.md` for the full task definitions.
   orchestrator, passes typecheck, and fails at lint because existing legacy files
   produce 1023 warnings under `--max-warnings 0`. Task 0.11 owns formal
   documentation of Phase 0 known failures in `VERIFICATION.md`.
+- 2026-05-28 — Session start blocker before Phase 0 task 0.7. `git status`
+  showed uncommitted ADR-008/V13+V14 planning docs and an untracked
+  `docs/restructure/phases/phase-13-v14-compat.md` before task work started.
+  `SESSION_PROTOCOL.md` requires a clean repository before `npm run verify` or
+  new work, so task 0.7 was not started. Reconcile the pending planning docs
+  before continuing with Foundry V13 type definitions.
+- 2026-05-28 — Human direction changed blocker handling: blockers are now
+  documented and worked through in-session when locally solvable. Task 0.7
+  continued under the revised protocol. The pre-existing ADR-008 planning docs
+  remain uncommitted and should not be mixed into task-specific commits unless
+  intentionally reconciled.
+- 2026-05-28 — Phase 0 task 0.7 verification note. `npx tsc --noEmit` passed
+  after adding Foundry V13 types and removing the temporary `types/.smoke.ts`
+  file. `npm run verify` still passes the typecheck gate and fails at the
+  pre-existing lint gate with 1023 warnings; this is the same Phase 0 known
+  failure owned by task 0.11. Installing `fvtt-types` also produced the already
+  documented local Node v20.3.0 engine warnings and reported npm audit findings
+  in dev-only transitive dependencies.
 
 ---
 
@@ -79,7 +97,7 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 
 Sessions append to `.restructure/sessions/<UTC-timestamp>.md`. Latest:
 
-(none yet — phase 0 has not started)
+`.restructure/sessions/2026-05-28T06-43-33Z.md`
 
 ---
 
@@ -101,4 +119,5 @@ When a phase completes:
 
 If blocked:
 - Write the blocker under "Open issues" with date and context
-- Stop the session (do not start a different task to avoid the block)
+- Work through the blocker inside the current task scope
+- Stop only if it requires human input or external state you cannot provide
