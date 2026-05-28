@@ -1,3 +1,5 @@
+import { registerSetupHook } from "./setup.js";
+
 /**
  * Central entry point for Foundry hook registrations extracted out of
  * swffg-main.js by Phase 3 of the restructure.
@@ -12,6 +14,5 @@
  * here once. The whole chain runs once at module load.
  */
 export function registerAllHooks() {
-  // Per-event register calls are added by tasks 3.2 through 3.9 as each
-  // hook file lands. Until then this is a no-op.
+  registerSetupHook();
 }

@@ -75,13 +75,8 @@ async function parseSkillList() {
 // inline below have not been extracted yet.
 registerAllHooks();
 
-Hooks.on("setup", function (){
-  // add dice symbol rendering to the text editor for journal pages
-  register_roll_tag_enricher();
-  register_oggdude_tag_enricher();
-  register_dice_enricher();
-  register_system_tours();
-});
+// Setup hook now lives in modules/hooks/setup.js (Phase 3.2).
+// Registered via registerAllHooks() above.
 
 Hooks.once("init", async function () {
   console.log(`Initializing SWFFG System`);
