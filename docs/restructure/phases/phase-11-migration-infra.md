@@ -95,16 +95,158 @@ JSON format is canonical so changes are reviewable in PRs.
 - **Do** capture fixtures from real worlds (with permission and PII
   anonymization). Synthetic fixtures miss real-world quirks.
 
-## Tasks (to be detailed before phase begins)
+## Tasks
 
-Suggested breakdown:
-- Task 11.1: Create `modules/migrations/runner.js` with semver-aware runner
-- Task 11.2: Migrate `1.901` from swffg-migration.js to new file
-- Task 11.3: Migrate `1.906` from swffg-migration.js
-- Task 11.4: Migrate `1.907` from swffg-migration.js
-- Task 11.5: Delete swffg-migration.js; update callers
-- Task 11.6: Implement `scripts/replay-migrations.mjs`
-- Task 11.7: Capture initial fixtures (requires real-world worlds; may
-  need human help)
-- Task 11.8: Wire replay-migrations into `npm run verify`
-- Task 11.9: Verify Phase 11 stop gate
+### 11.1 — Create migrations/runner.js with semver-aware dispatcher
+
+**Files to create:**
+- `modules/migrations/runner.js`
+
+**Exports:**
+- `handleUpdate()` — top-level entry point called from the ready hook;
+  reads stored version, compares to running, runs needed migrations
+- `runMigrations(oldVersion, newVersion, options)` — pure dispatcher used
+  by both production and the replay script
+- `MIGRATION_REGISTRY` — ordered array of `{ version, migrate }` entries
+  imported from per-version files
+
+**Behavior:**
+- Uses `foundry.utils.isNewerVersion(targetVersion, oldVersion)` to decide
+  which migrations to run (replaces `parseFloat` comparisons)
+- For each migration whose `version` is newer than `oldVersion`, awaits
+  the migrate function in order
+- Each `migrate(world, options)` is called with a `world` adapter object
+  and options `{ dryRun, logger }`
+- In production, `world` is a thin adapter over `game.actors`, `game.items`,
+  `game.settings`; in replay mode, it wraps a fixture
+- `runMigrations` returns a summary `{ ran: [...versions], changed: count, errors: [...] }`
+
+**Verification:**
+- Lint and typecheck pass
+- A trivial unit test (`tests/migrations/runner.test.js`) verifies that
+  `runMigrations` skips already-completed migrations when oldVersion is newer
+
+**Commit:** `phase 11.1: create migrations runner with semver dispatcher`
+
+---
+
+### 11.2 — Relocate migrateTo1_901 to modules/migrations/1.901-species-talents.js
+
+**Source:** `modules/swffg-migration.js:77-85` (migrateTo1_901)
+
+**Files to create:**
+- `modules/migrations/1.901-species-talents.js`
+
+**Exports:**
+```js
+export const version = "1.901";
+export const slug = "species-talents";
+export const description = "Tag species-granted talents with fromSpecies flag";
+export default async function migrate(world) { ... }
+```
+
+The body is the existing function adapted to use `world.actors` instead
+of `game.actors`. Production runner passes `world = { actors: game.actors }`.
+
+**Commit:** `phase 11.2: relocate 1.901 species-talents migration`
+
+---
+
+### 11.3 — Relocate migrateTo1_906 to modules/migrations/1.906-compendium-paths.js
+
+**Source:** `modules/swffg-migration.js:91-132` (migrateTo1_906)
+
+**Files to create:**
+- `modules/migrations/1.906-compendium-paths.js`
+
+The body's repetitive per-compendium loops should be factored into a
+single helper that takes a setting key and rewrites the path. The
+behavior must remain byte-identical.
+
+**Commit:** `phase 11.3: relocate 1.906 compendium-paths migration`
+
+---
+
+### 11.4 — Relocate migrateTo1907 to modules/migrations/1.907-active-effects.js
+
+**Source:** `modules/swffg-migration.js:138-414` (migrateTo1907)
+
+**Files to create:**
+- `modules/migrations/1.907-active-effects.js`
+
+This is a long (~280 line) migration that touches actor stats, items,
+and specialization/forcepower/signatureability internals. It must be
+decomposed into helpers to satisfy complexity rules. Suggested helpers:
+- `parseLegacyXpLog(xpLog)` — string-form xp log → structured form
+- `snapshotActorStats(actor)` — captures original stats
+- `inverseStats(initial, updated)` — the `x - ((x - initial) * 2)` reversal
+- `createAEsFromItemAttributes(item)` — the per-talent/upgrade AE creation
+  (called for specialization, forcepower, signatureability)
+- `runFor1907Actor(actor)` — orchestrates the per-actor flow
+
+**Behavior:** Must be byte-equivalent to the source. This is migration
+code — operators ran it once already to upgrade to 1.907. The relocated
+form must produce the same effect for any world that has not yet been
+migrated.
+
+**Commit:** `phase 11.4: relocate 1.907 active-effects migration`
+
+---
+
+### 11.5 — Delete swffg-migration.js and update caller
+
+**Files modified:**
+- `modules/swffg-main.js` — change `import {handleUpdate} from "./swffg-migration.js"`
+  to `import { handleUpdate } from "./migrations/runner.js"`
+- `modules/swffg-migration.js` — DELETE
+
+**Verification:**
+- `grep -rn "swffg-migration" modules/` returns zero matches
+- `npm run verify` — same green/lint pattern
+- Build succeeds (vite picks up the new entry)
+
+**Commit:** `phase 11.5: delete swffg-migration.js; route through runner`
+
+---
+
+### 11.6 — Implement scripts/replay-migrations.mjs against fixtures
+
+**Files modified:**
+- `scripts/replay-migrations.mjs` — replace the placeholder with a real
+  implementation
+
+**Behavior:**
+- Scan `test-worlds/` for fixture directories
+- For each fixture, parse its `version.txt` and load `actors.json`,
+  `items.json`, `settings.json`
+- Build a `world` adapter that mimics `game.actors`/`game.items`/`game.settings`
+  enough for the migrations to run against
+- Run `runMigrations(fixture.version, RUNNING_VERSION, { dryRun: true })`
+- Assert no errors; report number of changes
+- If `test-worlds/` does not exist or is empty, print "no fixtures yet"
+  and exit 0 (matches the current placeholder behavior)
+
+**Commit:** `phase 11.6: implement replay-migrations script`
+
+---
+
+### 11.7 — Verify Phase 11 stop gate
+
+**Steps:**
+1. `grep -rn "parseFloat.*Version" modules/` — zero matches outside the
+   relocated migration bodies (which may still use parseFloat internally
+   for their own purposes)
+2. `npm run verify` — same green/lint pattern
+3. Migration replay gate runs without crashing even when test-worlds/ is empty
+4. `npx vitest run tests/migrations/` — runner tests pass
+
+**Commit:** `phase 11.7: phase 11 stop gate verified`
+
+---
+
+## Out of scope for Phase 11 (open issues at close)
+
+- Capturing real-world fixture worlds. Requires operator-provided
+  `world.db` files from upstream-version worlds. Document procedure but
+  do not gate phase close on this.
+- Adding a UI to surface migration progress / errors during world load.
