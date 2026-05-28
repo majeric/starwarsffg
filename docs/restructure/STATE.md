@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-04-prototype-cleanup
-**Current task:** 4.1 — Investigate Foundry V13 dice and token registration APIs
-**Last verified:** 2026-05-28T09:30:00Z (lint gate red as known failure; all other gates green; 51 rules tests passing)
-**Last commit on plan:** 2646503
+**Current task:** 4.2 — Move Token._drawBar override into TokenFFG class
+**Last verified:** 2026-05-28T09:35:00Z (lint gate red as known failure; all other gates green; 51 rules tests passing)
+**Last commit on plan:** 7c3ddff
 
 ---
 
@@ -34,8 +34,8 @@
 See `phases/phase-04-prototype-cleanup.md` for the full task definitions.
 
 - [x] 4.0 — Detail Phase 4 atomic tasks (commit `2646503`)
-- [ ] 4.1 — Investigate Foundry V13 dice and token registration APIs (produce ADR-009)   ← CURRENT
-- [ ] 4.2 — Move Token._drawBar override into TokenFFG class
+- [x] 4.1 — Investigate Foundry V13 dice and token registration APIs (ADR-009, commit `7c3ddff`)
+- [ ] 4.2 — Move Token._drawBar override into TokenFFG class   ← CURRENT
 - [ ] 4.3 — Clean up CONFIG.Dice.rolls registration
 - [ ] 4.4 — Verify Phase 4 stop gate
 
