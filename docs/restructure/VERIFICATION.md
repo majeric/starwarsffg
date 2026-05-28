@@ -3,7 +3,7 @@
 `npm run verify` is the single source of truth for "is the codebase OK?"
 Every session runs it at the start and after every task.
 
-It runs gates in this order, **failing fast** on the first failure:
+It runs gates in this order, reporting every gate before exiting:
 
 | Order | Gate | Command | Purpose |
 |---|---|---|---|
@@ -16,7 +16,8 @@ It runs gates in this order, **failing fast** on the first failure:
 | 7 | migration replay | `node scripts/replay-migrations.mjs` | migrations work against fixture worlds |
 
 Once `scripts/verify.mjs` is in place (Phase 0.6), running `npm run verify`
-invokes the orchestrator which runs all gates in order.
+invokes the orchestrator which runs all gates in order and prints a final
+summary. The command exits 0 only when every gate passes.
 
 ---
 
@@ -30,6 +31,16 @@ during early phases), they are listed here under "Known failures" with the
 task that will fix them.
 
 ## Known failures
+
+### lint — legacy codebase warnings under `--max-warnings 0`
+**Gate:** lint
+**Discovered:** 2026-05-28
+**Owning task:** phase-00 task 0.11 (document) / phase-12 task TBD (tighten)
+**Workaround:** Tolerated for Phase 0 exit. The current legacy codebase emits
+1023 ESLint warnings, mostly from legacy Foundry globals, oversized files and
+functions, complexity limits, unused variables, and old Mocha/Cypress globals.
+Later phases fix these as files are moved into the restructured architecture;
+CI records the verify exit code but does not enforce it during Phase 0.
 
 ### tests/modifiers.test.js — legacy custom-runner suite quarantined
 **Gate:** unit tests

@@ -30,16 +30,34 @@ function runGate(gate) {
   });
 }
 
+const results = [];
+
 for (const gate of gates) {
   const code = await runGate(gate);
 
   if (code === 0) {
     console.log(`[PASS] ${gate.name}`);
+    results.push({ ...gate, code });
     continue;
   }
 
   console.error(`[FAIL] ${gate.name}`);
-  process.exit(code);
+  results.push({ ...gate, code });
+}
+
+console.log("");
+console.log("Verification summary:");
+
+for (const result of results) {
+  const status = result.code === 0 ? "PASS" : "FAIL";
+  console.log(`[${status}] ${result.name}`);
+}
+
+const firstFailure = results.find((result) => result.code !== 0);
+
+if (firstFailure) {
+  console.error("[FAIL] verify");
+  process.exit(firstFailure.code);
 }
 
 console.log("[PASS] verify");
