@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-00-foundation
-**Current task:** 0.5 — Add vitest configuration and global Foundry mocks
+**Current task:** 0.6 — Create scripts/verify.mjs orchestrator
 **Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** 470e298
+**Last commit on plan:** 9ad3bdc
 
 ---
 
@@ -33,8 +33,8 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 - [x] 0.2 — Add vite.config.mjs configured for Foundry ESM output
 - [x] 0.3 — Add tsconfig.json with allowJs and strict-but-permissive defaults
 - [x] 0.4 — Add ESLint and Prettier configuration
-- [ ] 0.5 — Add vitest configuration and global Foundry mocks   ← CURRENT
-- [ ] 0.6 — Create scripts/verify.mjs orchestrator
+- [x] 0.5 — Add vitest configuration and global Foundry mocks
+- [ ] 0.6 — Create scripts/verify.mjs orchestrator   ← CURRENT
 - [ ] 0.7 — Add Foundry V13 type definitions
 - [ ] 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
 - [ ] 0.9 — Add CI workflow (.github/workflows/ci.yml)
@@ -63,6 +63,10 @@ See `phases/phase-00-foundation.md` for the full task definitions.
   config was replaced with the Phase 0 flat config. Because `modules/settings/`
   already exists as legacy code in this checkout, maintainability rules apply as
   warnings there until a later phase tightens them.
+- 2026-05-28 — Phase 0 task 0.5 dependency note. Task 0.5 requires a DOM test
+  environment, but task 0.1 omitted both `jsdom` and `happy-dom`. ADR-007 records
+  the decision to add `happy-dom`. Vitest configuration now loads; existing test
+  collection/import failures remain for task 0.8.
 
 ---
 

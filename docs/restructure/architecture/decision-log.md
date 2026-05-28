@@ -201,6 +201,31 @@ failure modes:
 
 ---
 
+## ADR-007: 2026-05-28 — Use happy-dom for Vitest DOM tests
+
+**Status:** accepted
+**Phase:** phase-00-foundation
+**Context:** Phase 0 task 0.5 requires a `jsdom` or `happy-dom` Vitest
+environment because Foundry code touches DOM globals. The Phase 0 task 0.1
+dependency list omitted both packages, and Vitest expects DOM environments to
+be installed separately.
+
+**Options considered:**
+- (a) Install `jsdom`
+- (b) Install `happy-dom`
+- (c) Use Vitest's Node environment and fake DOM globals manually
+
+**Decision:** (b) — install `happy-dom` as a dev dependency.
+
+**Consequences:**
+- Adds one test-only dependency during task 0.5
+- Keeps DOM test startup lighter than `jsdom`
+- Provides enough browser surface for Phase 0 smoke tests while still allowing
+  individual tests to add Foundry-specific globals as needed
+- Avoids hand-rolling browser APIs in `tests/setup.ts`
+
+---
+
 ## ADR template (for future entries)
 
 ```
