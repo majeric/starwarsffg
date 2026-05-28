@@ -1,16 +1,17 @@
 # Restructure State
 
-**Current phase:** phase-01-calculators
-**Current task:** 1.1 — Create calculator and test directories
-**Last verified:** 2026-05-28T07:30:00Z (lint gate red as known failure; all other gates green)
-**Last commit on plan:** 5cc1e6d
+**Current phase:** phase-02-settings
+**Current task:** 2.0 — Detail Phase 2 atomic tasks before execution
+**Last verified:** 2026-05-28T08:05:00Z (lint gate red as known failure; all other gates green; 51 rules tests passing)
+**Last commit on plan:** 7ae8112
 
 ---
 
 ## Phase progress
 
 - [x] phase-00-foundation
-- [ ] phase-01-calculators      ← CURRENT
+- [x] phase-01-calculators
+- [ ] phase-02-settings         ← CURRENT
 - [ ] phase-02-settings
 - [ ] phase-03-hooks
 - [ ] phase-04-prototype-cleanup
@@ -26,24 +27,20 @@
 
 ---
 
-## Current phase tasks (phase-01-calculators)
+## Current phase tasks (phase-02-settings)
 
-See `phases/phase-01-calculators.md` for the full task definitions.
+See `phases/phase-02-settings.md` for the full task definitions.
+Phase 2 atomic tasks are detailed in task 2.0; subsequent task numbering
+follows the result of that detailing.
 
-- [x] 1.0 — Detail Phase 1 atomic tasks (commit `5cc1e6d`)
-- [ ] 1.1 — Create calculator and test directories   ← CURRENT
-- [ ] 1.2 — Extract encumbrance calculator
-- [ ] 1.3 — Extract wounds-threshold calculator
-- [ ] 1.4 — Extract strain-threshold calculator
-- [ ] 1.5 — Extract soak calculator
-- [ ] 1.6 — Extract defense calculator
-- [ ] 1.7 — Extract force-pool calculator
-- [ ] 1.8 — Extract talent-list aggregator
-- [ ] 1.9 — Verify Phase 1 stop gate
+- [ ] 2.0 — Detail Phase 2 atomic tasks before execution   ← CURRENT
+- [ ] 2.1+ — Decompose settings registration (one task per settings group)
 
-(Previous: phase 0 closed with task 0.12 verified automated; see Open
-issues for the manual Foundry smoke that the operator should run when
-convenient.)
+(Previous: Phase 1 closed with all 7 calculators extracted and 51 unit
+tests passing across encumbrance, wounds, strain, soak, defense,
+force-pool, and talent-list. Legacy actor-ffg.js, modifiers.js, and
+sheet files are byte-identical to their Phase 0 close state — call-site
+migration is deferred to Phase 6 per the original spec.)
 
 ---
 
@@ -157,6 +154,22 @@ convenient.)
 - 2026-05-28 — Executor handoff #2. Claude transitioned Phase 0 to Phase 1.
   Phase 1 stub does not yet enumerate atomic tasks; task 1.0 (task detailing)
   is the first session's responsibility before extracting calculators.
+- 2026-05-28 — Phase 1 close note. All seven calculators extracted:
+  encumbrance (10 tests), wounds (6), strain (6), soak (6), defense (6,
+  preserves the legacy "all items sum" quirk despite the misleading
+  "highest" comment in source), force-pool (6), talent-list (11). Total
+  51 tests, all passing. Each calculator file is < 200 lines and passes
+  the strict lint rules added in task 0.4. No legacy files were modified;
+  call-site migration is deferred to Phase 6 per the original spec.
+  Commits 1.1 through 1.9: c32e507, a2c7f56, 10b7cf1, 4265d31, 0cc994f,
+  e309431, 30e52f2, 7ae8112.
+- 2026-05-28 — Defense calculator preserves a known source bug. The legacy
+  `getCalculatedValueFromItems` defense branch has a comment "// get the
+  highest defense item" but the implementation sums all items because of
+  `items.filter(...).length >= 0` always being true. The calculator
+  preserves the actual behavior (sum, not max) because changing it would
+  modify user-facing defense values. A future ADR + task should decide
+  whether to align the implementation with the comment.
 
 ---
 
