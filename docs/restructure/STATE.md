@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-00-foundation
-**Current task:** 0.3 — Add tsconfig.json with allowJs and strict-but-permissive defaults
+**Current task:** 0.4 — Add ESLint and Prettier configuration
 **Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** dc0acd3
+**Last commit on plan:** 3f93c91
 
 ---
 
@@ -31,8 +31,8 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 
 - [x] 0.1 — Create package.json with build/test dependencies
 - [x] 0.2 — Add vite.config.mjs configured for Foundry ESM output
-- [ ] 0.3 — Add tsconfig.json with allowJs and strict-but-permissive defaults   ← CURRENT
-- [ ] 0.4 — Add ESLint and Prettier configuration
+- [x] 0.3 — Add tsconfig.json with allowJs and strict-but-permissive defaults
+- [ ] 0.4 — Add ESLint and Prettier configuration   ← CURRENT
 - [ ] 0.5 — Add vitest configuration and global Foundry mocks
 - [ ] 0.6 — Create scripts/verify.mjs orchestrator
 - [ ] 0.7 — Add Foundry V13 type definitions
