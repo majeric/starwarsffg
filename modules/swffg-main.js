@@ -146,18 +146,8 @@ Hooks.once("init", async function () {
     onChange: this.debouncedReload,
   });
 
-   /**
-   * Register statuses to add
-   */
-  game.settings.register("starwarsffg", "additionalStatuses", {
-    name: game.i18n.localize("SWFFG.Settings.AdditionalStatuses.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.AdditionalStatuses.Hint"),
-    scope: "world",
-    config: false,
-    default: "[]",
-    type: String,
-    onChange: (rule) => window.location.reload()
-  });
+  // additionalStatuses setting now lives in modules/settings/simulation.js
+  // (Phase 2.5). Registered via registerAllSettings() above.
 
   // configuredTurnMarker setting now lives in modules/settings/combat.js
   // (Phase 2.3). Registered via registerAllSettings() above.
@@ -295,39 +285,9 @@ Hooks.once("init", async function () {
   // modules/settings/compendiums.js (Phase 2.2). Registered via
   // registerAllSettings() above.
 
-  // defense dice setting
-  game.settings.register("starwarsffg", "useDefense", {
-    name: game.i18n.localize("SWFFG.Settings.UseDefense.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.UseDefense.Hint"),
-    scope: "client",
-    config: false,
-    default: true,
-    type: Boolean,
-  });
-   /**
-   * Register roll simulation mode
-   */
-  game.settings.register("starwarsffg", "displaySimulation", {
-    name: game.i18n.localize("SWFFG.Settings.Simulate.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Simulate.Hint"),
-    scope: "world",
-    config: false,
-    default: "GM",
-    type: String,
-    choices: {
-      GM: "GM Only",
-      All: "All Players",
-      None: "None",
-    },
-  });
-  game.settings.register("starwarsffg", "rollSimulation", {
-    name: game.i18n.localize("SWFFG.Settings.SimulateCount.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.SimulateCount.Hint"),
-    scope: "world",
-    config: false,
-    default: 10000,
-    type: Number,
-  });
+  // useDefense, displaySimulation, and rollSimulation settings now live in
+  // modules/settings/simulation.js (Phase 2.5). Registered via
+  // registerAllSettings() above.
 
   // initiativeRule setting and the _setffgInitiative helper now live in
   // modules/settings/combat.js (Phase 2.3). Registered and initialized

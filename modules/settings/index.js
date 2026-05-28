@@ -1,6 +1,7 @@
 import { registerCompendiumSettings } from "./compendiums.js";
 import { registerCombatSettings } from "./combat.js";
 import { registerCharacterSettings } from "./character.js";
+import { registerSimulationSettings } from "./simulation.js";
 
 /**
  * Central entry point for setting registrations extracted out of
@@ -20,4 +21,5 @@ export function registerAllSettings(callbacks = {}) {
   registerCompendiumSettings();
   registerCombatSettings();
   registerCharacterSettings();
+  registerSimulationSettings();
 }
