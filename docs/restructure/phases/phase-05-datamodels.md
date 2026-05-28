@@ -127,6 +127,14 @@ DataModel-shaped data more cleanly.
 
 ## Tasks
 
+### 5.0 — Detail Phase 5 atomic tasks
+
+**Status:** Complete — commit `f9999f0`. This phase file's "Common per-type
+task template", "Sequencing" subsection, and "5.last" stop gate are the
+detailed task list. Future sessions executing per-type tasks should follow
+the template and append individual task status markers in the Sequencing
+list as each type's DataModel lands.
+
 ### Common per-type task template
 
 Each actor or item type conversion follows the same shape; this template
@@ -175,7 +183,7 @@ is referenced from per-task definitions below to avoid duplication.
 ### Sequencing
 
 **Actors (simplest first, most-coupled last):**
-- 5.1 — Establish base infrastructure (base-actor-data.js, base-item-data.js, _register.js stubs, migration scaffolds)
+- 5.1 — Establish base infrastructure (base-actor-data.js, base-item-data.js, _register.js stubs, migration scaffolds) — **Complete** — commit `b8838fc`
 - 5.2 — Homestead
 - 5.3 — Minion
 - 5.4 — Rival

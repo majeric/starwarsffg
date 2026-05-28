@@ -41,6 +41,8 @@ after every task. Phase 0 is what makes that possible.
 
 ### 0.1 — Create package.json with build/test dependencies
 
+**Status:** Complete — commit `dc0acd3`
+
 **Preconditions:**
 - [ ] No `package.json` exists at repo root (check with `ls package.json`).
       If one exists, STOP and document — its contents must be reconciled.
@@ -110,6 +112,8 @@ since they shouldn't.
 
 ### 0.2 — Add vite.config.mjs configured for Foundry ESM output
 
+**Status:** Complete — commit `3f93c91`
+
 **Preconditions:**
 - [ ] Task 0.1 complete; `node_modules` populated
 
@@ -144,6 +148,8 @@ source in a comment at the top of `vite.config.mjs`.
 ---
 
 ### 0.3 — Add tsconfig.json with allowJs and permissive defaults
+
+**Status:** Complete — commit `470e298`
 
 **Preconditions:**
 - [ ] Tasks 0.1, 0.2 complete
@@ -193,6 +199,8 @@ gradually. Phase 12 tightens these settings as files convert.
 ---
 
 ### 0.4 — Add ESLint and Prettier configuration
+
+**Status:** Complete — commit `9ad3bdc`
 
 **Preconditions:**
 - [ ] Tasks 0.1–0.3 complete
@@ -266,6 +274,8 @@ build
 
 ### 0.5 — Add vitest configuration and global Foundry mocks
 
+**Status:** Complete — commit `2de8b3e`
+
 **Preconditions:**
 - [ ] Tasks 0.1–0.4 complete
 
@@ -304,6 +314,8 @@ Do not attempt a full Foundry mock — that's a tarpit.
 ---
 
 ### 0.6 — Create scripts/verify.mjs orchestrator
+
+**Status:** Complete — commit `eea401a`
 
 **Preconditions:**
 - [ ] Tasks 0.1–0.5 complete
@@ -377,6 +389,8 @@ Do not attempt a full Foundry mock — that's a tarpit.
 
 ### 0.7 — Add Foundry V13 type definitions
 
+**Status:** Complete — commit `cf87a04`
+
 **Preconditions:**
 - [ ] Tasks 0.1–0.6 complete
 
@@ -406,6 +420,8 @@ Do not attempt a full Foundry mock — that's a tarpit.
 ---
 
 ### 0.8 — Wire existing tests/modifiers.test.js to vitest and document failures
+
+**Status:** Complete — commit `6b1e4ba`
 
 **Preconditions:**
 - [ ] Tasks 0.1–0.7 complete
@@ -442,6 +458,8 @@ Do not attempt a full Foundry mock — that's a tarpit.
 
 ### 0.9 — Add CI workflow
 
+**Status:** Complete — commit `00fb003`
+
 **Preconditions:**
 - [ ] Tasks 0.1–0.8 complete
 
@@ -471,6 +489,8 @@ Do not attempt a full Foundry mock — that's a tarpit.
 ---
 
 ### 0.10 — Add .restructure/ to .gitignore
+
+**Status:** Complete — commit `dca2ffa`
 
 **Preconditions:**
 - [ ] Tasks 0.1–0.9 complete
@@ -505,6 +525,8 @@ own log file as needed; if the directory doesn't exist, the session creates it.
 
 ### 0.11 — Document Phase 0 known failures in VERIFICATION.md
 
+**Status:** Complete — commit `47cbd29`
+
 **Preconditions:**
 - [ ] Tasks 0.1–0.10 complete
 
@@ -531,6 +553,8 @@ own log file as needed; if the directory doesn't exist, the session creates it.
 ---
 
 ### 0.12 — Verify Foundry V13 loads the system after build
+
+**Status:** Partial — commit `f3c7ef4` (automated checks: build, dist/ structure, system.json validation, ESM file existence all pass; manual Foundry V13 launch + character/sheet/item/settings smoke deferred to operator)
 
 **Preconditions:**
 - [ ] Tasks 0.1–0.11 complete

@@ -80,6 +80,8 @@ verbatim with any imports it needs. Wire from `modules/hooks/index.js`'s
 
 ### 3.1 — Scaffold modules/hooks/index.js
 
+**Status:** Complete — commit `b494e12`
+
 Create `modules/hooks/index.js` with `export function registerAllHooks()`
 that is initially a no-op (matches the index.js pattern from Phase 2).
 Wire `swffg-main.js` to call `registerAllHooks()` once near the top of
@@ -89,6 +91,8 @@ its import + call to `index.js`.
 **Commit:** `phase 03.1: scaffold modules/hooks/index.js`
 
 ### 3.2 — Extract setup hook
+
+**Status:** Complete — commit `e39a636`
 
 **Source:** `swffg-main.js:72-75` (Hooks.on("setup") that registers journal
 enrichers and system tours).
@@ -103,6 +107,8 @@ The body imports `register_roll_tag_enricher`, `register_oggdude_tag_enricher`,
 
 ### 3.3 — Extract renderChatInput hook
 
+**Status:** Complete — commits `7f0196a` + `2b3219f` (fix for unused-args warning)
+
 **Source:** `swffg-main.js:703-` (registers click handlers for chat input).
 
 **Files to create:** `modules/hooks/render-chat-input.js`
@@ -113,6 +119,8 @@ Carefully audit what helpers and imports the body needs; move them along.
 
 ### 3.4 — Extract renderActorDirectory hook
 
+**Status:** Complete — commit `dc5598e` (batched with 3.5-3.7 and 3.9; protocol deviation documented in STATE.md)
+
 **Source:** `swffg-main.js:728-`
 
 **Files to create:** `modules/hooks/render-actor-directory.js`
@@ -121,6 +129,8 @@ Carefully audit what helpers and imports the body needs; move them along.
 
 ### 3.5 — Extract renderCompendiumDirectory hook
 
+**Status:** Complete — commit `dc5598e` (batched)
+
 **Source:** `swffg-main.js:757-`
 
 **Files to create:** `modules/hooks/render-compendium-directory.js`
@@ -128,6 +138,8 @@ Carefully audit what helpers and imports the body needs; move them along.
 **Commit:** `phase 03.5: extract renderCompendiumDirectory hook`
 
 ### 3.6 — Extract renderChatMessage hook
+
+**Status:** Complete — commit `dc5598e` (batched; imports itemPillHover from swffg-main.js — circular but safe since referenced lazily inside the hook callback)
 
 **Source:** `swffg-main.js:780-`
 
@@ -139,6 +151,8 @@ This hook is asynchronous; preserve the async signature.
 
 ### 3.7 — Extract dropActorSheetData hook
 
+**Status:** Complete — commit `dc5598e` (batched)
+
 **Source:** `swffg-main.js:817-`
 
 **Files to create:** `modules/hooks/drop-actor-sheet-data.js`
@@ -146,6 +160,8 @@ This hook is asynchronous; preserve the async signature.
 **Commit:** `phase 03.7: extract dropActorSheetData hook`
 
 ### 3.8 — Extract diceSoNiceReady hook
+
+**Status:** Deferred — see STATE.md "Open issues". The hook's 221-line callback contains many dice-preset definitions that exceed the 50-line per-function maintainability rule. Extracting cleanly requires splitting by dice theme (swffg, genesys) into multiple helper functions inside the hook file.
 
 **Source:** `swffg-main.js:1354-`
 
@@ -159,6 +175,8 @@ semantics in the extracted file.
 
 ### 3.9 — Extract renderGamePause hook
 
+**Status:** Complete — commit `dc5598e` (batched)
+
 **Source:** `swffg-main.js:1576-`
 
 **Files to create:** `modules/hooks/render-game-pause.js`
@@ -166,6 +184,8 @@ semantics in the extracted file.
 **Commit:** `phase 03.9: extract renderGamePause hook`
 
 ### 3.10 — Verify Phase 3 stop gate
+
+**Status:** Complete (partial close; 3.8 deferred) — commit `eb79caf`
 
 **Steps:**
 1. `grep -n "^Hooks\." modules/swffg-main.js` returns only the init and

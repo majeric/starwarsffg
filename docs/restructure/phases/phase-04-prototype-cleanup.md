@@ -76,6 +76,8 @@ Foundry V13. The assignment is now centralized in
 
 ### 4.1 — Investigate Foundry V13 dice and token registration APIs
 
+**Status:** Complete — commit `7c3ddff` (ADR-009)
+
 **No code changes.** Produce an ADR documenting:
 - The current state of `CONFIG.Dice.rolls` in V13: is `unshift()` supported?
   Is there a documented "default Roll" registration helper?
@@ -92,6 +94,8 @@ pattern centralized in a helper.
 **Commit:** `phase 04.1: foundry v13 dice and token API investigation`
 
 ### 4.2 — Move Token._drawBar override into TokenFFG class
+
+**Status:** Complete — commit `be6d328` (decomposed into 5 helpers; TokenFFG registration moved out of useGenericSlots conditional)
 
 **Source:** `modules/swffg-main.js:168-` (the
 `foundry.canvas.placeables.Token.prototype._drawBar` assignment, ~85 lines)
@@ -116,6 +120,8 @@ prototype assignment.
 
 ### 4.3 — Clean up CONFIG.Dice.rolls registration
 
+**Status:** Complete — commit `b64bcb8` (replaced index-swap with unshift; centralized in modules/dice/roll-registration.js)
+
 **Source:** `swffg-main.js:112-113`
 ```js
 CONFIG.Dice.rolls.push(CONFIG.Dice.rolls[0]);
@@ -133,6 +139,8 @@ CONFIG.Dice.rolls[0] = RollFFG;
 **Commit:** `phase 04.3: clean up CONFIG.Dice.rolls registration`
 
 ### 4.4 — Verify Phase 4 stop gate
+
+**Status:** Complete — commit `c0857c2` (zero prototype patches in modules/; zero CONFIG.Dice.rolls[0] mutations)
 
 **Steps:**
 1. `grep -n "\.prototype\." modules/` — zero matches outside test files
