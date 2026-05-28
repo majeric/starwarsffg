@@ -1,3 +1,5 @@
+import { registerCompendiumSettings } from "./compendiums.js";
+
 /**
  * Central entry point for setting registrations extracted out of
  * swffg-main.js by Phase 2 of the restructure.
@@ -12,8 +14,6 @@
  *   cannot reasonably move with the setting).
  */
 export function registerAllSettings(callbacks = {}) {
-  // Group register* calls are added by tasks 2.2 through 2.8 as each
-  // grouping file lands. Until then this is a no-op so swffg-main.js
-  // can safely wire the call early.
   void callbacks;
+  registerCompendiumSettings();
 }

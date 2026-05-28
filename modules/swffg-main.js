@@ -52,6 +52,7 @@ import SWAImporter from "./importer/swa-importer.js";
 import {CharacterCreator} from "./helpers/character-creator.js";
 import {xpLogUndo} from "./helpers/actor-helpers.js";
 import {register_system_tours} from "./helpers/tours.js";
+import { registerAllSettings } from "./settings/index.js";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -129,6 +130,10 @@ Hooks.once("init", async function () {
 
   CONFIG.ui.pause = PauseFFG;
 
+  // Register settings extracted by Phase 2 of the restructure (see
+  // docs/restructure/phases/phase-02-settings.md). Settings still
+  // registered inline below have not been extracted yet.
+  registerAllSettings();
 
   // Enable debug messages in console
   game.settings.register("starwarsffg", "enableDebug", {
@@ -387,95 +392,10 @@ Hooks.once("init", async function () {
     type: Number,
   });
 
-  /**
-   * Register compendiums for sources for purchasing and character creation
-   */
-  game.settings.register("starwarsffg", "specializationCompendiums", {
-    name: game.i18n.localize("SWFFG.Settings.Purchase.Specialization.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Purchase.Specialization.Hint"),
-    scope: "world",
-    config: false,
-    default: "world.oggdudespecializations",
-    type: String,
-  });
-  game.settings.register("starwarsffg", "signatureAbilityCompendiums", {
-    name: game.i18n.localize("SWFFG.Settings.Purchase.SignatureAbility.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Purchase.SignatureAbility.Hint"),
-    scope: "world",
-    config: false,
-    default: "world.oggdudesignatureabilities",
-    type: String,
-  });
-  game.settings.register("starwarsffg", "forcePowerCompendiums", {
-    name: game.i18n.localize("SWFFG.Settings.Purchase.ForcePower.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Purchase.ForcePower.Hint"),
-    scope: "world",
-    config: false,
-    default: "world.oggdudeforcepowers",
-    type: String,
-  });
-  game.settings.register("starwarsffg", "talentCompendiums", {
-    name: game.i18n.localize("SWFFG.Settings.Purchase.Talent.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Purchase.Talent.Hint"),
-    scope: "world",
-    config: false,
-    default: "",
-    type: String,
-  });
-  // backgrounds
-  game.settings.register("starwarsffg", "backgroundCompendiums", {
-    name: game.i18n.localize("SWFFG.Settings.Purchase.Background.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Purchase.Background.Hint"),
-    scope: "world",
-    config: false,
-    default: "world.oggdudebackgrounds",
-    type: String,
-  });
-  // obligations
-  game.settings.register("starwarsffg", "obligationCompendiums", {
-    name: game.i18n.localize("SWFFG.Settings.Purchase.Obligation.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Purchase.Obligation.Hint"),
-    scope: "world",
-    config: false,
-    default: "world.oggdudeobligations",
-    type: String,
-  });
-  // species
-  game.settings.register("starwarsffg", "speciesCompendiums", {
-    name: game.i18n.localize("SWFFG.Settings.Purchase.Species.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Purchase.Species.Hint"),
-    scope: "world",
-    config: false,
-    default: "world.oggdudespecies",
-    type: String,
-  });
-  // careers
-  game.settings.register("starwarsffg", "careerCompendiums", {
-    name: game.i18n.localize("SWFFG.Settings.Purchase.Career.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Purchase.Career.Hint"),
-    scope: "world",
-    config: false,
-    default: "world.oggdudecareers",
-    type: String,
-  });
-  // motivations
-  game.settings.register("starwarsffg", "motivationCompendiums", {
-    name: game.i18n.localize("SWFFG.Settings.Purchase.Motivation.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Purchase.Motivation.Hint"),
-    scope: "world",
-    config: false,
-    default: "world.oggdudemotivations",
-    type: String,
-  });
-  // items
-  game.settings.register("starwarsffg", "itemCompendiums", {
-    name: game.i18n.localize("SWFFG.Settings.Purchase.Item.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.Purchase.Item.Hint"),
-    scope: "world",
-    config: false,
-    default: "world.oggdudeweapons,world.oggdudearmor,world.oggdudegear,world.oggdudearmorattachments,world.oggdudegenericattachments,world.oggdudeweaponattachments,world.oggdudearmormods,world.oggdudegenericmods,world.oggdudeweaponmods",
-    type: String,
-  });
+  // Compendium-pack source settings now live in
+  // modules/settings/compendiums.js (Phase 2.2). Registered via
+  // registerAllSettings() above.
+
   // defense dice setting
   game.settings.register("starwarsffg", "useDefense", {
     name: game.i18n.localize("SWFFG.Settings.UseDefense.Name"),
