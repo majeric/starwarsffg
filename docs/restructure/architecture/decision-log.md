@@ -305,6 +305,104 @@ Vitest marker suites.
 
 ---
 
+## ADR-009: 2026-05-28 — Foundry V13 dice and token API patterns for Phase 4 cleanup
+
+**Status:** accepted
+**Phase:** 04 (cleanup of prototype-style patches)
+
+**Context:** Phase 4 of the restructure removes two prototype-style patches
+that swffg-main.js performs against Foundry core:
+
+1. `foundry.canvas.placeables.Token.prototype._drawBar = function (...)`
+   at lines 168+ — about 85 lines that completely replace the base
+   `_drawBar` implementation to draw FFG-style wounds/strain bars.
+2. `CONFIG.Dice.rolls.push(CONFIG.Dice.rolls[0]); CONFIG.Dice.rolls[0] = RollFFG;`
+   at lines 112-113 — replaces the default Roll class with RollFFG by
+   swapping the array's first element.
+
+Both patterns are fragile across Foundry minor releases. This ADR records
+the V13-canonical replacement patterns chosen for tasks 4.2 and 4.3.
+
+**Sources consulted:**
+- `node_modules/fvtt-types/src/foundry/client/config.d.mts` (CONFIG.Dice)
+- `node_modules/fvtt-types/src/foundry/client/canvas/placeables/token.d.mts` (Token class)
+
+**Findings:**
+
+For Token:
+- The Token class lives at `foundry.canvas.placeables.Token` in V13.
+- `_drawBar(number, bar, data)` is `protected` and documented as
+  "Unconditionally returns `true`" (return type `boolean`).
+- `bar` is typed `PIXI.Graphics`; `data` is `NonNullable<TokenDocument.GetBarAttributeReturn>`.
+- Subclassing + registering via `CONFIG.Token.objectClass` is the
+  canonical override pathway. swffg-main.js already does this
+  registration (`CONFIG.Token.objectClass = TokenFFG`) but only inside
+  `if (useGenericSlots)`, which means the override is conditional on a
+  different feature. Phase 4.2 should make this unconditional (the FFG
+  token bar drawing is wanted whether or not generic slots are enabled)
+  unless the operator confirms the coupling is intentional.
+
+For Dice:
+- `CONFIG.Dice.rolls` is documented as `Array<foundry.dice.Roll.Internal.AnyConstructor>`
+  with default `[foundry.dice.Roll]` (single-element array containing the
+  base Roll class).
+- The array is a plain JS Array; native `unshift(RollFFG)` puts RollFFG
+  at index 0 and shifts the existing Roll to index 1. This is
+  semantically identical to the current two-line mutation.
+- There is no documented "register default Roll" helper. The array IS
+  the public API.
+
+**Options considered:**
+
+- (a) **Keep both prototype patches.** Status quo; documented anti-pattern;
+  high risk of breaking on Foundry minor releases.
+- (b) **Subclass + register for Token, native Array method for Dice.**
+  - TokenFFG extends `foundry.canvas.placeables.Token` with a method
+    override of `_drawBar`. Register via `CONFIG.Token.objectClass = TokenFFG`.
+  - `CONFIG.Dice.rolls.unshift(RollFFG)` replaces the index-swap mutation.
+- (c) **Build a foundry-compat shim layer.** Over-engineered for two patches.
+
+**Decision:** (b).
+
+**Consequences:**
+
+For Token (task 4.2):
+- TokenFFG (already in `modules/tokens/token-ffg.js`) gains a `_drawBar(number, bar, data)`
+  method. Body verbatim from the current prototype assignment, plus a
+  `return true;` at the end to match the documented contract.
+- Per PRINCIPLES.md 29 (max-lines-per-function 50), the 85-line body must
+  be decomposed into helpers: `drawThresholdBar(bar, data, h, colors)`,
+  `drawDefaultBar(bar, number, val, data, h)`, `colorsForAttribute(attribute)`,
+  etc. Each helper stays within complexity 10.
+- The `CONFIG.Token.objectClass = TokenFFG` registration moves out of the
+  `if (useGenericSlots)` branch into the unconditional init path. Operator
+  has not flagged the coupling as intentional; the assumption is that the
+  FFG bar drawing should apply regardless of generic-slots setting. If
+  this turns out to be wrong, a follow-up ADR can re-couple them with
+  documented rationale.
+
+For Dice (task 4.3):
+- `modules/dice/roll-registration.js` exports `registerRollFFG()` whose
+  body is `CONFIG.Dice.rolls.unshift(RollFFG);` plus the import.
+- swffg-main.js replaces the two-line mutation with one
+  `registerRollFFG()` call (and the import).
+- The function signature stays a no-op `void` return — caller does not
+  need to know the implementation detail.
+
+For both:
+- Per ADR-008, V14 may have changed either API. Phase 13 will verify
+  both subclass override and `Dice.rolls.unshift` still work on V14.
+  PRINCIPLES.md 39 (feature detection over version sniffing) means the
+  implementations check for the API's existence in V14 rather than
+  branching on `game.release.generation`.
+- The `protected` access on `_drawBar` in the type signature is a
+  TypeScript-only constraint. JavaScript override does not enforce it,
+  and the existing pattern (override in subclass) is what TS expects for
+  `protected` members anyway. Phase 12 (TypeScript) will type the new
+  method correctly.
+
+---
+
 ## ADR template (for future entries)
 
 ```
