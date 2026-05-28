@@ -42,6 +42,7 @@ This is the central phase of the restructure. Treat it carefully.
 - [ ] All actor sheets and item sheets render with no errors
 - [ ] No tests previously passing now fail
 - [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [ ] V13/V14 compatibility verified per ADR-008 (DataModel API is high-risk for cross-version drift; explicit attention required)
 
 ## Files to be created (high level)
 

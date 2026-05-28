@@ -27,6 +27,7 @@ auditable.
       `Hooks.on()` or `Hooks.once()` calls (apart from imports / `registerAllHooks()`)
 - [ ] All hooks still fire and behave identically
 - [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [ ] V13/V14 compatibility verified per ADR-008 (audit new code against API differences; full certification deferred to Phase 13)
 
 ## Suggested file layout
 

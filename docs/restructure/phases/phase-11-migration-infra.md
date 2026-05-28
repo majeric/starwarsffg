@@ -51,6 +51,7 @@ to land it once, here.
       `modules/migrations/runner.js` and the per-version files)
 - [ ] All callers updated to import from new locations
 - [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [ ] V13/V14 compatibility verified per ADR-008 (foundry.utils.isNewerVersion behavior consistent across versions; verify)
 
 ## Migration file convention
 

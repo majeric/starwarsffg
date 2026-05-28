@@ -40,6 +40,7 @@ exist and declare a clean schema).
 - [ ] Manual smoke: adding/removing an item recomputes derived state without
       sheet interaction
 - [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [ ] V13/V14 compatibility verified per ADR-008 (prepareBaseData/prepareDerivedData lifecycle hooks may differ between versions)
 
 ## Files to be modified
 

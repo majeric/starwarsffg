@@ -35,6 +35,7 @@ features.
 - [ ] All sheet features work as before (drag/drop, edit mode, popouts, etc.)
 - [ ] `npm run verify` is green
 - [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [ ] V13/V14 compatibility verified per ADR-008 (ApplicationV2 API is the highest-risk surface for cross-version drift; explicit attention required)
 
 ## Files to be created
 

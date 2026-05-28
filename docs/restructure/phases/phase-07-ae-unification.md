@@ -57,6 +57,7 @@ in unexpected configurations. The migration must be exhaustively tested.
       - Vehicle weapons and armor work
       - Attachments on weapons/armor stack correctly
 - [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [ ] V13/V14 compatibility verified per ADR-008 (Active Effect change modes and legacyTransferral behavior may differ between versions)
 
 ## Files to be created
 

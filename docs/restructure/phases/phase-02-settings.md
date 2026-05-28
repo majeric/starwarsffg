@@ -34,6 +34,7 @@ JSON-string migration (see below).
 - [ ] All existing settings still appear in Foundry's settings UI with the same
       labels, hints, defaults, and scopes
 - [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [ ] V13/V14 compatibility verified per ADR-008 (audit new code against API differences; full certification deferred to Phase 13)
 
 ## Files to be created
 

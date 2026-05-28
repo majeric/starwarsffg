@@ -37,6 +37,7 @@ of patched methods can change. The patches in scope:
 - [ ] Manual smoke: open a world, observe wound/strain/hullTrauma bars
       render exactly as before
 - [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [ ] V13/V14 compatibility verified per ADR-008 (Token + Roll APIs are high-risk for cross-version drift; explicit attention required)
 
 ## Files to be created
 

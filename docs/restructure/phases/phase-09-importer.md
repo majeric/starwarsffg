@@ -39,6 +39,7 @@ A clean pipeline:
       output to pre-refactor (or differences are documented)
 - [ ] `npm run verify` is green
 - [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [ ] V13/V14 compatibility verified per ADR-008 (CompendiumCollection write APIs may differ between versions)
 
 ## Stage contracts
 

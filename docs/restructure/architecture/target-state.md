@@ -20,6 +20,9 @@ flag it in `STATE.md` "Open issues".
 4. **No prototype monkey-patching.** Subclass + register.
 5. **Gradual TypeScript.** Pure modules typed first; sheets last.
 6. **AI-resumable.** This runbook + `STATE.md` is the way work continues.
+7. **Dual Foundry version support.** Per ADR-008, the system runs on both
+   Foundry V13 and V14 without functional regression. New code uses feature
+   detection over version-string sniffing; deprecated APIs are not used.
 
 ---
 

@@ -226,6 +226,49 @@ be installed separately.
 
 ---
 
+## ADR-008: 2026-05-28 — Target Foundry V13 + V14 dual compatibility
+
+**Status:** accepted
+**Phase:** meta (cross-cutting; certified in Phase 13)
+
+**Context:** Foundry V14 brings API changes that risk breaking systems
+written exclusively against V13. Users typically lag in upgrading their
+Foundry installs by months. To keep the fork usable across the V13→V14
+transition, the restructured system runs on both versions, not one.
+
+This commitment is cross-cutting: every phase that touches Foundry APIs
+must produce code that works on both versions, not just V13. A dedicated
+Phase 13 provides final certification before the restructure is declared
+complete.
+
+**Options considered:**
+- (a) Target V14 only; drop V13 once V14 stabilizes
+- (b) Target V13 only; defer V14 until upstream catches up
+- (c) Dual compatibility: V13 minimum, V14 verified, both gated in CI
+
+**Decision:** (c) — dual compatibility.
+
+**Consequences:**
+- `system.json` `compatibility` evolves to `{ minimum: 13, verified: 14,
+  maximum: 14 }` at Phase 13 close (until then, V13-only)
+- Every phase that touches Foundry APIs (2, 3, 4, 5, 6, 7, 8, 9, 11) gains
+  a postcondition: "V13/V14 compatibility verified per ADR-008"
+- PRINCIPLES.md gains principles 39-40 on cross-version Foundry API discipline
+- A new Phase 13 (V14 Compatibility Certification) is added at the end of
+  the plan; STATE.md "Phase progress" list will need Phase 13 appended
+- CI eventually runs a matrix build against both V13 and V14 binaries
+  (implemented in Phase 13)
+- Where APIs diverge between V13 and V14, prefer in-place feature detection
+  over a compatibility shim layer. If a shim is genuinely needed, it lives
+  in `modules/foundry-compat/` with one file per shimmed API and an ADR
+  justifying the shim
+- The restructure does not target V12 or earlier; V13 is the floor
+- The dual-version commitment continues past the restructure: future
+  Foundry versions follow the same pattern (verified one major behind the
+  current Foundry release, minimum two behind, until a superseding ADR)
+
+---
+
 ## ADR template (for future entries)
 
 ```

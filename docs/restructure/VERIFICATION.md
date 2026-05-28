@@ -58,6 +58,23 @@ Format for entries:
 
 ---
 
+## Future gates (per ADR-008)
+
+The smoke-load gate currently runs against whichever Foundry version is
+installed locally. Per ADR-008, the system targets both V13 and V14. Phase 13
+adds a dual-target smoke gate:
+
+| Order | Gate | Command |
+|---|---|---|
+| 6a | smoke load V13 | `FOUNDRY_VERSION=13 node scripts/smoke-load.mjs` |
+| 6b | smoke load V14 | `FOUNDRY_VERSION=14 node scripts/smoke-load.mjs` |
+
+Until V14 is available locally, the V13 smoke is the only enforced gate;
+the V14 gate is deferred to Phase 13. New code added by intermediate phases
+should still follow PRINCIPLES.md 39-40 (feature detection, no deprecated
+APIs) so the eventual V14 certification is straightforward rather than a
+large remediation effort.
+
 ## Adding a new gate
 
 Gates are added by ADR. Steps:
