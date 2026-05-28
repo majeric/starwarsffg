@@ -137,16 +137,8 @@ Hooks.once("init", async function () {
   // registered inline below have not been extracted yet.
   registerAllSettings();
 
-  // Enable debug messages in console
-  game.settings.register("starwarsffg", "enableDebug", {
-    name: game.i18n.localize("SWFFG.EnableDebug"),
-    hint: game.i18n.localize("SWFFG.EnableDebugHint"),
-    scope: "world",
-    config: true,
-    default: false,
-    type: Boolean,
-    onChange: this.debouncedReload,
-  });
+  // enableDebug setting now lives in modules/settings/debug.js (Phase 2.8).
+  // Registered via registerAllSettings() above.
 
   // additionalStatuses setting now lives in modules/settings/simulation.js
   // (Phase 2.5). Registered via registerAllSettings() above.

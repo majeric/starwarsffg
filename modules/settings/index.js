@@ -3,6 +3,7 @@ import { registerCombatSettings } from "./combat.js";
 import { registerCharacterSettings } from "./character.js";
 import { registerSimulationSettings } from "./simulation.js";
 import { registerSkillListSettings } from "./skill-list.js";
+import { registerDebugSettings } from "./debug.js";
 
 /**
  * Central entry point for setting registrations extracted out of
@@ -24,4 +25,5 @@ export function registerAllSettings(callbacks = {}) {
   registerCharacterSettings();
   registerSimulationSettings();
   registerSkillListSettings();
+  registerDebugSettings();
 }
