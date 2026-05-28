@@ -1,16 +1,12 @@
 # Restructure State
 
-**Current phase:** phase-11-migration-infra
-**Current task:** 11.0 — Detail Phase 11 atomic tasks before execution
-**Last verified:** 2026-05-28T09:40:00Z (lint gate red as known failure; all other gates green; 51 rules tests passing; zero prototype patches in modules/)
-**Last commit on plan:** c0857c2
+**Current phase:** phase-05-datamodels
+**Current task:** 5.0 — Detail Phase 5 atomic tasks before execution
+**Last verified:** 2026-05-28T09:55:00Z (lint gate red as known failure; all other gates green; 63 unit tests passing — 51 calculator + 12 migration)
+**Last commit on plan:** 297a024
 
-**Note on phase ordering:** Per phase-05-datamodels.md preconditions, Phase 11
-(migration infrastructure) must complete before Phase 5 (DataModels) can
-proceed. Phase 5 writes many schema-conversion migrations and needs a
-proper semver-aware runner. So Phase 5 is paused before its detailing task
-(5.0) and the current session executes Phase 11 first. After Phase 11 closes,
-execution returns to Phase 5.
+**Note on phase ordering:** Phase 11 (migration infrastructure) closed first
+to satisfy Phase 5 preconditions. Phase 5 execution resumes now.
 
 ---
 
@@ -21,13 +17,13 @@ execution returns to Phase 5.
 - [x] phase-02-settings
 - [x] phase-03-hooks (task 3.8 diceSoNiceReady deferred — see Open issues)
 - [x] phase-04-prototype-cleanup
-- [ ] phase-05-datamodels         (paused; Phase 11 prerequisite first)
+- [ ] phase-05-datamodels         ← CURRENT
 - [ ] phase-06-derived-split
 - [ ] phase-07-ae-unification
 - [ ] phase-08-sheets
 - [ ] phase-09-importer
 - [ ] phase-10-system-abstraction
-- [ ] phase-11-migration-infra    ← CURRENT (executed before Phase 5)
+- [x] phase-11-migration-infra    (closed early; inline parseFloat checks in swffg-main.js ready body deferred — see Open issues)
 - [ ] phase-02-settings
 - [ ] phase-03-hooks
 - [ ] phase-04-prototype-cleanup
@@ -41,24 +37,27 @@ execution returns to Phase 5.
 - [ ] phase-12-typescript
 - [ ] phase-13-v14-compat
 
-(Phase list shows duplicates above; Phase 5 listed earlier in the natural
-order, Phase 11 promoted as next-current. After Phase 11 closes, return
-to Phase 5 and remove the duplicate entry.)
-
 ---
 
-## Current phase tasks (phase-11-migration-infra)
+## Current phase tasks (phase-05-datamodels)
 
-See `phases/phase-11-migration-infra.md` for the full task definitions.
-Phase 11 atomic tasks are detailed in task 11.0; subsequent task numbering
+See `phases/phase-05-datamodels.md` for the full task definitions.
+Phase 5 atomic tasks are detailed in task 5.0; subsequent task numbering
 follows the result of that detailing.
 
-- [ ] 11.0 — Detail Phase 11 atomic tasks before execution   ← CURRENT
-- [ ] 11.1+ — Build semver-aware migration runner and relocate existing migrations
+- [ ] 5.0 — Detail Phase 5 atomic tasks before execution   ← CURRENT
+- [ ] 5.1+ — Convert actor and item types to DataModels (one task per type)
 
-(Previous: Phase 4 closed with both prototype patches removed. Phase 5
-(DataModels) paused at task 5.0 because it requires Phase 11's migration
-runner infrastructure first.)
+(Previous: Phase 11 closed with migration infrastructure in place.
+modules/migrations/runner.js provides semver-aware dispatcher with
+12 unit tests. The three legacy migrations relocated to
+modules/migrations/<version>-<slug>.js. swffg-migration.js deleted.
+scripts/replay-migrations.mjs implemented for fixture replay (no
+fixtures captured yet; operator-dependent). Five inline parseFloat
+version checks remain in the swffg-main.js ready hook body — these
+are inline historical adaptation hooks, not migration dispatcher
+calls, and their relocation to per-version migrations is deferred
+to a follow-up task.)
 
 (Previous: Phase 3 closed with 6 of 7 top-level hooks extracted. Task 3.8
 diceSoNiceReady deferred — its 221-line callback contains many dice-preset
@@ -245,6 +244,29 @@ proceed independently since prototype patches and dice presets don't overlap.)
   PASS, lint FAIL (1023 pre-existing legacy warnings; new code is clean),
   comments PASS, unit tests PASS (51 calculator tests added), build PASS,
   smoke load PASS, migration replay PASS.
+- 2026-05-28 — Phase 11 close note. Migration infrastructure in place.
+  Runner (modules/migrations/runner.js) uses a local semver-aware
+  compareVersions implementation (no foundry.utils dependency in tests).
+  Three legacy migrations relocated to per-version files:
+  1.901-species-talents.js (verbatim), 1.906-compendium-paths.js
+  (refactored to deduplicate per-setting loop), 1.907-active-effects.js
+  (relocated verbatim with eslint-disable for complexity; future task
+  decomposes into helpers). modules/migrations/index.js populates the
+  runner's registry — split off because direct import in runner.js
+  pulled in Foundry-dependent ModifierHelpers which crashed vitest.
+  swffg-migration.js (434 lines) deleted. scripts/replay-migrations.mjs
+  implemented for fixture-directory replay (currently exits cleanly
+  with "no fixtures yet"). 12 runner tests pass. Commits 11.1-11.6:
+  fee2ac1, 94aa393 (batched 11.2-11.4), e9fbe66, 297a024.
+- 2026-05-28 — Phase 11 deferred items. Five inline parseFloat version
+  checks remain in modules/swffg-main.js lines 676, 727, 777, 842, 861.
+  These are inline historical adaptation hooks in the ready hook body,
+  NOT dispatcher calls. Each triggers some old-world adaptation
+  (different from the dispatcher migrations). Relocating them properly
+  requires understanding each adaptation; deferred to a follow-up task.
+  A pragmatic alternative is to just swap `parseFloat` for
+  `compareVersions` calls inline, preserving the adaptations but using
+  the semver comparator.
 - 2026-05-28 — Phase 4 close note. Both prototype patches eliminated.
   Token._drawBar now lives as a method on TokenFFG (decomposed into 5
   helpers to pass complexity gate). CONFIG.Dice.rolls[0] mutation
