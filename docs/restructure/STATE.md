@@ -1,7 +1,7 @@
 # Restructure State
 
-**Current phase:** phase-00-foundation
-**Current task:** 0.12 — Verify Foundry V13 still loads the system after build
+**Current phase:** phase-01-calculators
+**Current task:** 1.0 — Detail Phase 1 atomic tasks before execution
 **Last verified:** 2026-05-28T07:30:00Z (lint gate red as known failure; all other gates green)
 **Last commit on plan:** 47cbd29
 
@@ -9,8 +9,8 @@
 
 ## Phase progress
 
-- [ ] phase-00-foundation       ← CURRENT
-- [ ] phase-01-calculators
+- [x] phase-00-foundation
+- [ ] phase-01-calculators      ← CURRENT
 - [ ] phase-02-settings
 - [ ] phase-03-hooks
 - [ ] phase-04-prototype-cleanup
@@ -26,22 +26,18 @@
 
 ---
 
-## Current phase tasks (phase-00-foundation)
+## Current phase tasks (phase-01-calculators)
 
-See `phases/phase-00-foundation.md` for the full task definitions.
+See `phases/phase-01-calculators.md` for the full task definitions.
+Phase 1 atomic tasks are detailed in task 1.0; subsequent task numbering
+follows the result of that detailing.
 
-- [x] 0.1 — Create package.json with build/test dependencies
-- [x] 0.2 — Add vite.config.mjs configured for Foundry ESM output
-- [x] 0.3 — Add tsconfig.json with allowJs and strict-but-permissive defaults
-- [x] 0.4 — Add ESLint and Prettier configuration
-- [x] 0.5 — Add vitest configuration and global Foundry mocks
-- [x] 0.6 — Create scripts/verify.mjs orchestrator
-- [x] 0.7 — Add Foundry V13 type definitions
-- [x] 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
-- [x] 0.9 — Add CI workflow (.github/workflows/ci.yml)
-- [x] 0.10 — Add .restructure/ to .gitignore
-- [x] 0.11 — Verify `npm run verify` runs end-to-end (even if some tests fail; that's documented)
-- [ ] 0.12 — Verify Foundry V13 still loads the system after build   ← CURRENT
+- [ ] 1.0 — Detail Phase 1 atomic tasks before execution   ← CURRENT
+- [ ] 1.1+ — Extract each calculator + tests (one task per calculator family)
+
+(Previous: phase 0 closed with task 0.12 verified automated; see Open
+issues for the manual Foundry smoke that the operator should run when
+convenient.)
 
 ---
 
@@ -124,6 +120,37 @@ See `phases/phase-00-foundation.md` for the full task definitions.
   (664ms), smoke load PASS (system.json parses, all ESM entries exist in
   dist/), migration replay PASS (no fixtures yet). The verify summary now
   reports every gate's status before exiting non-zero on the first failure.
+- 2026-05-28 — Phase 0 task 0.12 partial completion. Automated verification
+  passed: clean rebuild succeeds (616ms), `dist/` contains system.json,
+  template.json, full modules/ tree, lib/, lang/, images/, styles/,
+  templates/, fonts/. All four files in `esmodules[]`
+  (modules/dice-pool-ffg.js, modules/swffg-main.js, lib/slimselect/slimselect.js,
+  lib/datatables/datatables.min.js) exist post-build. `dist/system.json`
+  parses with id=starwarsffg, version=2.0.3, compatibility {min:13, verified:13,
+  max:13}. The build emits valid ES modules. Manual Foundry V13 launch
+  verification (steps 3-5 of task 0.12: create world, character, sheet,
+  item, settings UI) requires operator action and is left for the next
+  human session — copy `dist/` to Foundry's `Data/systems/starwarsffg/`,
+  launch Foundry V13, and exercise the five verification points.
+- 2026-05-28 — Build minification quality concern. Vite's default `build`
+  command minifies output via esbuild. `dist/modules/swffg-main.js` is 87
+  lines vs the 2006-line source. The minified output is syntactically valid
+  and functionally equivalent for runtime purposes, but stack traces will
+  be opaque and class identity checks (`constructor.name === "ActorFFG"`)
+  could break if any such pattern exists. A future task should add
+  `build: { minify: false }` to vite.config.mjs, OR enable sourcemaps in
+  production. Not blocking task 0.12; flagged for later attention.
+- 2026-05-28 — system.json not yet ADR-005-compliant. ADR-005 calls for
+  the fork's `system.json` to have `manifest` and `download` fields pointing
+  at the fork's GitHub releases (currently still upstream's URLs) and the
+  version to use a `-fork.N` pre-release suffix (currently 2.0.3). No
+  specific Phase 0 task covered this; the change requires knowing the
+  fork's GitHub URL. Operator should update these fields before publishing
+  the fork or sharing it with other users. Not blocking technical operation
+  since the fork is currently used locally.
+- 2026-05-28 — Executor handoff #2. Claude transitioned Phase 0 to Phase 1.
+  Phase 1 stub does not yet enumerate atomic tasks; task 1.0 (task detailing)
+  is the first session's responsibility before extracting calculators.
 
 ---
 
