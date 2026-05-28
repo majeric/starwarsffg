@@ -3,7 +3,7 @@
 **Current phase:** phase-00-foundation
 **Current task:** 0.7 — Add Foundry V13 type definitions
 **Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** 2de8b3e
+**Last commit on plan:** eea401a
 
 ---
 
