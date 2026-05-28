@@ -1,9 +1,16 @@
 # Restructure State
 
-**Current phase:** phase-05-datamodels
-**Current task:** 5.0 — Detail Phase 5 atomic tasks before execution
+**Current phase:** phase-11-migration-infra
+**Current task:** 11.0 — Detail Phase 11 atomic tasks before execution
 **Last verified:** 2026-05-28T09:40:00Z (lint gate red as known failure; all other gates green; 51 rules tests passing; zero prototype patches in modules/)
-**Last commit on plan:** b64bcb8
+**Last commit on plan:** c0857c2
+
+**Note on phase ordering:** Per phase-05-datamodels.md preconditions, Phase 11
+(migration infrastructure) must complete before Phase 5 (DataModels) can
+proceed. Phase 5 writes many schema-conversion migrations and needs a
+proper semver-aware runner. So Phase 5 is paused before its detailing task
+(5.0) and the current session executes Phase 11 first. After Phase 11 closes,
+execution returns to Phase 5.
 
 ---
 
@@ -14,7 +21,13 @@
 - [x] phase-02-settings
 - [x] phase-03-hooks (task 3.8 diceSoNiceReady deferred — see Open issues)
 - [x] phase-04-prototype-cleanup
-- [ ] phase-05-datamodels         ← CURRENT
+- [ ] phase-05-datamodels         (paused; Phase 11 prerequisite first)
+- [ ] phase-06-derived-split
+- [ ] phase-07-ae-unification
+- [ ] phase-08-sheets
+- [ ] phase-09-importer
+- [ ] phase-10-system-abstraction
+- [ ] phase-11-migration-infra    ← CURRENT (executed before Phase 5)
 - [ ] phase-02-settings
 - [ ] phase-03-hooks
 - [ ] phase-04-prototype-cleanup
@@ -28,26 +41,24 @@
 - [ ] phase-12-typescript
 - [ ] phase-13-v14-compat
 
+(Phase list shows duplicates above; Phase 5 listed earlier in the natural
+order, Phase 11 promoted as next-current. After Phase 11 closes, return
+to Phase 5 and remove the duplicate entry.)
+
 ---
 
-## Current phase tasks (phase-05-datamodels)
+## Current phase tasks (phase-11-migration-infra)
 
-See `phases/phase-05-datamodels.md` for the full task definitions.
-Phase 5 atomic tasks are detailed in task 5.0; subsequent task numbering
+See `phases/phase-11-migration-infra.md` for the full task definitions.
+Phase 11 atomic tasks are detailed in task 11.0; subsequent task numbering
 follows the result of that detailing.
 
-- [ ] 5.0 — Detail Phase 5 atomic tasks before execution   ← CURRENT
-- [ ] 5.1+ — Convert actor and item types to DataModels (one task per type)
+- [ ] 11.0 — Detail Phase 11 atomic tasks before execution   ← CURRENT
+- [ ] 11.1+ — Build semver-aware migration runner and relocate existing migrations
 
-(Previous: Phase 4 closed with both prototype patches removed.
-Token._drawBar moved into TokenFFG as a method override decomposed into
-5 helper methods to satisfy complexity gate. TokenFFG registration moved
-out of the useGenericSlots conditional to apply unconditionally — the
-operator should verify this is the intended behavior; if not, recouple
-in a follow-up task with documented rationale. CONFIG.Dice.rolls[0]
-mutation replaced with `CONFIG.Dice.rolls.unshift(RollFFG)` centralized
-in modules/dice/roll-registration.js. ADR-009 documents the V13 API
-investigation that drove both changes.)
+(Previous: Phase 4 closed with both prototype patches removed. Phase 5
+(DataModels) paused at task 5.0 because it requires Phase 11's migration
+runner infrastructure first.)
 
 (Previous: Phase 3 closed with 6 of 7 top-level hooks extracted. Task 3.8
 diceSoNiceReady deferred — its 221-line callback contains many dice-preset
