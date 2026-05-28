@@ -1,7 +1,7 @@
 # Restructure State
 
 **Current phase:** phase-00-foundation
-**Current task:** 0.9 — Add CI workflow
+**Current task:** 0.10 — Add .restructure/ to .gitignore
 **Last verified:** never (Phase 0 has not started)
 **Last commit on plan:** 6b1e4ba
 
@@ -38,8 +38,8 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 - [x] 0.6 — Create scripts/verify.mjs orchestrator
 - [x] 0.7 — Add Foundry V13 type definitions
 - [x] 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
-- [ ] 0.9 — Add CI workflow (.github/workflows/ci.yml)   ← CURRENT
-- [ ] 0.10 — Add .restructure/ to .gitignore
+- [x] 0.9 — Add CI workflow (.github/workflows/ci.yml)
+- [ ] 0.10 — Add .restructure/ to .gitignore   ← CURRENT
 - [ ] 0.11 — Verify `npm run verify` runs end-to-end (even if some tests fail; that's documented)
 - [ ] 0.12 — Verify Foundry V13 still loads the system after build
 
@@ -97,6 +97,14 @@ See `phases/phase-00-foundation.md` for the full task definitions.
   passes typecheck and fails at the pre-existing lint gate with 1023 warnings
   before reaching unit tests; task 0.11 owns the formal lint known-failure
   entry.
+- 2026-05-28 — Phase 0 task 0.9 verification note. `.github/workflows/ci.yml`
+  now runs on push and pull requests with Node 20.x, `npm ci`, and `npm run
+  verify`. The workflow records the `npm run verify` exit code in the job
+  summary but does not fail the job for known Phase 0 verification failures yet,
+  matching the task's visibility-not-enforcement requirement. Local `npm run
+  build` succeeded and produced ignored `dist/` artifact contents. Local `npm
+  run verify` still passes typecheck and fails at the pre-existing lint gate
+  with 1023 warnings.
 
 ---
 
