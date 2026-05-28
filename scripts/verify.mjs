@@ -1,25 +1,45 @@
 #!/usr/bin/env node
-/**
- * verify.mjs — restructure verification orchestrator
- *
- * This is a PLACEHOLDER. The full implementation lands in Phase 0 task 0.6.
- *
- * Intent: run each verification gate in order, fail fast, exit non-zero on
- * first failure. See docs/restructure/VERIFICATION.md for the canonical
- * gate list and order.
- *
- * Once Phase 0 completes, this file should:
- *   1. Run `npx tsc --noEmit`
- *   2. Run `npx eslint . --max-warnings 0`
- *   3. Run `npx vitest run`
- *   4. Run `npx vite build`
- *   5. Run `node scripts/smoke-load.mjs`
- *   6. Run `node scripts/replay-migrations.mjs`
- *
- * Each gate's stdout/stderr inherits to the parent process. Summary line per
- * gate: `[PASS]`, `[FAIL]`, or `[SKIP]`.
- */
 
-console.error("verify.mjs is a placeholder. Implement during Phase 0 task 0.6.");
-console.error("See docs/restructure/phases/phase-00-foundation.md for the spec.");
-process.exit(2); // non-zero so it's obvious the placeholder is in use
+import { spawn } from "node:child_process";
+
+const gates = [
+  { name: "typecheck", command: "npx", args: ["tsc", "--noEmit"] },
+  { name: "lint", command: "npx", args: ["eslint", ".", "--max-warnings", "0"] },
+  { name: "comments", command: "node", args: ["scripts/check-comments.mjs"] },
+  { name: "unit tests", command: "npx", args: ["vitest", "run"] },
+  { name: "build", command: "npx", args: ["vite", "build"] },
+  { name: "smoke load", command: "node", args: ["scripts/smoke-load.mjs"] },
+  { name: "migration replay", command: "node", args: ["scripts/replay-migrations.mjs"] },
+];
+
+function runGate(gate) {
+  return new Promise((resolve) => {
+    const child = spawn(gate.command, gate.args, {
+      shell: process.platform === "win32",
+      stdio: "inherit",
+    });
+
+    child.on("error", (error) => {
+      console.error(error);
+      resolve(1);
+    });
+
+    child.on("close", (code) => {
+      resolve(code ?? 1);
+    });
+  });
+}
+
+for (const gate of gates) {
+  const code = await runGate(gate);
+
+  if (code === 0) {
+    console.log(`[PASS] ${gate.name}`);
+    continue;
+  }
+
+  console.error(`[FAIL] ${gate.name}`);
+  process.exit(code);
+}
+
+console.log("[PASS] verify");

@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-00-foundation
-**Current task:** 0.6 — Create scripts/verify.mjs orchestrator
+**Current task:** 0.7 — Add Foundry V13 type definitions
 **Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** 9ad3bdc
+**Last commit on plan:** 2de8b3e
 
 ---
 
@@ -34,8 +34,8 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 - [x] 0.3 — Add tsconfig.json with allowJs and strict-but-permissive defaults
 - [x] 0.4 — Add ESLint and Prettier configuration
 - [x] 0.5 — Add vitest configuration and global Foundry mocks
-- [ ] 0.6 — Create scripts/verify.mjs orchestrator   ← CURRENT
-- [ ] 0.7 — Add Foundry V13 type definitions
+- [x] 0.6 — Create scripts/verify.mjs orchestrator
+- [ ] 0.7 — Add Foundry V13 type definitions   ← CURRENT
 - [ ] 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
 - [ ] 0.9 — Add CI workflow (.github/workflows/ci.yml)
 - [ ] 0.10 — Add .restructure/ to .gitignore
@@ -53,11 +53,12 @@ See `phases/phase-00-foundation.md` for the full task definitions.
   `npm install` exited 0 but warned because local Node v20.3.0 is below ESLint 9's
   dependency engine floor (`^20.9.0`), even though the phase precondition only says
   Node >=20.x.
-- 2026-05-28 — Phase 0 task 0.2 verification note. `npm run build` succeeds and
-  `dist/` contains the required Foundry files, but `npm run --silent verify` still
-  exits in the pre-existing `scripts/verify.mjs` placeholder before it can reach
-  the build gate. Human direction for this session is to document bootstrap
-  mismatches and keep working through the Phase 0 tooling setup.
+- 2026-05-28 — Phase 0 task 0.2 verification note, resolved by task 0.6.
+  `npm run build` succeeded and `dist/` contained the required Foundry files,
+  but `npm run --silent verify` still exited in the pre-existing
+  `scripts/verify.mjs` placeholder before it could reach the build gate.
+  Human direction for this session was to document bootstrap mismatches and
+  keep working through the Phase 0 tooling setup.
 - 2026-05-28 — Phase 0 task 0.4 reconciliation note. This checkout already had a
   legacy `eslint.config.mjs` that depended on packages removed by task 0.1. The
   config was replaced with the Phase 0 flat config. Because `modules/settings/`
@@ -67,6 +68,10 @@ See `phases/phase-00-foundation.md` for the full task definitions.
   environment, but task 0.1 omitted both `jsdom` and `happy-dom`. ADR-007 records
   the decision to add `happy-dom`. Vitest configuration now loads; existing test
   collection/import failures remain for task 0.8.
+- 2026-05-28 — Phase 0 task 0.6 verification note. `npm run verify` now runs the
+  orchestrator, passes typecheck, and fails at lint because existing legacy files
+  produce 1023 warnings under `--max-warnings 0`. Task 0.11 owns formal
+  documentation of Phase 0 known failures in `VERIFICATION.md`.
 
 ---
 
