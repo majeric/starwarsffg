@@ -147,92 +147,11 @@ Hooks.once("init", async function () {
   // configuredTurnMarker setting now lives in modules/settings/combat.js
   // (Phase 2.3). Registered via registerAllSettings() above.
 
-  // Override the default Token _drawBar function to allow for FFG style wound and strain values.
-  foundry.canvas.placeables.Token.prototype._drawBar = function (number, bar, data) {
-    let val = Number(data.value);
-    // FFG style behaviour for wounds and strain.
-    let aboveThreshold = 0;
-    if (data.attribute === "stats.wounds" || data.attribute === "stats.strain" || data.attribute === "stats.hullTrauma" || data.attribute === "stats.systemStrain") {
-      val = Number(data.max - data.value);
-      aboveThreshold = Math.max(data.value - data.max, 0);
-    }
-
-    // draw the empty bar
-    let h = Math.max(canvas.dimensions.size / 12, 8);
-    bar.clear()
-      .beginFill(0x000000, 0.5)
-      .lineStyle(2, 0x000000, 0.9)
-      .drawRoundedRect(0, 0, this.w, h, 3);
-    let startX = 1;
-    let startY = 1;
-
-    const colors = {
-      "stats.wounds": {
-        ok: game.settings.get("starwarsffg", "ui-token-healthy"),
-        damaged: game.settings.get("starwarsffg", "ui-token-wounded"),
-        overDamaged: game.settings.get("starwarsffg", "ui-token-overwounded"),
-      },
-      "stats.hullTrauma": {
-        ok: game.settings.get("starwarsffg", "ui-token-healthy"),
-        damaged: game.settings.get("starwarsffg", "ui-token-wounded"),
-        overDamaged: game.settings.get("starwarsffg", "ui-token-overwounded"),
-      },
-      "stats.strain": {
-        ok: game.settings.get("starwarsffg", "ui-token-stamina-ok"),
-        damaged: game.settings.get("starwarsffg", "ui-token-stamina-damaged"),
-        overDamaged: game.settings.get("starwarsffg", "ui-token-stamina-over"),
-      },
-      "stats.systemStrain": {
-        ok: game.settings.get("starwarsffg", "ui-token-stamina-ok"),
-        damaged: game.settings.get("starwarsffg", "ui-token-stamina-damaged"),
-        overDamaged: game.settings.get("starwarsffg", "ui-token-stamina-over"),
-      },
-    }
-
-    if (["stats.wounds", "stats.hullTrauma", "stats.strain", "stats.systemStrain"].includes(data.attribute)) {
-      if (aboveThreshold > 0) {
-        // render the above-threshold portion of the bar
-        let abovePct = Math.min(aboveThreshold / data.max, 1);
-        bar
-        .beginFill(colors[data.attribute]["overDamaged"], 0.8)
-        .lineStyle(1, 0x000000, 0.8)
-        .drawRoundedRect(startX, startY, abovePct * (this.w - 2), h - 2, 2);
-        // render the rest as wounds
-        startX = abovePct * (this.w - 2) + 1;
-        let remainingLength = this.w  - abovePct * (this.w - 2) - 2;
-        bar
-        .beginFill(colors[data.attribute]["damaged"], 0.8)
-        .lineStyle(1, 0x000000, 0.8)
-        .drawRoundedRect(startX, startY, remainingLength, h - 2, 2);
-      } else {
-        // render healthy and then unhealthy portions of the bar
-        let woundedPct = Math.min((data.max - data.value) / data.max, 1);
-        bar
-        .beginFill(colors[data.attribute]["ok"], 0.8)
-        .lineStyle(1, 0x000000, 0.8)
-        .drawRoundedRect(startX, startY, woundedPct * (this.w - 2), h - 2, 2);
-        // remaining health
-        startX = woundedPct * (this.w - 2) + 1;
-        let remainingLength = this.w - woundedPct * (this.w - 2) - 2;
-        bar
-        .beginFill(colors[data.attribute]["damaged"], 0.8)
-        .lineStyle(1, 0x000000, 0.8)
-        .drawRoundedRect(startX, startY, remainingLength, h - 2, 2);
-      }
-    } else {
-      // render normally
-      const pct = Math.clamp(val, 0, data.max) / data.max;
-      let color = number === 0 ? [1 - pct / 2, pct, 0] : [0.5 * pct, 0.7 * pct, 0.5 + pct / 2];
-      bar
-      .beginFill(PIXI.utils.rgb2hex(color), 0.8)
-      .lineStyle(1, 0x000000, 0.8)
-      .drawRoundedRect(1, 1, pct * (this.w - 2), h - 2, 2);
-    }
-
-    // Set position
-    let posY = number === 0 ? this.h - h : 0;
-    bar.position.set(0, posY);
-  };
+  // Token _drawBar override now lives as a method on TokenFFG in
+  // modules/tokens/token-ffg.js (Phase 4.2). TokenFFG is registered
+  // unconditionally below via CONFIG.Token.objectClass so the FFG bar
+  // drawing applies whether or not generic slots are enabled.
+  CONFIG.Token.objectClass = TokenFFG;
 
   // Load character templates so that dynamic skills lists work correctly
   await foundry.applications.handlebars.loadTemplates(["systems/starwarsffg/templates/actors/ffg-character-sheet.html", "systems/starwarsffg/templates/actors/ffg-minion-sheet.html"]);
@@ -265,8 +184,8 @@ Hooks.once("init", async function () {
     CONFIG.ui.combat = CombatTrackerFFG;
     CONFIG.Combat.documentClass = CombatFFG;
     CONFIG.Combatant.documentClass = CombatantFFG;
-    // override the token placeable object so we can control turn indicators
-    CONFIG.Token.objectClass = TokenFFG;
+    // CONFIG.Token.objectClass = TokenFFG moved out of this conditional
+    // by Phase 4.2 — see comment above.
   }
 
   // removeCombatantAction setting now lives in modules/settings/combat.js
