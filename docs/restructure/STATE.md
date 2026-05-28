@@ -97,7 +97,7 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 
 Sessions append to `.restructure/sessions/<UTC-timestamp>.md`. Latest:
 
-`.restructure/sessions/2026-05-28T06-43-33Z.md`
+`.restructure/sessions/2026-05-28T06-54-10Z.md`
 
 ---
 
