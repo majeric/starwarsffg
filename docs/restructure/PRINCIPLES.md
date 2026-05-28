@@ -4,7 +4,8 @@ These rules are non-negotiable. Every session, every model, every task.
 
 If a principle conflicts with what a task seems to require, **the principle
 wins** and the task description is wrong — flag it in `STATE.md` "Open issues"
-and stop.
+and resolve the conflict before continuing. Stop only if resolution requires
+human input or external state you cannot provide.
 
 ---
 
@@ -42,7 +43,9 @@ and stop.
 18. Read `STATE.md` first thing. Update `STATE.md` last thing. Both are mandatory.
 19. Commit per task, not per session. One task = one commit (or one merge commit if the task naturally splits into trivially sequential edits).
 20. Commit message format: `phase NN.MM: <task title from STATE.md>` (e.g. `phase 01.2: extract encumbrance calculator`).
-21. If blocked, write the blocker in `STATE.md` "Open issues" and stop. Do not improvise.
+21. If blocked, write the blocker in `STATE.md` "Open issues", then work
+    through it within the current task scope. Stop only when the same blocker
+    cannot be resolved without human input or external state.
 22. Do not start the *next* task in the same session that completed the previous one unless the phase file explicitly groups them.
 
 ## Decision discipline
@@ -92,6 +95,23 @@ because future maintenance happens without AI. See ADR-006.
 38. **Tests read like documentation.** Test names describe behavior in plain
     English. A contributor should understand what a function does by reading
     its test file, without opening the implementation.
+
+## Foundry API compatibility (per ADR-008)
+
+These rules ensure new code works on both Foundry V13 and V14. Certification
+happens in Phase 13; per-phase compliance happens as code is written.
+
+39. **All Foundry API calls must work on both V13 and V14.** When an API
+    differs between versions, prefer feature detection
+    (`if (CONFIG.X)` or `if (typeof Y.method === "function")`) over
+    version-string sniffing (`if (game.release.generation === 14)`).
+    Version-string sniffing is only justified when feature detection is
+    genuinely impossible; if so, add an ADR explaining why.
+40. **Do not introduce deprecated API usage.** Foundry deprecates APIs
+    version-by-version; using a deprecated API works on V13 today but
+    breaks on V14 or V15 tomorrow. If a deprecated API is the only option,
+    add an ADR documenting the situation and a follow-up task to migrate
+    when the replacement is available.
 
 ## The future-maintainer check
 

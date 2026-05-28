@@ -31,14 +31,15 @@ The plan is split across files in this directory:
 5. npm run verify
 ```
 
-If step 5 fails, **do not start new work**. Investigate the failure, document it
-in `STATE.md` under "Open issues", and stop. A future session (or a human) will
-unblock you.
+If step 5 fails, document the failure in `STATE.md` under "Open issues" before
+changing anything else. Then work the failure as part of the current session
+until it is resolved or until it genuinely requires human input or external
+state you cannot provide. Do not skip to unrelated work.
 
 ## Your last 3 commands every session
 
 ```
-1. Update STATE.md (mark tasks complete, note any blockers)
+1. Update STATE.md (mark tasks complete, note blockers and their resolution)
 2. git status   (must show only files you touched per the current task)
 3. Append a session log to .restructure/sessions/<UTC-timestamp>.md
 ```

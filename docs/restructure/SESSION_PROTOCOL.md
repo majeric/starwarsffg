@@ -13,14 +13,18 @@ This is the exact ritual every session follows. Do not skip steps.
 4. Read docs/restructure/architecture/decision-log.md   (decisions already made)
 5. Read docs/restructure/phases/<current-phase>.md      (the work)
 6. Locate the current task block in the phase file (matches STATE.md "Current task")
-7. Run `git status` — must be clean. If dirty, stop and reconcile.
-8. Run `npm run verify` — must pass. If fails, stop and investigate.
+7. Run `git status`. If dirty, document the pre-existing state and reconcile it
+   before touching overlapping files.
+8. Run `npm run verify`. If it fails, document the failure and work through it
+   before starting the task's implementation.
 9. Update STATE.md: change "Current task" status indicator if you use one,
    note session start in the session log.
 ```
 
-If steps 7 or 8 fail, do not start new work. Document the failure in
-`STATE.md` "Open issues" and end the session.
+If steps 7 or 8 surface a blocker, do not skip to unrelated work. Document the
+failure in `STATE.md` "Open issues", then resolve it in the current session if
+it can be resolved locally. Stop only when the blocker requires human input or
+external state you cannot provide.
 
 ---
 
@@ -31,7 +35,8 @@ For each task in the current phase, in order:
 
   a. Read the task block in the phase file (preconditions, steps, verification, anti-creep notes)
   b. Verify task preconditions one by one. Each precondition has a check command.
-     If any precondition fails, stop. Document in "Open issues".
+     If any precondition fails, document it in "Open issues", then work through
+     it if doing so stays inside the current task scope.
   c. Make exactly the changes the task specifies. Nothing else.
   d. Run the task-specific verification commands listed in the task block.
      If they fail, fix and re-run. Do not proceed until green.
@@ -89,7 +94,7 @@ written. Examples:
 **What to do when blocked:**
 
 ```
-1. Do NOT improvise a workaround.
+1. Do NOT improvise a workaround outside the current task's scope.
 2. Do NOT skip to a different task.
 3. Document the blocker in STATE.md "Open issues" with:
      - Date (UTC)
@@ -97,11 +102,17 @@ written. Examples:
      - What you tried
      - What failed
      - Your best guess at the cause
-4. If you partially made changes, roll them back (git checkout -- <files>).
-5. End the session.
+4. Work through the blocker directly if it can be solved locally while obeying
+   the current task scope and PRINCIPLES.md.
+5. Update the Open issue with the resolution once fixed, including any command
+   that proved the fix.
+6. Stop only if the blocker requires human input or external state you cannot
+   provide. If you partially made changes and cannot finish, leave the worktree
+   in a known-good state and document exactly what remains.
 ```
 
-A human or a future session will unblock you.
+A human or a future session should only be needed when the blocker cannot be
+resolved locally.
 
 ---
 
