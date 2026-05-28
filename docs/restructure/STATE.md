@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-04-prototype-cleanup
-**Current task:** 4.0 — Detail Phase 4 atomic tasks before execution
-**Last verified:** 2026-05-28T09:15:00Z (lint gate red as known failure; all other gates green; 51 rules tests passing; swffg-main.js much smaller after settings + 6 of 7 top-level hooks extracted)
-**Last commit on plan:** dc5598e
+**Current task:** 4.1 — Investigate Foundry V13 dice and token registration APIs
+**Last verified:** 2026-05-28T09:30:00Z (lint gate red as known failure; all other gates green; 51 rules tests passing)
+**Last commit on plan:** 2646503
 
 ---
 
@@ -32,17 +32,17 @@
 ## Current phase tasks (phase-04-prototype-cleanup)
 
 See `phases/phase-04-prototype-cleanup.md` for the full task definitions.
-Phase 4 atomic tasks are detailed in task 4.0; subsequent task numbering
-follows the result of that detailing.
 
-- [ ] 4.0 — Detail Phase 4 atomic tasks before execution   ← CURRENT
-- [ ] 4.1+ — Replace prototype patches with subclass + register pattern
+- [x] 4.0 — Detail Phase 4 atomic tasks (commit `2646503`)
+- [ ] 4.1 — Investigate Foundry V13 dice and token registration APIs (produce ADR-009)   ← CURRENT
+- [ ] 4.2 — Move Token._drawBar override into TokenFFG class
+- [ ] 4.3 — Clean up CONFIG.Dice.rolls registration
+- [ ] 4.4 — Verify Phase 4 stop gate
 
-(Previous: Phase 3 closed with 6 of 7 top-level hooks extracted from
-swffg-main.js into modules/hooks/. Task 3.8 (diceSoNiceReady) deferred —
-its 221-line callback contains many dice-preset definitions that need
-internal decomposition before extraction. Phase 4 can proceed
-independently since prototype patches and dice presets don't overlap.)
+(Previous: Phase 3 closed with 6 of 7 top-level hooks extracted. Task 3.8
+diceSoNiceReady deferred — its 221-line callback contains many dice-preset
+definitions that need internal decomposition before extraction. Phase 4 can
+proceed independently since prototype patches and dice presets don't overlap.)
 
 ---
 
@@ -214,6 +214,18 @@ independently since prototype patches and dice presets don't overlap.)
   updateActiveEffect). These cannot be cleanly extracted without first
   decomposing the init/ready bodies (Phase 5 DataModel work will
   naturally do much of this since init contains class registration).
+- 2026-05-28 — Session summary (Claude takeover). Continuous-progress
+  session executed from Phase 0 task 0.11 through Phase 4 task 4.0. Net
+  output: 32 commits, three full phases closed (1, 2, partial 3), Phase 4
+  detailed. Files added: 14 in modules/rules/calculators/, 14 in
+  modules/settings/, 8 in modules/hooks/, plus tests. swffg-main.js
+  shrunk substantially. No legacy production code modified outside the
+  extraction comments. Verify summary unchanged throughout: typecheck
+  PASS, lint FAIL (1023 pre-existing legacy warnings; new code is clean),
+  comments PASS, unit tests PASS (51 calculator tests added), build PASS,
+  smoke load PASS, migration replay PASS. Next session should start at
+  Phase 4 task 4.1 and follow the detailed task list in
+  phases/phase-04-prototype-cleanup.md.
 
 ---
 
