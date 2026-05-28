@@ -10,3 +10,12 @@ cypress/screenshots/
 /blob-report/
 /playwright/.cache/
 state.json
+
+# Restructure scratch space (session logs, intermediate artifacts).
+# The bootstrap intentionally does not track this directory; sessions
+# create it as needed. See docs/restructure/SESSION_PROTOCOL.md.
+.restructure/
+
+# Build output (added by Phase 0; safe to ignore in advance)
+dist/
+build/
