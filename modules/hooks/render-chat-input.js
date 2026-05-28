@@ -7,7 +7,7 @@ import DiceHelpers from "../helpers/dice-helpers.js";
  * privacy controls when the chat input renders.
  */
 export function registerRenderChatInputHook() {
-  Hooks.on("renderChatInput", (app, _html, _data) => {
+  Hooks.on("renderChatInput", (app) => {
     if (app.id !== "chat") return;
     const rollButtonId = "ffgChatRoll";
     if (document.querySelector(`#${rollButtonId}`)) return;
