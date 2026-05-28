@@ -1,7 +1,7 @@
 # Restructure State
 
 **Current phase:** phase-00-foundation
-**Current task:** 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
+**Current task:** 0.9 — Add CI workflow
 **Last verified:** never (Phase 0 has not started)
 **Last commit on plan:** cf87a04
 
@@ -37,8 +37,8 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 - [x] 0.5 — Add vitest configuration and global Foundry mocks
 - [x] 0.6 — Create scripts/verify.mjs orchestrator
 - [x] 0.7 — Add Foundry V13 type definitions
-- [ ] 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)   ← CURRENT
-- [ ] 0.9 — Add CI workflow (.github/workflows/ci.yml)
+- [x] 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
+- [ ] 0.9 — Add CI workflow (.github/workflows/ci.yml)   ← CURRENT
 - [ ] 0.10 — Add .restructure/ to .gitignore
 - [ ] 0.11 — Verify `npm run verify` runs end-to-end (even if some tests fail; that's documented)
 - [ ] 0.12 — Verify Foundry V13 still loads the system after build
@@ -91,6 +91,12 @@ See `phases/phase-00-foundation.md` for the full task definitions.
   failure owned by task 0.11. Installing `fvtt-types` also produced the already
   documented local Node v20.3.0 engine warnings and reported npm audit findings
   in dev-only transitive dependencies.
+- 2026-05-28 — Phase 0 task 0.8 verification note. `npx vitest run
+  tests/modifiers.test.js` and `npx vitest run` now run without crashing and
+  report the legacy custom-runner suites as skipped. `npm run verify` still
+  passes typecheck and fails at the pre-existing lint gate with 1023 warnings
+  before reaching unit tests; task 0.11 owns the formal lint known-failure
+  entry.
 
 ---
 

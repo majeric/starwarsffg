@@ -1,4 +1,9 @@
+import { describe, it } from "vitest";
 import Helpers from "../modules/helpers/common.js";
+
+describe.skip("Common Helpers legacy suite", () => {
+  it("awaits migration from the custom suite runner", () => {});
+});
 
 export const HelpersTests = (suite, suiteInstance, Test, chai) => {
   const _suite = suiteInstance.create(suite, `Common Helpers`);

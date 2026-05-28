@@ -269,6 +269,42 @@ complete.
 
 ---
 
+## ADR-009: 2026-05-28 — Quarantine legacy custom-runner tests during Vitest bootstrap
+
+**Status:** accepted
+**Phase:** phase-00-foundation
+
+**Context:** Phase 0 task 0.8 wires legacy tests into Vitest only far enough
+to make collection behavior explicit. `tests/modifiers.test.js` is not a
+Vitest suite; it exports a custom-runner function and imports helper code that
+requires Foundry UI globals during module evaluation. `tests/common.test.js`
+uses the same custom-runner export shape and causes `npx vitest run` to fail
+with "No test suite found" once the modifier import crash is avoided.
+
+**Options considered:**
+- (a) Rewrite the legacy tests into Vitest now
+- (b) Expand Foundry mocks until the legacy imports collect, but leave the
+  custom-runner shape in place
+- (c) Preserve the legacy tests and add skipped Vitest marker suites until
+  Phase 5 rewrites the fixtures against DataModels
+
+**Decision:** (c) — preserve the legacy tests and quarantine them with skipped
+Vitest marker suites.
+
+**Consequences:**
+- `tests/modifiers.test.js` becomes a skipped Vitest marker; the preserved
+  legacy body moves to `tests/modifiers.test.js.legacy`
+- `tests/common.test.js` keeps its legacy export and gains a skipped Vitest
+  marker so the file is explicit debt instead of a collection failure
+- `npx vitest run` can execute without crashing while reporting the legacy
+  suites as skipped
+- Phase 5 owns converting these tests into real Vitest tests after DataModels
+  replace the legacy `data:` fixture shape
+- This ADR does not permit skipping new tests; it applies only to the
+  pre-existing custom-runner files
+
+---
+
 ## ADR template (for future entries)
 
 ```

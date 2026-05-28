@@ -31,7 +31,22 @@ task that will fix them.
 
 ## Known failures
 
-(none yet — Phase 0 hasn't run)
+### tests/modifiers.test.js — legacy custom-runner suite quarantined
+**Gate:** unit tests
+**Discovered:** 2026-05-28
+**Owning task:** phase-00 task 0.8 (document) / phase-05 task TBD (fix)
+**Workaround:** `tests/modifiers.test.js` is a skipped Vitest marker. The
+preserved legacy suite lives at `tests/modifiers.test.js.legacy` until its
+fixtures are rewritten from legacy `data:` shape to DataModel-era `system:`
+shape.
+
+### tests/common.test.js — legacy custom-runner suite quarantined
+**Gate:** unit tests
+**Discovered:** 2026-05-28
+**Owning task:** phase-00 task 0.8 (document) / phase-05 task TBD (fix)
+**Workaround:** The file keeps its legacy export for reference and includes a
+skipped Vitest marker so `npx vitest run` reports the debt without failing
+collection.
 
 Format for entries:
 
