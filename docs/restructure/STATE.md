@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-00-foundation
-**Current task:** 0.2 — Add vite.config.mjs configured for Foundry ESM output
+**Current task:** 0.3 — Add tsconfig.json with allowJs and strict-but-permissive defaults
 **Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** (initial bootstrap)
+**Last commit on plan:** dc0acd3
 
 ---
 
@@ -30,8 +30,8 @@
 See `phases/phase-00-foundation.md` for the full task definitions.
 
 - [x] 0.1 — Create package.json with build/test dependencies
-- [ ] 0.2 — Add vite.config.mjs configured for Foundry ESM output   ← CURRENT
-- [ ] 0.3 — Add tsconfig.json with allowJs and strict-but-permissive defaults
+- [x] 0.2 — Add vite.config.mjs configured for Foundry ESM output
+- [ ] 0.3 — Add tsconfig.json with allowJs and strict-but-permissive defaults   ← CURRENT
 - [ ] 0.4 — Add ESLint and Prettier configuration
 - [ ] 0.5 — Add vitest configuration and global Foundry mocks
 - [ ] 0.6 — Create scripts/verify.mjs orchestrator
@@ -53,6 +53,11 @@ See `phases/phase-00-foundation.md` for the full task definitions.
   `npm install` exited 0 but warned because local Node v20.3.0 is below ESLint 9's
   dependency engine floor (`^20.9.0`), even though the phase precondition only says
   Node >=20.x.
+- 2026-05-28 — Phase 0 task 0.2 verification note. `npm run build` succeeds and
+  `dist/` contains the required Foundry files, but `npm run --silent verify` still
+  exits in the pre-existing `scripts/verify.mjs` placeholder before it can reach
+  the build gate. Human direction for this session is to document bootstrap
+  mismatches and keep working through the Phase 0 tooling setup.
 
 ---
 

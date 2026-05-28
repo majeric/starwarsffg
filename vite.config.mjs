@@ -1,0 +1,59 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { defineConfig } from "vite";
+
+// Reference: https://foundryvtt.wiki/en/development/guides/vite
+// This build writes Foundry-loadable ES modules to dist/ while preserving paths.
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
+const outDir = path.resolve(rootDir, "dist");
+const manifest = JSON.parse(fs.readFileSync(path.join(rootDir, "system.json"), "utf8"));
+const staticPaths = ["system.json", "template.json", "lang", "templates", "styles", "images", "fonts", "lib"];
+
+function foundryModuleInputs() {
+  return Object.fromEntries(
+    manifest.esmodules
+      .filter((entry) => entry.startsWith("modules/"))
+      .map((entry) => [entry.replace(/\.js$/, ""), path.resolve(rootDir, entry)])
+  );
+}
+
+function copyFoundryAssets() {
+  return {
+    name: "copy-foundry-assets",
+    closeBundle() {
+      for (const relativePath of staticPaths) {
+        const sourcePath = path.resolve(rootDir, relativePath);
+        const targetPath = path.resolve(outDir, relativePath);
+
+        fs.cpSync(sourcePath, targetPath, { recursive: true });
+      }
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => {
+  const isWatchBuild = process.argv.includes("--watch");
+
+  return {
+    plugins: [copyFoundryAssets()],
+    build: {
+      outDir,
+      emptyOutDir: true,
+      sourcemap: mode === "development" || isWatchBuild,
+      target: "es2022",
+      rollupOptions: {
+        input: foundryModuleInputs(),
+        preserveEntrySignatures: "strict",
+        output: {
+          format: "es",
+          preserveModules: true,
+          preserveModulesRoot: rootDir,
+          entryFileNames: "[name].js",
+          chunkFileNames: "[name].js",
+        },
+      },
+    },
+  };
+});
