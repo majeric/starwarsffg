@@ -3,7 +3,7 @@
 **Current phase:** phase-00-foundation
 **Current task:** 0.9 — Add CI workflow
 **Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** cf87a04
+**Last commit on plan:** 6b1e4ba
 
 ---
 
