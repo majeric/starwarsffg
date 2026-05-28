@@ -1,7 +1,7 @@
 # Restructure State
 
 **Current phase:** phase-00-foundation
-**Current task:** 0.1 — Create package.json with build/test dependencies
+**Current task:** 0.2 — Add vite.config.mjs configured for Foundry ESM output
 **Last verified:** never (Phase 0 has not started)
 **Last commit on plan:** (initial bootstrap)
 
@@ -29,8 +29,8 @@
 
 See `phases/phase-00-foundation.md` for the full task definitions.
 
-- [ ] 0.1 — Create package.json with build/test dependencies   ← CURRENT
-- [ ] 0.2 — Add vite.config.mjs configured for Foundry ESM output
+- [x] 0.1 — Create package.json with build/test dependencies
+- [ ] 0.2 — Add vite.config.mjs configured for Foundry ESM output   ← CURRENT
 - [ ] 0.3 — Add tsconfig.json with allowJs and strict-but-permissive defaults
 - [ ] 0.4 — Add ESLint and Prettier configuration
 - [ ] 0.5 — Add vitest configuration and global Foundry mocks
@@ -46,7 +46,13 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 
 ## Open issues
 
-(none)
+- 2026-05-28 — Phase 0 bootstrap mismatch documented and reconciled by human
+  direction. Task 0.1 expected no root `package.json`, but this checkout already
+  had a legacy `package.json` and tracked `package-lock.json`. The legacy manifest
+  was replaced with the task 0.1 manifest and `npm install` regenerated the lockfile.
+  `npm install` exited 0 but warned because local Node v20.3.0 is below ESLint 9's
+  dependency engine floor (`^20.9.0`), even though the phase precondition only says
+  Node >=20.x.
 
 ---
 
