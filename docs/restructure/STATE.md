@@ -1,12 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.0 — Detail Phase 5 atomic tasks before execution
-**Last verified:** 2026-05-28T09:55:00Z (lint gate red as known failure; all other gates green; 63 unit tests passing — 51 calculator + 12 migration)
-**Last commit on plan:** 297a024
-
-**Note on phase ordering:** Phase 11 (migration infrastructure) closed first
-to satisfy Phase 5 preconditions. Phase 5 execution resumes now.
+**Current task:** 5.2 — Convert homestead actor type to DataModel
+**Last verified:** 2026-05-28T10:05:00Z (lint gate red as known failure; all other gates green; 63 unit tests passing — 51 calculator + 12 migration)
+**Last commit on plan:** b8838fc
 
 ---
 
@@ -42,22 +39,33 @@ to satisfy Phase 5 preconditions. Phase 5 execution resumes now.
 ## Current phase tasks (phase-05-datamodels)
 
 See `phases/phase-05-datamodels.md` for the full task definitions.
-Phase 5 atomic tasks are detailed in task 5.0; subsequent task numbering
-follows the result of that detailing.
 
-- [ ] 5.0 — Detail Phase 5 atomic tasks before execution   ← CURRENT
-- [ ] 5.1+ — Convert actor and item types to DataModels (one task per type)
+- [x] 5.0 — Detail Phase 5 atomic tasks (commit `f9999f0`)
+- [x] 5.1 — Scaffold data model base classes and registration helper (commit `b8838fc`)
+- [ ] 5.2 — Convert homestead actor type to DataModel   ← CURRENT
+- [ ] 5.3 — Convert minion actor type to DataModel
+- [ ] 5.4 — Convert rival actor type to DataModel
+- [ ] 5.5 — Convert nemesis actor type to DataModel
+- [ ] 5.6 — Convert character actor type to DataModel
+- [ ] 5.7 — Convert vehicle actor type to DataModel
+- [ ] 5.8 — Convert criticalinjury, criticaldamage item types
+- [ ] 5.9 — Convert motivation, obligation, background item types
+- [ ] 5.10 — Convert species, career item types
+- [ ] 5.11 — Convert ability, gear item types
+- [ ] 5.12 — Convert talent item type
+- [ ] 5.13 — Convert specialization item type
+- [ ] 5.14 — Convert forcepower, signatureability item types
+- [ ] 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
+- [ ] 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)
+- [ ] 5.17 — Convert shipattachment item type
+- [ ] 5.last — Verify Phase 5 stop gate
 
-(Previous: Phase 11 closed with migration infrastructure in place.
-modules/migrations/runner.js provides semver-aware dispatcher with
-12 unit tests. The three legacy migrations relocated to
-modules/migrations/<version>-<slug>.js. swffg-migration.js deleted.
-scripts/replay-migrations.mjs implemented for fixture replay (no
-fixtures captured yet; operator-dependent). Five inline parseFloat
-version checks remain in the swffg-main.js ready hook body — these
-are inline historical adaptation hooks, not migration dispatcher
-calls, and their relocation to per-version migrations is deferred
-to a follow-up task.)
+(Previous: Phase 11 closed; migration infrastructure in place. Phase 5
+scaffolding in place: modules/data/{actor,item}/base-*-data.js and
+modules/data/_register.js. registerDataModels() is wired into
+swffg-main.js init but the registries are empty until per-type tasks
+populate them. Foundry falls back to template.json for any unconverted
+type.)
 
 (Previous: Phase 3 closed with 6 of 7 top-level hooks extracted. Task 3.8
 diceSoNiceReady deferred — its 221-line callback contains many dice-preset
@@ -267,6 +275,24 @@ proceed independently since prototype patches and dice presets don't overlap.)
   A pragmatic alternative is to just swap `parseFloat` for
   `compareVersions` calls inline, preserving the adaptations but using
   the semver comparator.
+- 2026-05-28 — Phase 5.1 scaffold note. modules/data/{actor,item}/
+  base-*-data.js are minimal TypeDataModel subclasses with empty
+  defineSchema() — placeholders for the per-type subclasses that arrive
+  in 5.2 onward. modules/data/_register.js has empty ACTOR_DATA_MODELS
+  and ITEM_DATA_MODELS objects; per-type tasks append entries as each
+  type's DataModel lands. registerDataModels() is called from
+  swffg-main.js init after document class registration. Foundry falls
+  back to template.json for any type not registered — so partial
+  conversion is safe at every commit boundary.
+- 2026-05-28 — Session resume summary. Resumed at Phase 4 task 4.1 and
+  executed through Phase 5 task 5.1. Major outputs: closed Phase 4
+  (prototype patches eliminated), closed Phase 11 (migration runner +
+  semver dispatcher + 12 tests), opened Phase 5 with scaffold ready
+  for per-type conversion. Cumulative tests: 63 (51 calculator + 12
+  migration). swffg-main.js continues to shrink. Next session: start
+  Phase 5 task 5.2 (convert homestead — simplest actor type, has only
+  cost and consumables fields plus biography/attributes/meta_only
+  template includes).
 - 2026-05-28 — Phase 4 close note. Both prototype patches eliminated.
   Token._drawBar now lives as a method on TokenFFG (decomposed into 5
   helpers to pass complexity gate). CONFIG.Dice.rolls[0] mutation
