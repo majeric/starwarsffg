@@ -1,5 +1,10 @@
 import { registerSetupHook } from "./setup.js";
 import { registerRenderChatInputHook } from "./render-chat-input.js";
+import { registerRenderActorDirectoryHook } from "./render-actor-directory.js";
+import { registerRenderCompendiumDirectoryHook } from "./render-compendium-directory.js";
+import { registerRenderChatMessageHook } from "./render-chat-message.js";
+import { registerDropActorSheetDataHook } from "./drop-actor-sheet-data.js";
+import { registerRenderGamePauseHook } from "./render-game-pause.js";
 
 /**
  * Central entry point for Foundry hook registrations extracted out of
@@ -17,4 +22,9 @@ import { registerRenderChatInputHook } from "./render-chat-input.js";
 export function registerAllHooks() {
   registerSetupHook();
   registerRenderChatInputHook();
+  registerRenderActorDirectoryHook();
+  registerRenderCompendiumDirectoryHook();
+  registerRenderChatMessageHook();
+  registerDropActorSheetDataHook();
+  registerRenderGamePauseHook();
 }

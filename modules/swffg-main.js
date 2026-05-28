@@ -704,98 +704,21 @@ Hooks.once("init", async function () {
 // renderChatInput hook now lives in modules/hooks/render-chat-input.js
 // (Phase 3.3). Registered via registerAllHooks() above.
 
-Hooks.on("renderActorDirectory", (app, html) => {
-  if (app.id === "actors") {
-    const wizardId = "ffgCharacterWizard";
-    if (!document.querySelector(`#${wizardId}`)) {
-      const wizardButtonIcon = document.createElement("i");
-      wizardButtonIcon.classList.add("fa-solid", "fa-wand-magic-sparkles");
+// renderActorDirectory hook now lives in
+// modules/hooks/render-actor-directory.js (Phase 3.4). Registered via
+// registerAllHooks() above.
 
-      const wizardButtonText = document.createElement("span");
-      wizardButtonText.textContent = game.i18n.localize("SWFFG.CharacterCreator.Entry.Button");
+// renderCompendiumDirectory hook now lives in
+// modules/hooks/render-compendium-directory.js (Phase 3.5). Registered
+// via registerAllHooks() above.
 
-      const wizardButton = document.createElement("button");
-      wizardButton.id = wizardId;
-      wizardButton.type = "button";
-      wizardButton.classList.add("activate-wizard");
-      wizardButton.appendChild(wizardButtonIcon);
-      wizardButton.appendChild(wizardButtonText);
+// renderChatMessage hook now lives in
+// modules/hooks/render-chat-message.js (Phase 3.6). Registered via
+// registerAllHooks() above.
 
-      const folderElement = html.querySelector(".header-actions.action-buttons");
-      folderElement.appendChild(wizardButton);
-
-      wizardButton.onclick = async function () {
-        ui.notifications.info(game.i18n.localize("SWFFG.CharacterCreator.Entry.Loading"));
-        const create = new CharacterCreator();
-        create.render(true);
-      }
-    }
-  }
-});
-
-Hooks.on("renderCompendiumDirectory", (app, html, data) => {
-  if (game.user.isGM) {
-    let div;
-    // Native DOM (V13+)
-    div = document.createElement("div");
-    div.className = "og-character-import";
-    div.innerHTML = `<hr><h4>Importers</h4>
-    <button class="og-character" style="width:100%;margin-bottom:4px;">OggDude Dataset Importer</button>
-    <button class="swa-character" style="width:100%;">Adversaries Dataset Importer</button>`;
-    html.querySelector(".directory-footer")?.appendChild(div);
-    // add event handlers with addEventListener()
-    div.querySelector(".og-character")?.addEventListener("click", (event) => {
-      event.preventDefault();
-      new DataImporter().render(true);
-    });
-    div.querySelector(".swa-character")?.addEventListener("click", (event) => {
-      event.preventDefault();
-      new SWAImporter().render(true);
-    });
-  }
-});
-
-// Update chat messages with dice images
-Hooks.on("renderChatMessage", async (app, html, messageData) => {
-  const content = html.find(".message-content");
-  content[0].innerHTML = await PopoutEditor.renderDiceImages(content[0].innerHTML);
-
-  html.on("click", ".ffg-pool-to-player", () => {
-    const poolData = messageData.message.flags.starwarsffg;
-
-    const dicePool = new DicePoolFFG(poolData.dicePool);
-
-    DiceHelpers.displayRollDialog(poolData.roll.data, dicePool, poolData.description, poolData.roll.skillName, poolData.roll.item, poolData.roll.flavor, poolData.roll.sound);
-  });
-
-  // collapse / expand item details
-  html.find(".starwarsffg.item-card .summary").on("click", async (event) => {
-    event.preventDefault();
-    const li = $(event.currentTarget);
-    const details = li.parent().children(".collapsible-content");
-    const collapseButton = li.children(".collapse-toggle");
-    // Toggle summary
-    if (li.hasClass("expanded")) {
-      details.slideUp(200, () => details.hide());
-    } else {
-      details.show();
-      details.slideDown(200);
-    }
-    li.toggleClass("expanded");
-    collapseButton.toggleClass("fa-chevron-down");
-    collapseButton.toggleClass("fa-chevron-left");
-  });
-
-  // item card tooltips
-  html.find(".starwarsffg.item-card .item-pill, .starwarsffg .specials .hover-tooltip").on("mouseover", (event) => {
-    itemPillHover(event);
-  });
-});
-
-// Handle crew registration
-Hooks.on("dropActorSheetData", (...args) => {
-    register_crew(...args);
-});
+// dropActorSheetData hook now lives in
+// modules/hooks/drop-actor-sheet-data.js (Phase 3.7). Registered via
+// registerAllHooks() above.
 
 function isCurrentVersionNullOrBlank(currentVersion) {
   return currentVersion === "null" || currentVersion === '' || currentVersion === null;
@@ -1552,12 +1475,8 @@ Hooks.once("diceSoNiceReady", (dice3d) => {
   });
 });
 
-Hooks.on("renderGamePause", function (_application, element, _context, _options) {
-  const pausedImage = game.settings.get("starwarsffg", "ui-pausedImage");
-  if (pausedImage) {
-    element.querySelector("img").src = pausedImage;
-  }
-});
+// renderGamePause hook now lives in modules/hooks/render-game-pause.js
+// (Phase 3.9). Registered via registerAllHooks() above.
 
 // registerCrewRoles() now lives in modules/settings/crew-main-settings.js
 // (Phase 2.7) as registerCrewMainSettings(). Imported and called at the
