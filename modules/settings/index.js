@@ -1,4 +1,5 @@
 import { registerCompendiumSettings } from "./compendiums.js";
+import { registerCombatSettings } from "./combat.js";
 
 /**
  * Central entry point for setting registrations extracted out of
@@ -16,4 +17,5 @@ import { registerCompendiumSettings } from "./compendiums.js";
 export function registerAllSettings(callbacks = {}) {
   void callbacks;
   registerCompendiumSettings();
+  registerCombatSettings();
 }

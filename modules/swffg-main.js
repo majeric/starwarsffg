@@ -159,15 +159,8 @@ Hooks.once("init", async function () {
     onChange: (rule) => window.location.reload()
   });
 
-  // register turn marker reconfigurator
-  game.settings.register("starwarsffg", "configuredTurnMarker", {
-    name: "configuredTurnMarker",
-    hint: "configuredTurnMarker",
-    scope: "world",
-    config: false,
-    default: false,
-    type: Boolean,
-  });
+  // configuredTurnMarker setting now lives in modules/settings/combat.js
+  // (Phase 2.3). Registered via registerAllSettings() above.
 
   // Override the default Token _drawBar function to allow for FFG style wound and strain values.
   foundry.canvas.placeables.Token.prototype._drawBar = function (number, bar, data) {
@@ -334,18 +327,9 @@ Hooks.once("init", async function () {
     type: Number,
   });
 
-  /**
-   * Register the option to use generic slots for combat
-   */
-  game.settings.register("starwarsffg", "useGenericSlots", {
-    name: game.i18n.localize("SWFFG.Settings.UseGenericSlots.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.UseGenericSlots.Hint"),
-    scope: "world",
-    config: false,
-    default: true,
-    type: Boolean,
-    onChange: (rule) => window.location.reload()
-  });
+  // useGenericSlots setting now lives in modules/settings/combat.js
+  // (Phase 2.3). The READ below stays here because it gates registering
+  // FFG combat document classes during init.
 
   if (game.settings.get("starwarsffg", "useGenericSlots")) {
     CONFIG.ui.combat = CombatTrackerFFG;
@@ -355,22 +339,8 @@ Hooks.once("init", async function () {
     CONFIG.Token.objectClass = TokenFFG;
   }
 
-  /**
-   * Register action to take when a user removes a combatant from combat
-   */
-  game.settings.register("starwarsffg", "removeCombatantAction", {
-    name: game.i18n.localize("SWFFG.Settings.RemoveCombatantAction.Name"),
-    hint: game.i18n.localize("SWFFG.Settings.RemoveCombatantAction.Hint"),
-    scope: "world",
-    config: false,
-    default: "combatant_only",
-    type: String,
-    choices: {
-      combatant_only: "Combatant Only",
-      last_slot: "Last Slot",
-      prompt: "Prompt",
-    },
-  });
+  // removeCombatantAction setting now lives in modules/settings/combat.js
+  // (Phase 2.3). Registered via registerAllSettings() above.
 
   /**
    * Register the max value for characteristics and skills
@@ -430,48 +400,9 @@ Hooks.once("init", async function () {
     type: Number,
   });
 
-  /**
-   * Set an initiative formula for the system
-   * @type {String}
-   */
-  // Register initiative rule
-  game.settings.register("starwarsffg", "initiativeRule", {
-    name: game.i18n.localize("SWFFG.InitiativeMode"),
-    hint: game.i18n.localize("SWFFG.InitiativeModeHint"),
-    scope: "world",
-    config: false,
-    default: "v",
-    type: String,
-    choices: {
-      v: game.i18n.localize("SWFFG.SkillsNameVigilance"),
-      c: game.i18n.localize("SWFFG.SkillsNameCool"),
-    },
-    onChange: (rule) => _setffgInitiative(rule),
-  });
-  _setffgInitiative(game.settings.get("starwarsffg", "initiativeRule"));
-
-  function _setffgInitiative(initMethod) {
-    let formula;
-    switch (initMethod) {
-      case "v":
-        formula = "Vigilance";
-        break;
-
-      case "c":
-        formula = "Cool";
-        break;
-    }
-
-    CONFIG.Combat.initiative = {
-      formula: formula,
-      decimals: 2,
-    };
-    if (canvas) {
-      if (canvas?.groupmanager?.window) {
-        canvas.groupmanager.window.render(true);
-      }
-    }
-  }
+  // initiativeRule setting and the _setffgInitiative helper now live in
+  // modules/settings/combat.js (Phase 2.3). Registered and initialized
+  // via registerAllSettings() above.
 
   async function gameSkillsList() {
     game.settings.registerMenu("starwarsffg", "addskilltheme", {
