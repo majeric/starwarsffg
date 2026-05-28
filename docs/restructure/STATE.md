@@ -3,7 +3,7 @@
 **Current phase:** phase-00-foundation
 **Current task:** 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
 **Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** dbd3473
+**Last commit on plan:** cf87a04
 
 ---
 
