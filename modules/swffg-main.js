@@ -56,6 +56,7 @@ import { registerAllSettings } from "./settings/index.js";
 import { registerSkillThemeSetting } from "./settings/skill-list.js";
 import { registerCrewMainSettings } from "./settings/crew-main-settings.js";
 import { registerAllHooks } from "./hooks/index.js";
+import { registerRollFFG } from "./dice/roll-registration.js";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -112,9 +113,9 @@ Hooks.once("init", async function () {
   // also, reeeeeeeeeeeeeeeee
   CONFIG.ActiveEffect.legacyTransferral = false;
 
-  // Define custom Roll class
-  CONFIG.Dice.rolls.push(CONFIG.Dice.rolls[0]);
-  CONFIG.Dice.rolls[0] = RollFFG;
+  // Define custom Roll class (Phase 4.3 — see modules/dice/roll-registration.js
+  // and ADR-009 for the V13 API investigation that chose unshift).
+  registerRollFFG();
 
   // Define DiceTerms
   CONFIG.Dice.terms["a"] = AbilityDie;
