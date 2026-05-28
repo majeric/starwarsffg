@@ -1,9 +1,9 @@
 # Restructure State
 
-**Current phase:** phase-04-prototype-cleanup
-**Current task:** 4.2 — Move Token._drawBar override into TokenFFG class
-**Last verified:** 2026-05-28T09:35:00Z (lint gate red as known failure; all other gates green; 51 rules tests passing)
-**Last commit on plan:** 7c3ddff
+**Current phase:** phase-05-datamodels
+**Current task:** 5.0 — Detail Phase 5 atomic tasks before execution
+**Last verified:** 2026-05-28T09:40:00Z (lint gate red as known failure; all other gates green; 51 rules tests passing; zero prototype patches in modules/)
+**Last commit on plan:** b64bcb8
 
 ---
 
@@ -13,7 +13,8 @@
 - [x] phase-01-calculators
 - [x] phase-02-settings
 - [x] phase-03-hooks (task 3.8 diceSoNiceReady deferred — see Open issues)
-- [ ] phase-04-prototype-cleanup ← CURRENT
+- [x] phase-04-prototype-cleanup
+- [ ] phase-05-datamodels         ← CURRENT
 - [ ] phase-02-settings
 - [ ] phase-03-hooks
 - [ ] phase-04-prototype-cleanup
@@ -29,15 +30,24 @@
 
 ---
 
-## Current phase tasks (phase-04-prototype-cleanup)
+## Current phase tasks (phase-05-datamodels)
 
-See `phases/phase-04-prototype-cleanup.md` for the full task definitions.
+See `phases/phase-05-datamodels.md` for the full task definitions.
+Phase 5 atomic tasks are detailed in task 5.0; subsequent task numbering
+follows the result of that detailing.
 
-- [x] 4.0 — Detail Phase 4 atomic tasks (commit `2646503`)
-- [x] 4.1 — Investigate Foundry V13 dice and token registration APIs (ADR-009, commit `7c3ddff`)
-- [ ] 4.2 — Move Token._drawBar override into TokenFFG class   ← CURRENT
-- [ ] 4.3 — Clean up CONFIG.Dice.rolls registration
-- [ ] 4.4 — Verify Phase 4 stop gate
+- [ ] 5.0 — Detail Phase 5 atomic tasks before execution   ← CURRENT
+- [ ] 5.1+ — Convert actor and item types to DataModels (one task per type)
+
+(Previous: Phase 4 closed with both prototype patches removed.
+Token._drawBar moved into TokenFFG as a method override decomposed into
+5 helper methods to satisfy complexity gate. TokenFFG registration moved
+out of the useGenericSlots conditional to apply unconditionally — the
+operator should verify this is the intended behavior; if not, recouple
+in a follow-up task with documented rationale. CONFIG.Dice.rolls[0]
+mutation replaced with `CONFIG.Dice.rolls.unshift(RollFFG)` centralized
+in modules/dice/roll-registration.js. ADR-009 documents the V13 API
+investigation that drove both changes.)
 
 (Previous: Phase 3 closed with 6 of 7 top-level hooks extracted. Task 3.8
 diceSoNiceReady deferred — its 221-line callback contains many dice-preset
@@ -223,9 +233,19 @@ proceed independently since prototype patches and dice presets don't overlap.)
   extraction comments. Verify summary unchanged throughout: typecheck
   PASS, lint FAIL (1023 pre-existing legacy warnings; new code is clean),
   comments PASS, unit tests PASS (51 calculator tests added), build PASS,
-  smoke load PASS, migration replay PASS. Next session should start at
-  Phase 4 task 4.1 and follow the detailed task list in
-  phases/phase-04-prototype-cleanup.md.
+  smoke load PASS, migration replay PASS.
+- 2026-05-28 — Phase 4 close note. Both prototype patches eliminated.
+  Token._drawBar now lives as a method on TokenFFG (decomposed into 5
+  helpers to pass complexity gate). CONFIG.Dice.rolls[0] mutation
+  replaced with the equivalent `unshift(RollFFG)` centralized in
+  modules/dice/roll-registration.js. TokenFFG registration moved out of
+  the useGenericSlots conditional so the FFG bar drawing applies
+  regardless of generic-slots setting — this is an intentional behavior
+  change per ADR-009. Operator should manually verify in Foundry that
+  tokens display correctly when useGenericSlots is disabled. Commits
+  4.1-4.3: 7c3ddff, be6d328, b64bcb8. _refreshTurnMarker on TokenFFG
+  has a pre-existing complexity-15 issue; tagged with
+  eslint-disable-next-line and noted here for a future cleanup task.
 
 ---
 
