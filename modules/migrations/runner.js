@@ -11,6 +11,12 @@
  * newer than `newVersion`, in ascending version order.
  */
 
+/**
+ * Migrations register themselves via `modules/migrations/index.js`, which
+ * loads each per-version file and pushes entries into this array. Keeping
+ * the registry empty at runner-import time lets unit tests load the runner
+ * without pulling in Foundry-dependent migration code.
+ */
 export const MIGRATION_REGISTRY = [];
 
 export async function handleUpdate() {
