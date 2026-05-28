@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-00-foundation
-**Current task:** 0.4 — Add ESLint and Prettier configuration
+**Current task:** 0.5 — Add vitest configuration and global Foundry mocks
 **Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** 3f93c91
+**Last commit on plan:** 470e298
 
 ---
 
@@ -32,8 +32,8 @@ See `phases/phase-00-foundation.md` for the full task definitions.
 - [x] 0.1 — Create package.json with build/test dependencies
 - [x] 0.2 — Add vite.config.mjs configured for Foundry ESM output
 - [x] 0.3 — Add tsconfig.json with allowJs and strict-but-permissive defaults
-- [ ] 0.4 — Add ESLint and Prettier configuration   ← CURRENT
-- [ ] 0.5 — Add vitest configuration and global Foundry mocks
+- [x] 0.4 — Add ESLint and Prettier configuration
+- [ ] 0.5 — Add vitest configuration and global Foundry mocks   ← CURRENT
 - [ ] 0.6 — Create scripts/verify.mjs orchestrator
 - [ ] 0.7 — Add Foundry V13 type definitions
 - [ ] 0.8 — Wire existing tests/modifiers.test.js to vitest (expect failures, document them)
@@ -58,6 +58,11 @@ See `phases/phase-00-foundation.md` for the full task definitions.
   exits in the pre-existing `scripts/verify.mjs` placeholder before it can reach
   the build gate. Human direction for this session is to document bootstrap
   mismatches and keep working through the Phase 0 tooling setup.
+- 2026-05-28 — Phase 0 task 0.4 reconciliation note. This checkout already had a
+  legacy `eslint.config.mjs` that depended on packages removed by task 0.1. The
+  config was replaced with the Phase 0 flat config. Because `modules/settings/`
+  already exists as legacy code in this checkout, maintainability rules apply as
+  warnings there until a later phase tightens them.
 
 ---
 
