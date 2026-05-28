@@ -54,6 +54,7 @@ import {xpLogUndo} from "./helpers/actor-helpers.js";
 import {register_system_tours} from "./helpers/tours.js";
 import { registerAllSettings } from "./settings/index.js";
 import { registerSkillThemeSetting } from "./settings/skill-list.js";
+import { registerCrewMainSettings } from "./settings/crew-main-settings.js";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -1219,7 +1220,7 @@ Hooks.once("ready", async () => {
 
   dTracker.render(true);
 
-  await registerCrewRoles();
+  await registerCrewMainSettings();
   registerTokenControls();
 
   if (game.settings.get("starwarsffg", "useGenericSlots")) {
@@ -1587,47 +1588,9 @@ Hooks.on("renderGamePause", function (_application, element, _context, _options)
   }
 });
 
-async function registerCrewRoles() {
-  const defaultArrayCrewRoles = [
-    {
-      "role_name":  game.i18n.localize("SWFFG.Crew.Roles.Gunner.Name"),
-      "role_skill":  game.i18n.localize("SWFFG.SkillsNameGunnery"),
-      "use_weapons": true,
-      "use_handling": false
-    }
-  ];
-  game.settings.registerMenu("starwarsffg", "arrayCrewRoles", {
-    name: game.i18n.localize("SWFFG.Crew.Settings.Name"),
-    label: game.i18n.localize("SWFFG.Crew.Settings.Label"),
-    hint: game.i18n.localize("SWFFG.Crew.Settings.Hint"),
-    icon: "fas fa-file-import",
-    type: CrewSettings,
-    restricted: true,
-  });
-
-  game.settings.register("starwarsffg", "arrayCrewRoles", {
-    module: "starwarsffg",
-    name: "arrayCrewRoles",
-    scope: "world",
-    default: defaultArrayCrewRoles,
-    config: false,
-    type: Object,
-  });
-  const initiativeCrewRole = {
-      "role_name":  game.i18n.localize("SWFFG.Crew.Roles.Initiative.Name"),
-      "role_skill": undefined,
-      "use_weapons": false,
-      "use_handling": false
-    };
-  game.settings.register("starwarsffg", "initiativeCrewRole", {
-    module: "starwarsffg",
-    name: "initiativeCrewRole",
-    scope: "world",
-    default: initiativeCrewRole,
-    config: false,
-    type: Object,
-  });
-}
+// registerCrewRoles() now lives in modules/settings/crew-main-settings.js
+// (Phase 2.7) as registerCrewMainSettings(). Imported and called at the
+// previous call site in the ready hook.
 
 /**
  * Check if all built-in compendiums are empty or not
