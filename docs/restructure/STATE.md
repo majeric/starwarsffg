@@ -3,7 +3,7 @@
 **Current phase:** phase-00-foundation
 **Current task:** 0.11 — Verify `npm run verify` runs end-to-end (even if some tests fail; that's documented)
 **Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** 00fb003
+**Last commit on plan:** dca2ffa
 
 ---
 
