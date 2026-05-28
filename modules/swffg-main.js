@@ -57,6 +57,7 @@ import { registerSkillThemeSetting } from "./settings/skill-list.js";
 import { registerCrewMainSettings } from "./settings/crew-main-settings.js";
 import { registerAllHooks } from "./hooks/index.js";
 import { registerRollFFG } from "./dice/roll-registration.js";
+import { registerDataModels } from "./data/_register.js";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -108,6 +109,10 @@ Hooks.once("init", async function () {
   CONFIG.Actor.documentClass = ActorFFG;
   CONFIG.Item.documentClass = ItemFFG;
   CONFIG.ActiveEffect.documentClass = ActiveEffectFFG;
+
+  // Phase 5: register per-type DataModels (empty registries until Phase 5.2+
+  // populates them). Types not registered fall back to template.json.
+  registerDataModels();
 
   // we do not want the legacy active effect transfer mode
   // also, reeeeeeeeeeeeeeeee
