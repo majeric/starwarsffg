@@ -53,6 +53,7 @@ import {CharacterCreator} from "./helpers/character-creator.js";
 import {xpLogUndo} from "./helpers/actor-helpers.js";
 import {register_system_tours} from "./helpers/tours.js";
 import { registerAllSettings } from "./settings/index.js";
+import { registerSkillThemeSetting } from "./settings/skill-list.js";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -294,31 +295,10 @@ Hooks.once("init", async function () {
   // via registerAllSettings() above.
 
   async function gameSkillsList() {
-    game.settings.registerMenu("starwarsffg", "addskilltheme", {
-      name: game.i18n.localize("SWFFG.SettingsSkillListImporter"),
-      label: game.i18n.localize("SWFFG.SettingsSkillListImporterLabel"),
-      hint: game.i18n.localize("SWFFG.SettingsSkillListImporterHint"),
-      icon: "fas fa-file-import",
-      type: SkillListImporter,
-      restricted: true,
-    });
-
-    game.settings.register("starwarsffg", "addskilltheme", {
-      name: "Item Importer",
-      scope: "world",
-      default: {},
-      config: false,
-      type: Object,
-    });
-
-    game.settings.register("starwarsffg", "arraySkillList", {
-      name: "Skill List",
-      scope: "world",
-      default: defaultSkillList,
-      config: false,
-      type: Object,
-      onChange: SettingsHelpers.debouncedReload,
-    });
+    // Static skill-list settings (addskilltheme menu + setting,
+    // arraySkillList) are registered by registerAllSettings() above.
+    // The dynamic skilltheme setting is registered below once choices
+    // are known.
 
     let skillList = await parseSkillList();
     try {
@@ -330,16 +310,7 @@ Hooks.once("init", async function () {
         skillChoices[list.id] = list.id;
       });
 
-      game.settings.register("starwarsffg", "skilltheme", {
-        name: game.i18n.localize("SWFFG.SettingsSkillTheme"),
-        hint: game.i18n.localize("SWFFG.SettingsSkillThemeHint"),
-        scope: "world",
-        config: false,
-        default: "starwars",
-        type: String,
-        onChange: SettingsHelpers.debouncedReload,
-        choices: skillChoices,
-      });
+      registerSkillThemeSetting(skillChoices);
 
       if (game.settings.get("starwarsffg", "skilltheme") !== "starwars") {
         const altSkills = JSON.parse(JSON.stringify(CONFIG.FFG.alternateskilllists.find((list) => list.id === game.settings.get("starwarsffg", "skilltheme")).skills));
