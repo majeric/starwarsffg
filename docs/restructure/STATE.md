@@ -3,7 +3,7 @@
 **Current phase:** phase-00-foundation
 **Current task:** 0.10 — Add .restructure/ to .gitignore
 **Last verified:** never (Phase 0 has not started)
-**Last commit on plan:** 6b1e4ba
+**Last commit on plan:** 00fb003
 
 ---
 
