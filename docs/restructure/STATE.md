@@ -1,9 +1,9 @@
 # Restructure State
 
-**Current phase:** phase-02-settings
-**Current task:** 2.0 — Detail Phase 2 atomic tasks before execution
-**Last verified:** 2026-05-28T08:05:00Z (lint gate red as known failure; all other gates green; 51 rules tests passing)
-**Last commit on plan:** 7ae8112
+**Current phase:** phase-03-hooks
+**Current task:** 3.0 — Detail Phase 3 atomic tasks before execution
+**Last verified:** 2026-05-28T08:30:00Z (lint gate red as known failure; all other gates green; 51 rules tests passing; swffg-main.js 17% smaller)
+**Last commit on plan:** 23db87f
 
 ---
 
@@ -11,7 +11,8 @@
 
 - [x] phase-00-foundation
 - [x] phase-01-calculators
-- [ ] phase-02-settings         ← CURRENT
+- [x] phase-02-settings
+- [ ] phase-03-hooks            ← CURRENT
 - [ ] phase-02-settings
 - [ ] phase-03-hooks
 - [ ] phase-04-prototype-cleanup
@@ -27,20 +28,21 @@
 
 ---
 
-## Current phase tasks (phase-02-settings)
+## Current phase tasks (phase-03-hooks)
 
-See `phases/phase-02-settings.md` for the full task definitions.
-Phase 2 atomic tasks are detailed in task 2.0; subsequent task numbering
+See `phases/phase-03-hooks.md` for the full task definitions.
+Phase 3 atomic tasks are detailed in task 3.0; subsequent task numbering
 follows the result of that detailing.
 
-- [ ] 2.0 — Detail Phase 2 atomic tasks before execution   ← CURRENT
-- [ ] 2.1+ — Decompose settings registration (one task per settings group)
+- [ ] 3.0 — Detail Phase 3 atomic tasks before execution   ← CURRENT
+- [ ] 3.1+ — Decompose hook handlers (one task per hook event)
 
-(Previous: Phase 1 closed with all 7 calculators extracted and 51 unit
-tests passing across encumbrance, wounds, strain, soak, defense,
-force-pool, and talent-list. Legacy actor-ffg.js, modifiers.js, and
-sheet files are byte-identical to their Phase 0 close state — call-site
-migration is deferred to Phase 6 per the original spec.)
+(Previous: Phase 2 closed with all 30+ swffg-main.js settings extracted
+into 7 grouping files. swffg-main.js shrank from 2006 to 1672 lines
+(~17%). All settings still register and behave identically; verify and
+build remain green. Pre-existing settings-helpers.js, ui-settings.js,
+and crew-settings.js were intentionally untouched per the phase scope;
+consolidating them is a follow-up.)
 
 ---
 
@@ -170,6 +172,26 @@ migration is deferred to Phase 6 per the original spec.)
   preserves the actual behavior (sum, not max) because changing it would
   modify user-facing defense values. A future ADR + task should decide
   whether to align the implementation with the comment.
+- 2026-05-28 — Phase 2 close note. swffg-main.js dropped from 2006 to
+  1672 lines (~17% smaller) as 30+ settings registrations extracted to
+  7 grouping files in modules/settings/. Each grouping file is small
+  (22-78 lines) and exports a `register*Settings()` function called from
+  `registerAllSettings()` in index.js. Settings still in the legacy
+  settings-helpers.js (~30 registrations + menus), ui-settings.js, and
+  crew-settings.js were intentionally not touched — consolidation is a
+  Phase 2 follow-up (open issue in phase-02-settings.md "Out of scope").
+  Commits 2.1-2.8: 1acbbee, 3aeb5fe, 8c03eae, fe1a0f1, 0a3bb0c, d3ed6fd,
+  70396a7, 23db87f.
+- 2026-05-28 — arraySkillList migration deferred. The setting is already
+  `type: Object` in the current code so no schema migration is required
+  for new worlds. Legacy upstream worlds that stored it as JSON string
+  are handled by the surviving `parseSkillList()` defensive helper in
+  swffg-main.js. A future task can clean up the helper and write an
+  explicit migration once Phase 11 establishes the migration runner.
+- 2026-05-28 — additionalStatuses also stores JSON-encoded string into a
+  String-typed setting (same anti-pattern as legacy arraySkillList). The
+  call site at swffg-main.js uses `$.parseJSON()`. Same future-task as
+  arraySkillList: convert to typed Object setting with migration.
 
 ---
 
