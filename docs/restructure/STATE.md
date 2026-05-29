@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.13 — Convert specialization item type
-**Last verified:** 2026-05-29T04:36:01Z (after task 5.12; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 114 unit tests — 51 calculator + 12 migration + 51 datamodel)
-**Last commit on plan:** 19864c6
+**Current task:** 5.14 — Convert forcepower, signatureability item types
+**Last verified:** 2026-05-29T04:37:42Z (after task 5.13; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 118 unit tests — 51 calculator + 12 migration + 55 datamodel)
+**Last commit on plan:** e109694
 
 ---
 
@@ -43,8 +43,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.10 — Convert species, career item types
 - [x] 5.11 — Convert ability, gear item types
 - [x] 5.12 — Convert talent item type
-- [ ] 5.13 — Convert specialization item type   ← CURRENT
-- [ ] 5.14 — Convert forcepower, signatureability item types
+- [x] 5.13 — Convert specialization item type
+- [ ] 5.14 — Convert forcepower, signatureability item types   ← CURRENT
 - [ ] 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
 - [ ] 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)
 - [ ] 5.17 — Convert shipattachment item type
@@ -434,6 +434,11 @@ proceed independently since prototype patches and dice presets don't overlap.)
   state, force/conflict flags, tier, tree references, and long description.
   Activation-label derivation and actor talent aggregation remain in legacy
   preparation code for Phase 5. Three schema tests added; no migration needed.
+- 2026-05-29 — Phase 5 task 5.13 complete (specialization → DataModel).
+  Added and registered the schema-only specialization item DataModel. The
+  `talents` grid stays a free-form object with the twenty numbered default
+  slots from `template.json`, and `careerSkills` keeps the five positional
+  `"(none)"` defaults. Four schema tests added; no migration needed.
 
 ---
 
