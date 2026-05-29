@@ -27,6 +27,8 @@ import { AbilityData } from "./item/ability-data.js";
 import { GearData } from "./item/gear-data.js";
 import { TalentData } from "./item/talent-data.js";
 import { SpecializationData } from "./item/specialization-data.js";
+import { ForcePowerData } from "./item/forcepower-data.js";
+import { SignatureAbilityData } from "./item/signatureability-data.js";
 
 const ACTOR_DATA_MODELS = {
   homestead: HomesteadData,
@@ -49,6 +51,8 @@ const ITEM_DATA_MODELS = {
   gear: GearData,
   talent: TalentData,
   specialization: SpecializationData,
+  forcepower: ForcePowerData,
+  signatureability: SignatureAbilityData,
 };
 
 export function registerDataModels() {

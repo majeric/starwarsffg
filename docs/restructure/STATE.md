@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.14 — Convert forcepower, signatureability item types
-**Last verified:** 2026-05-29T04:37:42Z (after task 5.13; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 118 unit tests — 51 calculator + 12 migration + 55 datamodel)
-**Last commit on plan:** e109694
+**Current task:** 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
+**Last verified:** 2026-05-29T04:39:24Z (after task 5.14; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 124 unit tests — 51 calculator + 12 migration + 61 datamodel)
+**Last commit on plan:** 24af94f
 
 ---
 
@@ -44,8 +44,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.11 — Convert ability, gear item types
 - [x] 5.12 — Convert talent item type
 - [x] 5.13 — Convert specialization item type
-- [ ] 5.14 — Convert forcepower, signatureability item types   ← CURRENT
-- [ ] 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
+- [x] 5.14 — Convert forcepower, signatureability item types
+- [ ] 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)   ← CURRENT
 - [ ] 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)
 - [ ] 5.17 — Convert shipattachment item type
 - [ ] 5.18 — Convert homesteadupgrade item type (added during detailing — see Open issues)
@@ -439,6 +439,11 @@ proceed independently since prototype patches and dice presets don't overlap.)
   `talents` grid stays a free-form object with the twenty numbered default
   slots from `template.json`, and `careerSkills` keeps the five positional
   `"(none)"` defaults. Four schema tests added; no migration needed.
+- 2026-05-29 — Phase 5 task 5.14 complete (forcepower, signatureability →
+  DataModels). Added and registered schema-only DataModels for both upgrade-tree
+  item types. Upgrade grids stay free-form object maps with numbered defaults;
+  signature ability uplink nodes are explicit booleans. Six schema tests added;
+  no migration needed.
 
 ---
 
