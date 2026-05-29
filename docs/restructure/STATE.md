@@ -1,9 +1,9 @@
 # Restructure State
 
-**Current phase:** phase-05-datamodels
-**Current task:** 5.last — Verify Phase 5 stop gate
-**Last verified:** 2026-05-29T05:02:05Z (during task 5.last runtime smoke fix; targeted sheet-system-data tests/lint green; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 148 unit tests — 51 calculator + 12 migration + 83 datamodel + 2 sheet)
-**Last commit on plan:** 3453fdd
+**Current phase:** phase-06-derived-split
+**Current task:** 6.0 — Detail Phase 6 atomic tasks
+**Last verified:** 2026-05-29T16:12:05Z (Phase 5 closed — operator Foundry smoke passed, all actor + item sheets render; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 148 unit tests)
+**Last commit on plan:** 943b669
 
 ---
 
@@ -14,8 +14,8 @@
 - [x] phase-02-settings
 - [x] phase-03-hooks (task 3.8 diceSoNiceReady deferred — see Open issues)
 - [x] phase-04-prototype-cleanup
-- [ ] phase-05-datamodels         ← CURRENT
-- [ ] phase-06-derived-split
+- [x] phase-05-datamodels
+- [ ] phase-06-derived-split       ← CURRENT
 - [ ] phase-07-ae-unification
 - [ ] phase-08-sheets
 - [ ] phase-09-importer
@@ -26,48 +26,25 @@
 
 ---
 
-## Current phase tasks (phase-05-datamodels)
+## Current phase tasks (phase-06-derived-split)
 
-See `phases/phase-05-datamodels.md` for the full task definitions.
+Phase 5 complete — all 26 types (6 actor + 20 item) have DataModels; the actor
+sheet render path was fixed via `buildActorSheetSystemData()`; operator Foundry
+smoke passed. See `phases/phase-05-datamodels.md` for the per-type task history.
 
-- [x] 5.0 — Detail Phase 5 atomic tasks (commit `f9999f0`)
-- [x] 5.1 — Scaffold data model base classes and registration helper (commit `b8838fc`)
-- [x] 5.2 — Convert homestead actor type to DataModel
-- [x] 5.3 — Convert minion actor type to DataModel
-- [x] 5.4 — Convert rival actor type to DataModel
-- [x] 5.5 — Convert nemesis actor type to DataModel
-- [x] 5.6 — Convert character actor type to DataModel
-- [x] 5.7 — Convert vehicle actor type to DataModel
-- [x] 5.8 — Convert criticalinjury, criticaldamage item types
-- [x] 5.9 — Convert motivation, obligation, background item types
-- [x] 5.10 — Convert species, career item types
-- [x] 5.11 — Convert ability, gear item types
-- [x] 5.12 — Convert talent item type
-- [x] 5.13 — Convert specialization item type
-- [x] 5.14 — Convert forcepower, signatureability item types
-- [x] 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
-- [x] 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)
-- [x] 5.17 — Convert shipattachment item type
-- [x] 5.18 — Convert homesteadupgrade item type (added during detailing — see Open issues)
-- [ ] 5.last — Verify Phase 5 stop gate   ← CURRENT
+Phase 6 tasks will be detailed in `phases/phase-06-derived-split.md` by task 6.0
+(stub today). Provisional breakdown from the phase file's suggested list (6.0
+finalises the numbering):
 
-Per-type tasks 5.2–5.18 were expanded from one-line bullets into full
-phase-00-style task blocks (preconditions / files / source shape / schema notes
-/ derived / migration / steps / verification / Do-NOT / commit) on 2026-05-29.
-See `phases/phase-05-datamodels.md`. Phase 5 is **schema-definition-only** —
-DataModel `prepare*` hooks stay empty; calculator wiring is Phase 6.
-
-(Previous: Phase 11 closed; migration infrastructure in place. Phase 5
-scaffolding in place: modules/data/{actor,item}/base-*-data.js and
-modules/data/_register.js. registerDataModels() is wired into
-swffg-main.js init but the registries are empty until per-type tasks
-populate them. Foundry falls back to template.json for any unconverted
-type.)
-
-(Previous: Phase 3 closed with 6 of 7 top-level hooks extracted. Task 3.8
-diceSoNiceReady deferred — its 221-line callback contains many dice-preset
-definitions that need internal decomposition before extraction. Phase 4 can
-proceed independently since prototype patches and dice presets don't overlap.)
+- [ ] 6.0 — Detail Phase 6 atomic tasks   ← CURRENT
+- [ ] 6.1 — Add a `derived` namespace pattern to the base DataModels
+- [ ] 6.2-6.N — Per type: move computed values into `prepareDerivedData`
+  (delegating to Phase 1 calculators), write to `derived.*`, drop `*.adjusted`
+  from the schema, migrate
+- [ ] 6.N+1 — Remove `_preUpdate` delta math from `actor-ffg.js`
+- [ ] 6.N+2 — Remove `prepareDerivedData` mutations from `actor-ffg.js`
+- [ ] 6.N+3 — Update templates from `*.adjusted` to `derived.*`
+- [ ] 6.N+4 — Verify Phase 6 stop gate
 
 ---
 
@@ -506,6 +483,19 @@ proceed independently since prototype patches and dice presets don't overlap.)
   `buildActorSheetSystemData` carry skill labels (or localise in the sheet) —
   sheet-layer (Phase 8) territory, not a schema problem. 5.last remains open
   pending the operator Foundry smoke (all actor + item sheets render cleanly).
+- 2026-05-29 — Phase 5 CLOSED. Operator ran the Foundry smoke and confirmed all
+  actor and item sheets render ("looked okay"), satisfying the final 5.last
+  stop-gate step. All 26 types on DataModels; 148 tests; verify green except the
+  known-red lint gate. Current phase advanced to phase-06-derived-split.
+- 2026-05-29 — Phase 5 follow-up deferred: template.json still holds the full
+  per-type field definitions (now redundant — DataModels override them). The
+  phase postcondition's "reduce template.json (ideally none)" was left as-is
+  because reducing it carries its own risk (Foundry still reads the `types`
+  arrays) and deserves a dedicated task. DataModels take precedence, so the
+  redundant defs are inert. Trim in a Phase 6 or dedicated cleanup task.
+- 2026-05-29 — V13/V14: Phase 5 verified on V13 (operator smoke). V14
+  certification is deferred to Phase 13 per ADR-008, consistent with prior
+  phases (V14 not available locally).
 
 ---
 
