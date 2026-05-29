@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-06-derived-split
-**Current task:** 6.0 — Detail Phase 6 atomic tasks
-**Last verified:** 2026-05-29T16:12:05Z (Phase 5 closed — operator Foundry smoke passed, all actor + item sheets render; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 148 unit tests)
-**Last commit on plan:** 943b669
+**Current task:** 6.1 — Establish the derived-namespace pattern (+ ADR-011) — pending decision sign-off (see Open issues)
+**Last verified:** 2026-05-29T16:12:05Z (Phase 5 closed; task 6.0 is docs-only detailing. Baseline: typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 148 unit tests)
+**Last commit on plan:** 61fb6f7
 
 ---
 
@@ -32,19 +32,24 @@ Phase 5 complete — all 26 types (6 actor + 20 item) have DataModels; the actor
 sheet render path was fixed via `buildActorSheetSystemData()`; operator Foundry
 smoke passed. See `phases/phase-05-datamodels.md` for the per-type task history.
 
-Phase 6 tasks will be detailed in `phases/phase-06-derived-split.md` by task 6.0
-(stub today). Provisional breakdown from the phase file's suggested list (6.0
-finalises the numbering):
+Phase 6 is detailed in `phases/phase-06-derived-split.md` (task 6.0 done):
 
-- [ ] 6.0 — Detail Phase 6 atomic tasks   ← CURRENT
-- [ ] 6.1 — Add a `derived` namespace pattern to the base DataModels
-- [ ] 6.2-6.N — Per type: move computed values into `prepareDerivedData`
-  (delegating to Phase 1 calculators), write to `derived.*`, drop `*.adjusted`
-  from the schema, migrate
-- [ ] 6.N+1 — Remove `_preUpdate` delta math from `actor-ffg.js`
-- [ ] 6.N+2 — Remove `prepareDerivedData` mutations from `actor-ffg.js`
-- [ ] 6.N+3 — Update templates from `*.adjusted` to `derived.*`
-- [ ] 6.N+4 — Verify Phase 6 stop gate
+- [x] 6.0 — Detail Phase 6 atomic tasks
+- [ ] 6.1 — Establish the derived-namespace pattern on base DataModels (+ ADR-011)   ← CURRENT
+- [ ] 6.2 — Character derived (full stats + talent list + skilltypes)
+- [ ] 6.3 — Nemesis derived
+- [ ] 6.4 — Rival derived (no strain)
+- [ ] 6.5 — Minion derived (group-wound formula + calculators)
+- [ ] 6.6 — Vehicle derived (encumbrance + hull/system thresholds)
+- [ ] 6.7 — Remove `_preUpdate` delta math from `actor-ffg.js`
+- [ ] 6.8 — Remove `prepareDerivedData` mutations from `actor-ffg.js`
+- [ ] 6.9 — Update actor sheet templates to read `derived.*`
+- [ ] 6.10 — Migration: strip actor `*.adjusted` from persisted documents
+- [ ] 6.last — Verify Phase 6 stop gate (actor scope; item `*.adjusted` → Phase 7)
+
+Two decisions need sign-off before executing 6.1 (see Open issues): **ADR-011**
+(derived-namespace mechanism) and **ADR-012** (re-scope Phase 6 to actors only;
+defer item `*.adjusted` to Phase 7).
 
 ---
 
@@ -496,6 +501,20 @@ finalises the numbering):
 - 2026-05-29 — V13/V14: Phase 5 verified on V13 (operator smoke). V14
   certification is deferred to Phase 13 per ADR-008, consistent with prior
   phases (V14 not available locally).
+- 2026-05-29 — Phase 6 detailed (task 6.0). `phases/phase-06-derived-split.md`
+  now has full task blocks (6.1-6.last). Two decisions to confirm before
+  executing 6.1, both flagged in the phase file:
+  ADR-011 — the derived-namespace mechanism: `this.parent.derived` reset in the
+  base `prepareBaseData()`, filled per-type in `prepareDerivedData()` via the
+  Phase 1 calculators; sheets read `actor.derived.*`.
+  ADR-012 — re-scope: Phase 6 splits ACTOR derived state only; item `*.adjusted`
+  derived-split moves to Phase 7. Rationale: item `adjusted` is computed by the
+  bespoke modifier pipeline (~58 refs in item-ffg.js, ~70 template refs) that
+  ADR-004/Phase 7 replaces with Active Effects, so doing it in Phase 6 then
+  reworking in Phase 7 is double work. This shifts the phase boundary, so it
+  needs operator/ADR sign-off (PRINCIPLES 24).
+  Also: Phase 6 derived tests need a harness that executes prepare hooks (the
+  ADR-010 introspection mock only inspects schema); task 6.1 adds it.
 
 ---
 
