@@ -21,6 +21,8 @@ import { CriticalDamageData } from "./item/criticaldamage-data.js";
 import { MotivationData } from "./item/motivation-data.js";
 import { ObligationData } from "./item/obligation-data.js";
 import { BackgroundData } from "./item/background-data.js";
+import { SpeciesData } from "./item/species-data.js";
+import { CareerData } from "./item/career-data.js";
 
 const ACTOR_DATA_MODELS = {
   homestead: HomesteadData,
@@ -37,6 +39,8 @@ const ITEM_DATA_MODELS = {
   motivation: MotivationData,
   obligation: ObligationData,
   background: BackgroundData,
+  species: SpeciesData,
+  career: CareerData,
 };
 
 export function registerDataModels() {

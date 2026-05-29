@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.10 — Convert species, career item types
-**Last verified:** 2026-05-29T04:27:03Z (after task 5.9; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 100 unit tests — 51 calculator + 12 migration + 37 datamodel)
-**Last commit on plan:** 613e6c1
+**Current task:** 5.11 — Convert ability, gear item types
+**Last verified:** 2026-05-29T04:29:13Z (after task 5.10; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 106 unit tests — 51 calculator + 12 migration + 43 datamodel)
+**Last commit on plan:** 2bab7be
 
 ---
 
@@ -40,8 +40,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.7 — Convert vehicle actor type to DataModel
 - [x] 5.8 — Convert criticalinjury, criticaldamage item types
 - [x] 5.9 — Convert motivation, obligation, background item types
-- [ ] 5.10 — Convert species, career item types   ← CURRENT
-- [ ] 5.11 — Convert ability, gear item types
+- [x] 5.10 — Convert species, career item types
+- [ ] 5.11 — Convert ability, gear item types   ← CURRENT
 - [ ] 5.12 — Convert talent item type
 - [ ] 5.13 — Convert specialization item type
 - [ ] 5.14 — Convert forcepower, signatureability item types
@@ -410,6 +410,13 @@ proceed independently since prototype patches and dice presets don't overlap.)
   No migration needed because the schemas mirror `template.json` and omit only
   redundant hint keys plus the duplicate per-type `description` already
   supplied by `core()`.
+- 2026-05-29 — Phase 5 task 5.10 complete (species, career → DataModels).
+  Added and registered schema-only item DataModels for species and career.
+  Species keeps `talents`, `abilities`, and item-level `species` as free-form
+  maps with `startingXP` numeric. Career keeps `specializations` and
+  `signatureabilities` as free-form maps and preserves the eight positional
+  `careerSkill0`-`careerSkill7` defaults as `"(none)"`. Six schema tests added;
+  no migration needed.
 
 ---
 
