@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.6 — Convert character actor type to DataModel
-**Last verified:** 2026-05-29T04:02:36Z (after task 5.5; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 79 unit tests — 51 calculator + 12 migration + 16 datamodel)
-**Last commit on plan:** 185eb3a
+**Current task:** 5.7 — Convert vehicle actor type to DataModel
+**Last verified:** 2026-05-29T04:04:26Z (after task 5.6; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 82 unit tests — 51 calculator + 12 migration + 19 datamodel)
+**Last commit on plan:** 205a1ab
 
 ---
 
@@ -36,7 +36,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.3 — Convert minion actor type to DataModel
 - [x] 5.4 — Convert rival actor type to DataModel
 - [x] 5.5 — Convert nemesis actor type to DataModel
-- [ ] 5.6 — Convert character actor type to DataModel   ← CURRENT
+- [x] 5.6 — Convert character actor type to DataModel
+- [ ] 5.7 — Convert vehicle actor type to DataModel   ← CURRENT
 - [ ] 5.4 — Convert rival actor type to DataModel
 - [ ] 5.5 — Convert nemesis actor type to DataModel
 - [ ] 5.6 — Convert character actor type to DataModel

@@ -14,12 +14,14 @@ import { HomesteadData } from "./actor/homestead-data.js";
 import { MinionData } from "./actor/minion-data.js";
 import { RivalData } from "./actor/rival-data.js";
 import { NemesisData } from "./actor/nemesis-data.js";
+import { CharacterData } from "./actor/character-data.js";
 
 const ACTOR_DATA_MODELS = {
   homestead: HomesteadData,
   minion: MinionData,
   rival: RivalData,
   nemesis: NemesisData,
+  character: CharacterData,
 };
 
 const ITEM_DATA_MODELS = {
