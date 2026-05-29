@@ -2,7 +2,7 @@
 
 **Current phase:** phase-05-datamodels
 **Current task:** 5.2 — Convert homestead actor type to DataModel
-**Last verified:** 2026-05-28T10:05:00Z (lint gate red as known failure; all other gates green; 63 unit tests passing — 51 calculator + 12 migration)
+**Last verified:** 2026-05-29T03:24:16Z (docs-only detailing session; baseline unchanged — typecheck/comments/tests/build/smoke/migration green, lint known-red per Phase 12; 63 unit tests — 51 calculator + 12 migration)
 **Last commit on plan:** b8838fc
 
 ---
@@ -21,16 +21,6 @@
 - [ ] phase-09-importer
 - [ ] phase-10-system-abstraction
 - [x] phase-11-migration-infra    (closed early; inline parseFloat checks in swffg-main.js ready body deferred — see Open issues)
-- [ ] phase-02-settings
-- [ ] phase-03-hooks
-- [ ] phase-04-prototype-cleanup
-- [ ] phase-05-datamodels
-- [ ] phase-06-derived-split
-- [ ] phase-07-ae-unification
-- [ ] phase-08-sheets
-- [ ] phase-09-importer
-- [ ] phase-10-system-abstraction
-- [ ] phase-11-migration-infra
 - [ ] phase-12-typescript
 - [ ] phase-13-v14-compat
 
@@ -58,7 +48,14 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [ ] 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
 - [ ] 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)
 - [ ] 5.17 — Convert shipattachment item type
+- [ ] 5.18 — Convert homesteadupgrade item type (added during detailing — see Open issues)
 - [ ] 5.last — Verify Phase 5 stop gate
+
+Per-type tasks 5.2–5.18 were expanded from one-line bullets into full
+phase-00-style task blocks (preconditions / files / source shape / schema notes
+/ derived / migration / steps / verification / Do-NOT / commit) on 2026-05-29.
+See `phases/phase-05-datamodels.md`. Phase 5 is **schema-definition-only** —
+DataModel `prepare*` hooks stay empty; calculator wiring is Phase 6.
 
 (Previous: Phase 11 closed; migration infrastructure in place. Phase 5
 scaffolding in place: modules/data/{actor,item}/base-*-data.js and
@@ -305,6 +302,44 @@ proceed independently since prototype patches and dice presets don't overlap.)
   4.1-4.3: 7c3ddff, be6d328, b64bcb8. _refreshTurnMarker on TokenFFG
   has a pre-existing complexity-15 issue; tagged with
   eslint-disable-next-line and noted here for a future cleanup task.
+- 2026-05-29 — Phase 5 detailing session (docs-only). Per operator direction,
+  expanded per-type tasks 5.2–5.17 from one-line bullets into full
+  phase-00-style atomic task blocks in `phases/phase-05-datamodels.md`, sourced
+  from each type's exact `template.json` shape. Added shared-fragment plan
+  (`modules/data/shared/`, create-on-first-use), a migration policy, and a
+  sequencing rationale. No code changed; `git status` shows only the two doc
+  files. `npm run verify` re-run at baseline (typecheck/comments/tests/build/
+  smoke/migration green; lint known-red — Phase 12). Did not start task 5.2.
+- 2026-05-29 — Missing item type found: `homesteadupgrade`. It is a real Item
+  type in `template.json` (`types[]` line 616; block 694-696, templates
+  `[meta_only]`) but was omitted from the original Phase 5 plan — absent from
+  tasks 5.8–5.17 and from the phase file's "Files to be created" item list
+  (which named only 19 of 20 item types). Added as new task **5.18** so the
+  postcondition "every item type registered" can hold. Trivial schema (metadata
+  only); reuses the `metaOnly()` fragment.
+- 2026-05-29 — Phase 5 scope decision to confirm before task 5.2 (candidate
+  ADR). Phase 1 deferred calculator call-site migration to Phase 6, and legacy
+  `ActorFFG`/`ItemFFG` still own all derived computation. So Phase 5 is scoped
+  **schema-definition + registration only**: DataModel `prepareBaseData()`/
+  `prepareDerivedData()` stay empty; moving derivation + wiring the Phase 1
+  calculators is Phase 6. This refines the Common per-type task template's
+  step 4 ("delegate to calculators") for the duration of Phase 5. The 5.2
+  implementer should record this as a short ADR if formalization is wanted
+  (PRINCIPLES 23).
+- 2026-05-29 — Migration scaffolds not present. Phase file 5.1's bullet said it
+  established "migration scaffolds", but `modules/migrations/` contains only
+  1.901/1.906/1.907/runner/index — no `3.0.0-actor-datamodels.js` or
+  `3.0.0-item-datamodels.js`. Detailed tasks adopt create-on-first-need: the
+  first per-type task that genuinely requires a migration creates the shared
+  3.0.0 file and registers it in `index.js`. Most Phase 5 conversions are
+  expected to need no migration (lenient schema mirroring template.json).
+- 2026-05-29 — Housekeeping fixes to this file: removed a duplicated block in
+  "Phase progress" (phases 02–11 were listed twice; canonical list is now
+  00–13) and updated the stale "latest session log" pointer (was 07-00-19Z;
+  the 08-30-00Z log and this session's 03-24-16Z log are newer). Also corrected
+  task 5.last's stop-gate check in the phase file: registrations live as entries
+  in the `_register.js` registry objects (6 actor + 20 item = 26), assigned via
+  a loop, so the old "grep CONFIG.*.dataModels → 25+ matches" check was wrong.
 
 ---
 
@@ -312,7 +347,7 @@ proceed independently since prototype patches and dice presets don't overlap.)
 
 Sessions append to `.restructure/sessions/<UTC-timestamp>.md`. Latest:
 
-`.restructure/sessions/2026-05-28T07-00-19Z.md`
+`.restructure/sessions/2026-05-29T03-24-16Z.md`
 
 ---
 
