@@ -2,8 +2,8 @@
 
 **Current phase:** phase-05-datamodels
 **Current task:** 5.last — Verify Phase 5 stop gate
-**Last verified:** 2026-05-29T04:50:02Z (after task 5.18; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 146 unit tests — 51 calculator + 12 migration + 83 datamodel)
-**Last commit on plan:** f6fbb48
+**Last verified:** 2026-05-29T04:51:51Z (during task 5.last automatic stop-gate checks; registry coverage exact at 6 actor + 20 item DataModels; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 146 unit tests — 51 calculator + 12 migration + 83 datamodel; manual Foundry sheet smoke pending)
+**Last commit on plan:** 3453fdd
 
 ---
 
@@ -468,6 +468,15 @@ proceed independently since prototype patches and dice presets don't overlap.)
   Added and registered the schema-only homesteadupgrade DataModel using only
   the shared `metaOnly()` metadata fragment. Two schema tests added; no
   migration needed.
+- 2026-05-29 — Phase 5 stop-gate blocker. Automatic checks passed: `_register.js`
+  has exactly 6 actor entries and 20 item entries, matching `template.json`
+  with no missing/extra types; escalated `npm run verify` matched the expected
+  baseline (typecheck/comments/tests/build/smoke/migration green, lint
+  known-red with warnings only); migration replay has no fixtures; maintainer
+  readability check passed for `WeaponData` plus its shared item fragments.
+  Remaining required step is the operator Foundry smoke: every actor sheet and
+  item sheet renders with no console errors. Phase 5 remains at task 5.last
+  until that is confirmed.
 
 ---
 
@@ -475,7 +484,7 @@ proceed independently since prototype patches and dice presets don't overlap.)
 
 Sessions append to `.restructure/sessions/<UTC-timestamp>.md`. Latest:
 
-`.restructure/sessions/2026-05-29T03-24-16Z.md`
+`.restructure/sessions/2026-05-29T04-51-51Z.md`
 
 ---
 
