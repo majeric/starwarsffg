@@ -2,7 +2,7 @@
 
 **Current phase:** phase-05-datamodels
 **Current task:** 5.last — Verify Phase 5 stop gate
-**Last verified:** 2026-05-29T04:51:51Z (during task 5.last automatic stop-gate checks; registry coverage exact at 6 actor + 20 item DataModels; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 146 unit tests — 51 calculator + 12 migration + 83 datamodel; manual Foundry sheet smoke pending)
+**Last verified:** 2026-05-29T05:02:05Z (during task 5.last runtime smoke fix; targeted sheet-system-data tests/lint green; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 148 unit tests — 51 calculator + 12 migration + 83 datamodel + 2 sheet)
 **Last commit on plan:** 3453fdd
 
 ---
@@ -477,6 +477,15 @@ proceed independently since prototype patches and dice presets don't overlap.)
   Remaining required step is the operator Foundry smoke: every actor sheet and
   item sheet renders with no console errors. Phase 5 remains at task 5.last
   until that is confirmed.
+- 2026-05-29 — Phase 5 stop-gate smoke found an `ActorSheetFFGV2` render
+  regression: `_createSkillColumns()` received `data.data.skills === undefined`
+  and threw `Cannot convert undefined or null to object`. Cause: under
+  DataModels, `actor.toObject(false).system` can omit defaulted schema fields
+  and transient render fields that legacy `prepareDerivedData()` writes to the
+  live `actor.system`. Fixed by routing actor sheet system data through
+  `buildActorSheetSystemData()`, which starts with serialized source data,
+  overlays prepared `actor.system` defaults/derived fields, and preserves
+  source-only custom skill keys. Added two regression tests.
 
 ---
 

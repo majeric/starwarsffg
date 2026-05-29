@@ -22,6 +22,7 @@ import {
 import {DicePoolFFG} from "../dice/pool.js";
 import {get_dice_pool} from "../helpers/dice-helpers.js";
 import {itemPillHover} from "../swffg-main.js";
+import { buildActorSheetSystemData } from "./sheet-system-data.js";
 
 export class ActorSheetFFG extends foundry.appv1.sheets.ActorSheet {
   constructor(...args) {
@@ -199,8 +200,10 @@ export class ActorSheetFFG extends foundry.appv1.sheets.ActorSheet {
 
     // Compatibility for Foundry 0.8.x with backwards compatibility (hopefully) for 0.7.x
     const actorData = this.actor.toObject(false);
+    const systemData = buildActorSheetSystemData(actorData, this.actor.system);
+    actorData.system = systemData;
     data.actor = actorData;
-    data.data = actorData.system;
+    data.data = systemData;
     data.talentList = this.actor.talentList;
     data.rollData = this.actor.getRollData.bind(this.actor);
 
