@@ -123,8 +123,78 @@ Document each edge case decision as an ADR.
   they're applied. AE has documented ordering rules; verify behavior matches
   the bespoke pipeline's ordering before declaring the migration complete.
 
-## Tasks (to be detailed before phase begins)
+## Tasks
 
-This is the most complex phase. Expect 15-25 atomic tasks. First session
-in Phase 7 must produce the detailed breakdown before starting work, AND
-must propose any ADRs needed for edge cases.
+### 7.0 — Detail Phase 7 atomic tasks (+ ADR-014)
+
+This task produced the breakdown below and ADR-014 (architecture + edge cases),
+grounded in an investigation of the current modifier system.
+
+### Current architecture (investigation findings)
+
+The system is **hybrid**, not "bespoke vs AE":
+- Modifiers are authored as free-form `item.system.attributes` entries
+  (`{ modtype, mod, value, … }`). On item create/update,
+  `ModifierHelpers.applyActiveEffectOnUpdate` **syncs** them into embedded
+  `ActiveEffect`s whose `changes` target keys from `getModKeyPath`
+  (e.g. `system.stats.soak.value`, `system.skills.<skill>.boost`). The AEs —
+  standard Foundry application, mostly `ADD` mode — are what actually apply.
+- The **1.907 migration already performed the bulk `attributes`→AE conversion**
+  for existing worlds, so most worlds already carry the AEs.
+- `ActiveEffectFFG` is a thin subclass (only disables push animation for item
+  effects). The `applyActiveEffects` override in `actor-ffg.js` mutates AE
+  change values for the force-pool dice computation.
+- `explodeMod` expands compound mods (Brawn → Brawn + EncumbranceMax + Soak;
+  Defence → Melee + Ranged; Shields → 4 facings). "Inherent" effects (e.g.
+  species Brawn) are AEs named `(inherent)`.
+- ~10 production files reference `ModifierHelpers` (callers to migrate before
+  deletion): actor-ffg, actor-sheet-ffg, item-ffg, item-sheet-ffg, item-editor,
+  item-helpers, dice-helpers, import-helpers, popout-modifiers, plus the 1.907
+  migration.
+
+So ADR-004's "AE as the sole pipeline" concretely means: **eliminate the
+`attributes` intermediary.** The "add modifier" UI creates/edits AEs directly;
+the `attributes`→AE sync and `modifiers.js` are deleted; `item.system.attributes`
+is removed from schemas; the already-present AEs become the only representation;
+FFG-specific semantics become custom AE change modes. The Phase 6 actor derived
+split (deferred via ADR-013) folds in here once AE application is clean.
+
+### Sequencing (safe foundation first; deletions last)
+
+- [ ] 7.0 — Detail tasks + ADR-014 (this task)
+- [ ] 7.1 — Extract the pure modifier→AE-key taxonomy (`explodeMod`,
+  `getModKeyPath`, `getModTypeByModPath`) into a tested module
+  `modules/active-effects/modifier-map.js`; `modifiers.js` delegates.
+  Characterization tests lock the exact mapping (Phase-1-style; no behavior
+  change). **Safe foundation.**
+- [ ] 7.2 — Register custom FFG AE change modes (dice-symbol add, characteristic
+  cap, career-skill / force-boost statuses, upgrade/downgrade); move the
+  force-pool logic out of the `applyActiveEffects` override into a change mode.
+- [ ] 7.3 — Build synthetic `test-worlds/` fixtures covering the modifier
+  matrix (armour soak, weapon mods, talent +characteristic, force boost, career
+  skill, vehicle stats, attachments). Operator real worlds remain the gold
+  standard — flag for augmentation; synthetic fixtures unblock automated replay.
+- [ ] 7.4 — Migration `3.x-attributes-to-ae.js`: convert any remaining
+  `item.system.attributes` to embedded AEs (via the 7.1 taxonomy module) and
+  clear `attributes`; replay-tested against 7.3 fixtures. Forward-only.
+- [ ] 7.5 — "Add/edit modifier" UI creates AEs directly (replace
+  `onClickAttributeControl` + the attributes editor).
+- [ ] 7.6 — Migrate the ~10 `ModifierHelpers` callers onto AE iteration / the
+  taxonomy module, one cohesive group per commit.
+- [ ] 7.7 — Remove the `applyActiveEffects` override (force-pool now a change
+  mode from 7.2).
+- [ ] 7.8 — Remove `attributes` (and the Phase-7-coupled `itemmodifier`/
+  `adjusteditemmodifer`) from item DataModel schemas; fold in the Phase 6 actor
+  derived split (`*.adjusted` → `derived.*` via calculators, `_preUpdate`
+  removal, `prepareDerivedData` mutation removals) now AE application is clean.
+- [ ] 7.9 — Delete `modifiers.js` and `popout-modifiers.js` (verify zero callers
+  via lint/grep first — anti-creep note).
+- [ ] 7.10 — Update item/chat templates (`*.adjusted` → derived; remove the
+  attributes-editor markup).
+- [ ] 7.last — Verify Phase 7 stop gate: automated green; migration replay vs
+  fixtures; **operator real-world smoke matrix** (the scenarios under "Phase
+  postconditions").
+
+Per-task blocks expand as each is executed (as in Phases 5–6). Each is one
+commit, verified; the risky caller-migration/deletion tasks (7.5–7.10) require
+the operator real-world smoke before the stop gate closes.

@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-07-ae-unification
-**Current task:** 7.0 — Detail Phase 7 atomic tasks (execution gated on test-world modifier fixtures — operator-provided)
-**Last verified:** 2026-05-29T23:33:57Z (Phase 6 relaxed-complete per ADR-013; additive derived, no behavior change; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 153 unit tests)
-**Last commit on plan:** 4410b21
+**Current task:** 7.1 — Extract modifier→AE-key taxonomy to a tested module
+**Last verified:** 2026-05-29T23:43:08Z (task 7.0 docs-only detailing; baseline unchanged — typecheck/comments/tests/build/smoke/migration green, lint known-red 0 errors; 153 unit tests)
+**Last commit on plan:** 5435cc5
 
 ---
 
@@ -50,9 +50,24 @@ preconditions require `test-worlds/` fixtures with rich modifier scenarios that
 **do not exist yet and need real exported worlds from the operator**. Detailing
 (7.0) is unblocked; execution (7.1+) is gated on those fixtures.
 
-- [ ] 7.0 — Detail Phase 7 atomic tasks   ← CURRENT
-- [ ] 7.1+ — detailed by 7.0 (AE migration + custom change modes + the derived
-  split deferred from Phase 6)
+- [x] 7.0 — Detail Phase 7 atomic tasks (+ ADR-014)
+- [ ] 7.1 — Extract modifier→AE-key taxonomy to a tested module   ← CURRENT
+- [ ] 7.2 — Register custom FFG AE change modes (+ force-pool)
+- [ ] 7.3 — Synthetic test-world modifier fixtures
+- [ ] 7.4 — Migration: attributes → AEs, clear attributes
+- [ ] 7.5 — Add/edit-modifier UI creates AEs directly
+- [ ] 7.6 — Migrate the ~10 ModifierHelpers callers
+- [ ] 7.7 — Remove the applyActiveEffects override
+- [ ] 7.8 — Remove `attributes` from item schemas + fold in Phase 6 actor derived split
+- [ ] 7.9 — Delete modifiers.js + popout-modifiers.js
+- [ ] 7.10 — Update item/chat templates
+- [ ] 7.last — Phase 7 stop gate (incl. operator real-world smoke matrix)
+
+Phase 7 detailed in `phases/phase-07-ae-unification.md` (ADR-014). Approach: AEs
+become canonical, the `attributes` intermediary is removed; behavior preserved
+by extracting the mod→AE-key taxonomy verbatim (7.1) and reusing it. Risky
+caller-migration/deletion tasks (7.5-7.10) need the operator real-world smoke
+before the stop gate closes.
 
 ---
 

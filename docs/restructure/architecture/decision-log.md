@@ -571,6 +571,59 @@ hook never ran. Phase 6 adds the `super` call so the derived pattern functions.
 
 ---
 
+## ADR-014: 2026-05-29 — Phase 7 approach: AEs canonical, remove the `attributes` intermediary
+
+**Status:** accepted
+**Phase:** 07
+
+**Context:** Investigation showed the modifier system is hybrid, not "bespoke
+vs AE" (see phase-07 "Current architecture"). Modifiers are authored as
+`item.system.attributes` entries that `ModifierHelpers.applyActiveEffectOnUpdate`
+syncs into embedded `ActiveEffect`s; the AEs are what apply. The 1.907 migration
+already converted most worlds' attributes to AEs. Phase 7 must decide how to
+reach "AE as the sole pipeline" (ADR-004) and how to handle migration edge cases
+(the phase mandates ADRs for these).
+
+**Decision:**
+- **AEs become canonical; the `attributes` intermediary is removed.** The
+  authoring UI creates/edits AEs directly; the attributes→AE sync, `modifiers.js`,
+  and `item.system.attributes` are removed; FFG semantics become custom AE
+  change modes.
+- **Preserve behavior exactly (anti-creep).** The pure modifier→AE-key taxonomy
+  (`explodeMod`, `getModKeyPath`, `getModTypeByModPath`) is extracted verbatim
+  into a tested module (task 7.1) and reused by the migration, change modes, and
+  UI — so the mapping cannot drift.
+- **Edge-case handling for the `attributes`→AE migration (task 7.4):**
+  - `explodeMod` compound mods (Brawn → Brawn+EncumbranceMax+Soak; Defence →
+    Melee+Ranged; Shields → 4 facings) become a single AE with multiple
+    `changes`, preserving the expansion.
+  - `mod === "*"` / "Stat All" (the removed v2.0.0 hack): migrate to the explicit
+    set of keys it expanded to; if unmappable, create a disabled AE named
+    `Migrated (review): *` so nothing is silently dropped.
+  - `exclude: true` attributes → migrate as `disabled: true` AEs (semantics
+    preserved, not applied).
+  - Attributes on items not currently equipped → AE created with `disabled`
+    reflecting the equipped/active state (preserve current apply semantics).
+  - `(inherent)` effects (e.g. species Brawn) are already AEs — leave them; the
+    migration only touches user `attr*` entries.
+  - Embedded/attachment items → migrate their attributes the same way on the
+    embedded item.
+  - Forward-only; clears `attributes` after creating AEs; idempotent (skips
+    items whose attributes are already empty, so re-running is safe).
+- **Synthetic fixtures unblock automated replay (task 7.3); operator real-world
+  worlds remain the gold-standard smoke** (phase postconditions) before the stop
+  gate closes — this is the irreversible-migration safety net (ADR-002).
+
+**Consequences:**
+- The taxonomy module (7.1) is the safe first step and the single source of
+  truth for mod→key mapping across migration/change-modes/UI.
+- `applyActiveEffects` force-pool mutation becomes a custom change mode (7.2/7.7).
+- Item schema `attributes` removal + the folded-in Phase 6 actor derived split
+  happen together (7.8) once AE application is clean.
+- Highest-risk migration in the plan; gated on operator real-world smoke.
+
+---
+
 ## ADR template (for future entries)
 
 ```
