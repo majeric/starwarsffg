@@ -29,6 +29,9 @@ import { TalentData } from "./item/talent-data.js";
 import { SpecializationData } from "./item/specialization-data.js";
 import { ForcePowerData } from "./item/forcepower-data.js";
 import { SignatureAbilityData } from "./item/signatureability-data.js";
+import { WeaponData } from "./item/weapon-data.js";
+import { ArmourData } from "./item/armour-data.js";
+import { ShipWeaponData } from "./item/shipweapon-data.js";
 
 const ACTOR_DATA_MODELS = {
   homestead: HomesteadData,
@@ -53,6 +56,9 @@ const ITEM_DATA_MODELS = {
   specialization: SpecializationData,
   forcepower: ForcePowerData,
   signatureability: SignatureAbilityData,
+  weapon: WeaponData,
+  armour: ArmourData,
+  shipweapon: ShipWeaponData,
 };
 
 export function registerDataModels() {

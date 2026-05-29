@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
-**Last verified:** 2026-05-29T04:39:24Z (after task 5.14; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 124 unit tests — 51 calculator + 12 migration + 61 datamodel)
-**Last commit on plan:** 24af94f
+**Current task:** 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)
+**Last verified:** 2026-05-29T04:43:43Z (after task 5.15; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 135 unit tests — 51 calculator + 12 migration + 72 datamodel)
+**Last commit on plan:** f003dea
 
 ---
 
@@ -45,8 +45,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.12 — Convert talent item type
 - [x] 5.13 — Convert specialization item type
 - [x] 5.14 — Convert forcepower, signatureability item types
-- [ ] 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)   ← CURRENT
-- [ ] 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)
+- [x] 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
+- [ ] 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)   ← CURRENT
 - [ ] 5.17 — Convert shipattachment item type
 - [ ] 5.18 — Convert homesteadupgrade item type (added during detailing — see Open issues)
 - [ ] 5.last — Verify Phase 5 stop gate
@@ -444,6 +444,17 @@ proceed independently since prototype patches and dice presets don't overlap.)
   item types. Upgrade grids stay free-form object maps with numbered defaults;
   signature ability uplink nodes are explicit booleans. Six schema tests added;
   no migration needed.
+- 2026-05-29 — Phase 5 task 5.15 source-shape discrepancies. `template.json`
+  omits `weapon.characteristic`, but the weapon sheet edits it, OggDude/SWA
+  importers write it, and `ItemFFG` uses it for characteristic-based weapon
+  damage. `template.json` also omits `shipweapon.skill`, but shipweapon sheets
+  and actor weapon lists read it, and the OggDude weapon importer writes it.
+  Per ADR-002, both real persisted fields are declared in the Phase 5 schemas.
+- 2026-05-29 — Phase 5 task 5.15 complete (weapon, armour, shipweapon →
+  DataModels). Added shared `hardpoints()` and `equippable()` fragments, then
+  registered schema-only DataModels for all three equipment item types. Phase
+  7-coupled modifier and attachment arrays stay free-form; adjusted combat stats
+  stay persisted for Phase 5. Eleven schema tests added; no migration needed.
 
 ---
 
