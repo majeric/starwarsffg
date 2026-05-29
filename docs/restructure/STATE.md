@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-06-derived-split
-**Current task:** 6.1 — Establish the derived-namespace pattern (+ ADR-011) — pending decision sign-off (see Open issues)
-**Last verified:** 2026-05-29T16:12:05Z (Phase 5 closed; task 6.0 is docs-only detailing. Baseline: typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 148 unit tests)
-**Last commit on plan:** 61fb6f7
+**Current task:** 6.2 — Character derived (full stats + talent list + skilltypes)
+**Last verified:** 2026-05-29T16:25:12Z (after task 6.1; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 151 unit tests — +3 derived-namespace)
+**Last commit on plan:** 0aff883
 
 ---
 
@@ -35,8 +35,8 @@ smoke passed. See `phases/phase-05-datamodels.md` for the per-type task history.
 Phase 6 is detailed in `phases/phase-06-derived-split.md` (task 6.0 done):
 
 - [x] 6.0 — Detail Phase 6 atomic tasks
-- [ ] 6.1 — Establish the derived-namespace pattern on base DataModels (+ ADR-011)   ← CURRENT
-- [ ] 6.2 — Character derived (full stats + talent list + skilltypes)
+- [x] 6.1 — Establish the derived-namespace pattern on base DataModels (+ ADR-011)
+- [ ] 6.2 — Character derived (full stats + talent list + skilltypes)   ← CURRENT
 - [ ] 6.3 — Nemesis derived
 - [ ] 6.4 — Rival derived (no strain)
 - [ ] 6.5 — Minion derived (group-wound formula + calculators)
@@ -47,9 +47,10 @@ Phase 6 is detailed in `phases/phase-06-derived-split.md` (task 6.0 done):
 - [ ] 6.10 — Migration: strip actor `*.adjusted` from persisted documents
 - [ ] 6.last — Verify Phase 6 stop gate (actor scope; item `*.adjusted` → Phase 7)
 
-Two decisions need sign-off before executing 6.1 (see Open issues): **ADR-011**
-(derived-namespace mechanism) and **ADR-012** (re-scope Phase 6 to actors only;
-defer item `*.adjusted` to Phase 7).
+Decisions recorded (operator delegated, chosen for low risk / clean code):
+**ADR-011** (derived-namespace mechanism) and **ADR-012** (Phase 6 = actors;
+item `*.adjusted` deferred to Phase 7). 6.1 implemented the pattern + a derived
+test harness.
 
 ---
 

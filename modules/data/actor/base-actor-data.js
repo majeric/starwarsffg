@@ -22,4 +22,13 @@ export class BaseActorData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {};
   }
+
+  /**
+   * Reset the derived namespace on the parent actor before each prepare cycle.
+   * Per-type `prepareDerivedData()` overrides populate `this.parent.derived.*`
+   * (ADR-011); any per-type `prepareBaseData` override must call `super`.
+   */
+  prepareBaseData() {
+    this.parent.derived = {};
+  }
 }
