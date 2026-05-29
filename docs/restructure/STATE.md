@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.3 — Convert minion actor type to DataModel
-**Last verified:** 2026-05-29T03:53:54Z (after task 5.2; typecheck/comments/tests/build/smoke/migration green, lint known-red — 999 legacy warnings, 0 errors; 68 unit tests — 51 calculator + 12 migration + 5 homestead)
-**Last commit on plan:** b8838fc
+**Current task:** 5.4 — Convert rival actor type to DataModel
+**Last verified:** 2026-05-29T03:59:20Z (after task 5.3; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 73 unit tests — 51 calculator + 12 migration + 10 datamodel)
+**Last commit on plan:** ba97747
 
 ---
 
@@ -33,7 +33,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.0 — Detail Phase 5 atomic tasks (commit `f9999f0`)
 - [x] 5.1 — Scaffold data model base classes and registration helper (commit `b8838fc`)
 - [x] 5.2 — Convert homestead actor type to DataModel
-- [ ] 5.3 — Convert minion actor type to DataModel   ← CURRENT
+- [x] 5.3 — Convert minion actor type to DataModel
+- [ ] 5.4 — Convert rival actor type to DataModel   ← CURRENT
 - [ ] 5.4 — Convert rival actor type to DataModel
 - [ ] 5.5 — Convert nemesis actor type to DataModel
 - [ ] 5.6 — Convert character actor type to DataModel
@@ -367,6 +368,14 @@ proceed independently since prototype patches and dice presets don't overlap.)
   data — so Phase 5 mirrors template.json (no regression) and Phase 8 should fix
   the sheet. Separately noticed: decision-log.md has a duplicate `ADR-009`
   heading (two distinct ADRs share the number); pre-existing, left as-is.
+- 2026-05-29 — Phase 5 task 5.3 complete (minion → DataModel). Introduced the
+  three large shared fragments: `actor-stats.js` (`statsSchema({ strain })` —
+  `rival` will pass `strain:false`), `characteristics.js` (6, table-built), and
+  `skills.js` (35 core skills, table-built to stay under the size/complexity
+  lint limits). `MinionData` registered; 5 schema tests added (73 total).
+  Note: skills count is 35 (the phase doc's "~36" was an estimate); each skill's
+  `type` holds its category, and `characteristic`/category drive per-skill
+  defaults. Schema-only per ADR-010 (legacy minion prep stays on ActorFFG).
 
 ---
 

@@ -11,9 +11,11 @@
  */
 
 import { HomesteadData } from "./actor/homestead-data.js";
+import { MinionData } from "./actor/minion-data.js";
 
 const ACTOR_DATA_MODELS = {
   homestead: HomesteadData,
+  minion: MinionData,
 };
 
 const ITEM_DATA_MODELS = {
