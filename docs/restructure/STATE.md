@@ -340,8 +340,18 @@ proceed independently since prototype patches and dice presets don't overlap.)
   task 5.last's stop-gate check in the phase file: registrations live as entries
   in the `_register.js` registry objects (6 actor + 20 item = 26), assigned via
   a loop, so the old "grep CONFIG.*.dataModels → 25+ matches" check was wrong.
-
----
+- 2026-05-29 — Reverted the per-task status-marker scheme (operator direction;
+  it was a miscommunication). Commit `2eacb29` had amended SESSION_PROTOCOL.md
+  (added work-loop steps h/i) to mandate a `**Status:** Complete — commit
+  <sha>` line in each phase file per task plus a separate `docs(restructure):
+  record phase NN.MM state` commit, and retroactively added those markers to
+  phases 00-05/11. The intended behavior was simply checking off the STATE.md
+  task checkbox (already work-loop step f). Restored SESSION_PROTOCOL.md and
+  phases 00-04/11 to their pre-`2eacb29` state via `git checkout 2eacb29^ --
+  <files>`; manually stripped phase-05's 5.0 block, the 5.1 bullet's Complete
+  suffix, and the 5.2-5.18 "Not started" lines. Progress is now tracked only by
+  STATE.md checkboxes + commit SHAs, not phase-file markers. The `**Status:**
+  accepted` lines in decision-log.md (ADRs) are a different thing and untouched.
 
 ## Session log
 

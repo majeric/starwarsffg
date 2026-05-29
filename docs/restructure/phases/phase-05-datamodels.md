@@ -127,14 +127,6 @@ DataModel-shaped data more cleanly.
 
 ## Tasks
 
-### 5.0 — Detail Phase 5 atomic tasks
-
-**Status:** Complete — commit `f9999f0`. This phase file's "Common per-type
-task template", "Sequencing" subsection, and "5.last" stop gate are the
-detailed task list. Future sessions executing per-type tasks should follow
-the template and append individual task status markers in the Sequencing
-list as each type's DataModel lands.
-
 ### Common per-type task template
 
 Each actor or item type conversion follows the same shape; this template
@@ -280,13 +272,11 @@ standing amendments for all of Phase 5: template step 4 (derived data) → leave
 prepare hooks empty (scope clarification); template step 5 (migration) → only if
 the per-task "Migration" line says so (migration policy).
 
-- 5.1 — Establish base infrastructure (`base-actor-data.js`, `base-item-data.js`, `_register.js`) — **Complete** — commit `b8838fc`
+- 5.1 — Establish base infrastructure (`base-actor-data.js`, `base-item-data.js`, `_register.js`)
 
 ---
 
 ### 5.2 — Convert homestead actor type to DataModel
-
-**Status:** Not started
 
 **Why first:** least-coupled actor — no characteristics, skills, stats, species,
 career, or general. The legacy preparation does nothing homestead-specific
@@ -335,8 +325,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 
 ### 5.3 — Convert minion actor type to DataModel
 
-**Status:** Not started
-
 **Preconditions:** Task 5.2 complete; `npm run verify` at baseline.
 
 **Files to create:**
@@ -372,8 +360,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 
 ### 5.4 — Convert rival actor type to DataModel
 
-**Status:** Not started
-
 **Preconditions:** Task 5.3 complete; `npm run verify` at baseline.
 
 **Files to create:**
@@ -408,8 +394,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 
 ### 5.5 — Convert nemesis actor type to DataModel
 
-**Status:** Not started
-
 **Preconditions:** Task 5.4 complete; `npm run verify` at baseline.
 
 **Files to create:** `modules/data/actor/nemesis-data.js`; `tests/data/actor/nemesis-data.test.js`.
@@ -438,8 +422,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 ---
 
 ### 5.6 — Convert character actor type to DataModel
-
-**Status:** Not started
 
 **Preconditions:** Task 5.5 complete; `npm run verify` at baseline.
 
@@ -477,8 +459,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 
 ### 5.7 — Convert vehicle actor type to DataModel
 
-**Status:** Not started
-
 **Preconditions:** Task 5.6 complete; `npm run verify` at baseline.
 
 **Files to create:** `modules/data/actor/vehicle-data.js`; `tests/data/actor/vehicle-data.test.js`.
@@ -515,8 +495,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 
 ### 5.8 — Convert criticalinjury, criticaldamage item types
 
-**Status:** Not started
-
 **Preconditions:** Task 5.7 complete; `npm run verify` at baseline.
 
 **Files to create:**
@@ -549,8 +527,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 ---
 
 ### 5.9 — Convert motivation, obligation, background item types
-
-**Status:** Not started
 
 **Preconditions:** Task 5.8 complete; `npm run verify` at baseline.
 
@@ -585,8 +561,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 
 ### 5.10 — Convert species, career item types
 
-**Status:** Not started
-
 **Preconditions:** Task 5.9 complete; `npm run verify` at baseline.
 
 **Files to create:** `modules/data/item/species-data.js`, `career-data.js`; test files under `tests/data/item/`.
@@ -616,8 +590,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 ---
 
 ### 5.11 — Convert ability, gear item types
-
-**Status:** Not started
 
 **Preconditions:** Task 5.10 complete; `npm run verify` at baseline.
 
@@ -652,8 +624,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 
 ### 5.12 — Convert talent item type
 
-**Status:** Not started
-
 **Preconditions:** Task 5.11 complete; `npm run verify` at baseline.
 
 **Files to create:** `modules/data/item/talent-data.js`; `tests/data/item/talent-data.test.js`.
@@ -684,8 +654,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 
 ### 5.13 — Convert specialization item type
 
-**Status:** Not started
-
 **Preconditions:** Task 5.12 complete; `npm run verify` at baseline.
 
 **Files to create:** `modules/data/item/specialization-data.js`; `tests/data/item/specialization-data.test.js`.
@@ -714,8 +682,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 ---
 
 ### 5.14 — Convert forcepower, signatureability item types
-
-**Status:** Not started
 
 **Preconditions:** Task 5.13 complete; `npm run verify` at baseline.
 
@@ -746,8 +712,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 ---
 
 ### 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
-
-**Status:** Not started
 
 **Preconditions:** Task 5.14 complete; `npm run verify` at baseline.
 
@@ -783,8 +747,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 
 ### 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)
 
-**Status:** Not started
-
 **Preconditions:** Task 5.15 complete; `npm run verify` at baseline.
 
 **Files to create:** `modules/data/item/itemattachment-data.js`, `itemmodifier-data.js`; test files under `tests/data/item/`.
@@ -814,8 +776,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 
 ### 5.17 — Convert shipattachment item type
 
-**Status:** Not started
-
 **Preconditions:** Task 5.16 complete; `npm run verify` at baseline.
 
 **Files to create:** `modules/data/item/shipattachment-data.js`; `tests/data/item/shipattachment-data.test.js`.
@@ -842,8 +802,6 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 ---
 
 ### 5.18 — Convert homesteadupgrade item type
-
-**Status:** Not started
 
 > **Added during detailing.** `homesteadupgrade` is a real item type in
 > `template.json` (`types[]` line 616; block lines 694-696) but was omitted from

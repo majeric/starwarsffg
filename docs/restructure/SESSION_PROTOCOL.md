@@ -51,18 +51,7 @@ For each task in the current phase, in order:
        git commit -m "phase NN.MM: <task title>"
      (Use the exact title from STATE.md. No extra files. No co-author lines
       unless explicitly told.)
-  h. Update the per-task status in the phase file:
-       - Open phases/phase-NN-name.md
-       - Find the task's heading (`### N.M — title`) and add a
-         "**Status:** Complete — commit `<short-sha>`" line below it
-       - If the task is listed as a bullet rather than a heading, append
-         " — **Complete** — commit `<short-sha>`" to the bullet
-       - If the task was deferred or partial, use "Deferred" or "Partial"
-         with a brief reason referencing STATE.md Open issues
-     Update "Last commit on plan" in STATE.md to the new short SHA.
-  i. Commit the docs update:
-       git add docs/restructure/STATE.md docs/restructure/phases/phase-NN-name.md
-       git commit -m "docs(restructure): record phase NN.MM state"
+  h. Update "Last commit on plan" in STATE.md to the new short SHA.
 
   Continue to the next task ONLY IF:
    - The phase file explicitly groups the next task with this one ("tasks N.X and N.Y

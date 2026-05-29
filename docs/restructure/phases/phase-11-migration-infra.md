@@ -99,8 +99,6 @@ JSON format is canonical so changes are reviewable in PRs.
 
 ### 11.1 — Create migrations/runner.js with semver-aware dispatcher
 
-**Status:** Complete — commit `fee2ac1` (12 unit tests)
-
 **Files to create:**
 - `modules/migrations/runner.js`
 
@@ -134,8 +132,6 @@ JSON format is canonical so changes are reviewable in PRs.
 
 ### 11.2 — Relocate migrateTo1_901 to modules/migrations/1.901-species-talents.js
 
-**Status:** Complete — commit `94aa393` (batched with 11.3 and 11.4 — registry coupling forced grouping; documented as protocol deviation)
-
 **Source:** `modules/swffg-migration.js:77-85` (migrateTo1_901)
 
 **Files to create:**
@@ -158,8 +154,6 @@ of `game.actors`. Production runner passes `world = { actors: game.actors }`.
 
 ### 11.3 — Relocate migrateTo1_906 to modules/migrations/1.906-compendium-paths.js
 
-**Status:** Complete — commit `94aa393` (batched; refactored to deduplicate the per-setting loop)
-
 **Source:** `modules/swffg-migration.js:91-132` (migrateTo1_906)
 
 **Files to create:**
@@ -174,8 +168,6 @@ behavior must remain byte-identical.
 ---
 
 ### 11.4 — Relocate migrateTo1907 to modules/migrations/1.907-active-effects.js
-
-**Status:** Complete — commit `94aa393` (batched; partial decomposition via convertSpecialization/ForcePower/SignatureAbilityToAEs helpers; main body preserved verbatim with eslint-disable. Further decomposition is a future task per the spec)
 
 **Source:** `modules/swffg-migration.js:138-414` (migrateTo1907)
 
@@ -203,8 +195,6 @@ migrated.
 
 ### 11.5 — Delete swffg-migration.js and update caller
 
-**Status:** Complete — commit `e9fbe66` (434 lines deleted)
-
 **Files modified:**
 - `modules/swffg-main.js` — change `import {handleUpdate} from "./swffg-migration.js"`
   to `import { handleUpdate } from "./migrations/runner.js"`
@@ -220,8 +210,6 @@ migrated.
 ---
 
 ### 11.6 — Implement scripts/replay-migrations.mjs against fixtures
-
-**Status:** Complete — commit `297a024` (fixture-directory framework in place; exits cleanly with "no fixtures yet" until test-worlds/ is populated)
 
 **Files modified:**
 - `scripts/replay-migrations.mjs` — replace the placeholder with a real
@@ -243,8 +231,6 @@ migrated.
 ---
 
 ### 11.7 — Verify Phase 11 stop gate
-
-**Status:** Complete (with deferred items) — commit `ac9277a`. Five inline parseFloat version checks in swffg-main.js ready hook body deferred — they're inline historical adaptation hooks, not dispatcher calls; see STATE.md "Open issues".
 
 **Steps:**
 1. `grep -rn "parseFloat.*Version" modules/` — zero matches outside the

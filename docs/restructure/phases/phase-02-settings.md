@@ -106,8 +106,6 @@ passed in via a parameter to the register function.
 
 ### 2.1 — Create settings index
 
-**Status:** Complete — commit `1acbbee`
-
 **Files to create:**
 - `modules/settings/index.js` exporting `export function registerAllSettings(callbacks = {})`
 
@@ -142,8 +140,6 @@ yet.
 
 ### 2.2 — Extract compendium settings
 
-**Status:** Complete — commit `3aeb5fe` (10 settings; refactored to data-driven loop for maintainability)
-
 **Source:** `modules/swffg-main.js:393-478` (10 *Compendiums settings)
 
 **Files to create:**
@@ -172,8 +168,6 @@ compendium pack ids. Move verbatim.
 
 ### 2.3 — Extract combat settings
 
-**Status:** Complete — commit `8c03eae` (4 settings + setFFGInitiative helper moved)
-
 **Source:** `modules/swffg-main.js:335-368, 518-549, 158-165`
 (initiativeRule, useGenericSlots, removeCombatantAction, configuredTurnMarker)
 
@@ -201,8 +195,6 @@ moves.
 
 ### 2.4 — Extract character settings
 
-**Status:** Complete — commit `fe1a0f1` (9 settings via data-driven loop)
-
 **Source:** `modules/swffg-main.js:275-330, 373-388`
 
 **Files to create:**
@@ -220,8 +212,6 @@ All `scope: "world", config: false`. Plain value settings. Move verbatim.
 
 ### 2.5 — Extract simulation and miscellaneous settings
 
-**Status:** Complete — commit `0a3bb0c` (4 settings)
-
 **Source:** `modules/swffg-main.js:147-156, 480-512`
 
 **Files to create:**
@@ -238,8 +228,6 @@ All `scope: "world", config: false`. Plain value settings. Move verbatim.
 ---
 
 ### 2.6 — Extract skill-list settings and arraySkillList migration
-
-**Status:** Complete — commit `d3ed6fd` (arraySkillList migration deferred — setting is already Object-typed in current code; see STATE.md Open issues)
 
 **Source:** `modules/swffg-main.js:557-602` (skill-list area) plus `parseSkillList()`
 function at lines 60-67 which JSON.parses the setting value.
@@ -271,8 +259,6 @@ the one caller of `parseSkillList()` in swffg-main.js to use this.
 
 ### 2.7 — Extract crew main settings
 
-**Status:** Complete — commit `70396a7` (file named crew-main-settings.js to avoid clash with pre-existing crew-settings.js)
-
 **Source:** `modules/swffg-main.js:1888-1915`
 (arrayCrewRoles menu + setting, initiativeCrewRole)
 
@@ -294,8 +280,6 @@ without conflict. A follow-up task (after Phase 2 close) can consolidate.
 
 ### 2.8 — Extract debug setting
 
-**Status:** Complete — commit `23db87f` (this.debouncedReload replaced with SettingsHelpers.debouncedReload)
-
 **Source:** `modules/swffg-main.js:134-142`
 
 **Files to create:**
@@ -312,8 +296,6 @@ without conflict. A follow-up task (after Phase 2 close) can consolidate.
 ---
 
 ### 2.9 — Wire swffg-main.js to call registerAllSettings()
-
-**Status:** Complete — wired incrementally during 2.2 (the call site was added in commit `3aeb5fe` to support the first extracted group; subsequent tasks added each register* call to index.js)
 
 **Source:** what's left in `swffg-main.js` after tasks 2.2-2.8
 
@@ -338,8 +320,6 @@ without conflict. A follow-up task (after Phase 2 close) can consolidate.
 ---
 
 ### 2.10 — Verify Phase 2 stop gate
-
-**Status:** Complete — commit `db7c48c` (swffg-main.js 2006 → 1672 lines)
 
 **Steps:**
 1. `npm run verify` — same green/lint pattern

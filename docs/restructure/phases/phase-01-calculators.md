@@ -71,8 +71,6 @@ tests/rules/talent-list.test.js
 
 ### 1.1 — Create calculator and test directories
 
-**Status:** Complete — commit `c32e507`
-
 **Preconditions:**
 - [ ] Phase 0 marked complete in STATE.md
 - [ ] `modules/rules/` does not yet exist
@@ -90,8 +88,6 @@ tests/rules/talent-list.test.js
 ---
 
 ### 1.2 — Extract encumbrance calculator
-
-**Status:** Complete — commit `a2c7f56` (10 tests)
 
 **Source:** `modules/actors/actor-ffg.js:613-647` (`_calculateDerivedValues`, encumbrance loop)
 
@@ -141,8 +137,6 @@ export function computeEncumbrance(items) { ... }
 
 ### 1.3 — Extract wounds-threshold calculator
 
-**Status:** Complete — commit `10b7cf1` (6 tests)
-
 **Source:** `modules/actors/actor-ffg.js:117-177` (the Brawn-delta logic in `_preUpdate`)
 plus the implicit "wounds threshold = base + brawn" contract.
 
@@ -182,8 +176,6 @@ export function computeWoundThreshold({ baseWounds, brawn, modifiers = 0 }) { ..
 
 ### 1.4 — Extract strain-threshold calculator
 
-**Status:** Complete — commit `4265d31` (6 tests)
-
 **Source:** `modules/actors/actor-ffg.js:178-203` (Willpower-delta logic in `_preUpdate`)
 
 **Files to create:**
@@ -209,8 +201,6 @@ export function computeStrainThreshold({ baseStrain, willpower, modifiers = 0 })
 ---
 
 ### 1.5 — Extract soak calculator
-
-**Status:** Complete — commit `0cc994f` (6 tests)
 
 **Source:**
 - `modules/actors/actor-ffg.js:152-163` (Brawn-delta on soak)
@@ -254,8 +244,6 @@ export function computeSoak({ brawn, equippedArmourSoak = 0, modifiers = 0 }) { 
 ---
 
 ### 1.6 — Extract defense calculator
-
-**Status:** Complete — commit `e309431` (6 tests; preserves source's all-items-sum quirk)
 
 **Source:** `modules/helpers/modifiers.js:41-48` (Defence-Melee / Defence-Ranged
 "highest defense item" branch)
@@ -301,8 +289,6 @@ export function computeDefense(defensiveItems, baseDefense = 0, modifiers = 0) {
 
 ### 1.7 — Extract force-pool calculator
 
-**Status:** Complete — commit `30e52f2` (6 tests)
-
 **Source:** `modules/actors/actor-ffg.js:725-744` (`applyActiveEffects` override that
 mutates AE change values to compute force pool dice)
 
@@ -341,8 +327,6 @@ export function computeForcePool({ maxForceRating, committedDice }) { ... }
 ---
 
 ### 1.8 — Extract talent-list aggregator
-
-**Status:** Complete — commit `7ae8112` (11 tests)
 
 **Source:** `modules/actors/actor-ffg.js:399-540` (`_prepareCharacterData` talent
 aggregation across specializations + standalone talents)
@@ -404,8 +388,6 @@ export function buildTalentList({ specializations, talents, isStarWars, sortByAc
 ---
 
 ### 1.9 — Verify Phase 1 stop gate
-
-**Status:** Complete — commit `837450d` (all 51 tests passing; legacy files byte-identical)
 
 **Preconditions:**
 - [ ] Tasks 1.1-1.8 complete
