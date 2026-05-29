@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.8 — Convert criticalinjury, criticaldamage item types
-**Last verified:** 2026-05-29T04:06:23Z (after task 5.7; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 85 unit tests — 51 calculator + 12 migration + 22 datamodel)
-**Last commit on plan:** 6d92fff
+**Current task:** 5.9 — Convert motivation, obligation, background item types
+**Last verified:** 2026-05-29T04:17:07Z (after task 5.8; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 91 unit tests — 51 calculator + 12 migration + 28 datamodel)
+**Last commit on plan:** 815aee5
 
 ---
 
@@ -38,12 +38,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.5 — Convert nemesis actor type to DataModel
 - [x] 5.6 — Convert character actor type to DataModel
 - [x] 5.7 — Convert vehicle actor type to DataModel
-- [ ] 5.4 — Convert rival actor type to DataModel
-- [ ] 5.5 — Convert nemesis actor type to DataModel
-- [ ] 5.6 — Convert character actor type to DataModel
-- [ ] 5.7 — Convert vehicle actor type to DataModel
-- [ ] 5.8 — Convert criticalinjury, criticaldamage item types   ← CURRENT
-- [ ] 5.9 — Convert motivation, obligation, background item types
+- [x] 5.8 — Convert criticalinjury, criticaldamage item types
+- [ ] 5.9 — Convert motivation, obligation, background item types   ← CURRENT
 - [ ] 5.10 — Convert species, career item types
 - [ ] 5.11 — Convert ability, gear item types
 - [ ] 5.12 — Convert talent item type
@@ -388,6 +384,20 @@ proceed independently since prototype patches and dice presets don't overlap.)
   helper). Per-type hint-key omission verified against sheets per ADR-010. Items
   5.8-5.18 remain. All conversions schema-only; derived computation still on the
   legacy ActorFFG until Phase 6.
+- 2026-05-29 — Session start verification note for task 5.8. Initial sandboxed
+  `npm run verify` failed unit tests and build with esbuild `spawn EPERM`.
+  Rerunning the same command with escalation resolved the spawn failure:
+  typecheck/comments/unit tests/build/smoke/migration passed; lint remains the
+  documented known-red gate (0 errors, 999 warnings). Proceeding with task 5.8
+  against that baseline.
+- 2026-05-29 — Phase 5 task 5.8 complete (criticalinjury, criticaldamage →
+  DataModels). Introduced `modules/data/shared/item-core.js` for the shared
+  item `core` template (`description`, legacy free-form `attributes`,
+  `metadata`), added two explicit item DataModel subclasses, and registered both
+  item types in `_register.js`. Six schema tests added; no migration needed
+  because the schemas mirror `template.json`. While updating the phase
+  checklist, removed duplicate stale unchecked 5.4-5.7 actor entries so the
+  current task list matches the completed actor conversions.
 
 ---
 

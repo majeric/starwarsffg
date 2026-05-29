@@ -16,6 +16,8 @@ import { RivalData } from "./actor/rival-data.js";
 import { NemesisData } from "./actor/nemesis-data.js";
 import { CharacterData } from "./actor/character-data.js";
 import { VehicleData } from "./actor/vehicle-data.js";
+import { CriticalInjuryData } from "./item/criticalinjury-data.js";
+import { CriticalDamageData } from "./item/criticaldamage-data.js";
 
 const ACTOR_DATA_MODELS = {
   homestead: HomesteadData,
@@ -27,7 +29,8 @@ const ACTOR_DATA_MODELS = {
 };
 
 const ITEM_DATA_MODELS = {
-  // populated by Phase 5 tasks 5.8-5.17
+  criticalinjury: CriticalInjuryData,
+  criticaldamage: CriticalDamageData,
 };
 
 export function registerDataModels() {
