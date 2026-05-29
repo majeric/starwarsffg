@@ -10,8 +10,10 @@
  * for any type not registered here.
  */
 
+import { HomesteadData } from "./actor/homestead-data.js";
+
 const ACTOR_DATA_MODELS = {
-  // populated by Phase 5 tasks 5.2-5.7
+  homestead: HomesteadData,
 };
 
 const ITEM_DATA_MODELS = {

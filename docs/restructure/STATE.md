@@ -1,8 +1,8 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.2 — Convert homestead actor type to DataModel
-**Last verified:** 2026-05-29T03:24:16Z (docs-only detailing session; baseline unchanged — typecheck/comments/tests/build/smoke/migration green, lint known-red per Phase 12; 63 unit tests — 51 calculator + 12 migration)
+**Current task:** 5.3 — Convert minion actor type to DataModel
+**Last verified:** 2026-05-29T03:53:54Z (after task 5.2; typecheck/comments/tests/build/smoke/migration green, lint known-red — 999 legacy warnings, 0 errors; 68 unit tests — 51 calculator + 12 migration + 5 homestead)
 **Last commit on plan:** b8838fc
 
 ---
@@ -32,8 +32,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 
 - [x] 5.0 — Detail Phase 5 atomic tasks (commit `f9999f0`)
 - [x] 5.1 — Scaffold data model base classes and registration helper (commit `b8838fc`)
-- [ ] 5.2 — Convert homestead actor type to DataModel   ← CURRENT
-- [ ] 5.3 — Convert minion actor type to DataModel
+- [x] 5.2 — Convert homestead actor type to DataModel
+- [ ] 5.3 — Convert minion actor type to DataModel   ← CURRENT
 - [ ] 5.4 — Convert rival actor type to DataModel
 - [ ] 5.5 — Convert nemesis actor type to DataModel
 - [ ] 5.6 — Convert character actor type to DataModel
@@ -352,6 +352,23 @@ proceed independently since prototype patches and dice presets don't overlap.)
   suffix, and the 5.2-5.18 "Not started" lines. Progress is now tracked only by
   STATE.md checkboxes + commit SHAs, not phase-file markers. The `**Status:**
   accepted` lines in decision-log.md (ADRs) are a different thing and untouched.
+- 2026-05-29 — Phase 5 task 5.2 complete (homestead → DataModel). Bootstrapped
+  shared Phase 5 infra: `modules/data/shared/{actor-biography,attributes,
+  actor-meta}.js` fragments; a thin field-introspection test mock in
+  `tests/setup.ts` (`foundry.abstract.TypeDataModel` + `foundry.data.fields`
+  stubs); ADR-010 recording the three Phase 5 conventions (schema-only scope,
+  introspection-mock tests, omit redundant template.json hint keys).
+  `HomesteadData` registered in `_register.js`; 5 schema tests added (68 total).
+- 2026-05-29 — Homestead sheet vs template.json mismatch (Phase 8, not 5).
+  `ffg-homestead-sheet.html` reads/writes `system.stats.cost` and
+  `system.stats.consumables.*`, but template.json (and `HomesteadData`) keep
+  `cost`/`consumables` at top level (`system.cost`/`system.consumables`). It is
+  a pre-existing sheet bug — the sheet already reads a path absent from stored
+  data — so Phase 5 mirrors template.json (no regression) and Phase 8 should fix
+  the sheet. Separately noticed: decision-log.md has a duplicate `ADR-009`
+  heading (two distinct ADRs share the number); pre-existing, left as-is.
+
+---
 
 ## Session log
 

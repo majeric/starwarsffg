@@ -227,13 +227,14 @@ that apply as errors under `modules/data/` (PRINCIPLES 29-30).
 | `item-hardpoints.js` `hardpoints()` | `hardpoints: SchemaField{ value, adjusted }` | 5.15 |
 | `item-equippable.js` `equippable()` | `equippable: SchemaField{ value, equipped }` | 5.15 |
 
-> **Persisted helper keys.** Many sub-objects bake in redundant `type`/`label`/
-> `abrev` keys (e.g. `credits: { value, type: "Number", label: "Credits",
-> adjusted }`). They duplicate what DataModel field types and i18n already
-> provide, but existing worlds persist them. Declare them as optional
-> `StringField`/`NumberField` so documents round-trip losslessly, each tagged
-> `// TODO Phase 6/12: redundant persisted metadata`. Do **not** drop them in
-> Phase 5 unless you have confirmed no template or sheet reads them.
+> **Persisted helper keys (ADR-010).** Many sub-objects bake in redundant
+> `type`/`label`/`abrev` keys (e.g. `credits: { value, type: "Number",
+> label: "Credits", adjusted }`). These are template.json's pre-DataModel type
+> hints, which the field classes replace, and FFG sheets localise their own
+> labels — so **omit them**; Foundry cleaning drops them on next write (lossless
+> of functional data). **Exception:** where a template actually reads a hint key
+> (grep first — e.g. weapons render `{{localize item.system.range.label}}`),
+> declare that key. Verify per type before omitting.
 
 ### Migration policy for Phase 5
 
@@ -300,8 +301,14 @@ loop on a trivial schema and introduces the three most-shared actor fragments.
 
 **Schema notes:**
 - Compose `biography()` + `attributesField()` + `metaOnly()`.
-- `cost`: `SchemaField{ value: NumberField, adjusted: NumberField /* TODO Phase 6 */ }` (+ optional `type`/`label` helper keys per the persisted-helper-keys note).
-- `consumables`: `SchemaField{ value: NumberField(initial 1), duration: StringField(initial "months") }` (+ optional helpers).
+- `cost`: `SchemaField{ value: NumberField(initial 0), adjusted: NumberField(initial 0) /* TODO Phase 6 */ }`.
+- `consumables`: `SchemaField{ value: NumberField(initial 1), duration: StringField(initial "months") }`.
+- Hint keys (`type`/`label`) omitted per ADR-010 (the homestead sheet uses i18n titles, not `system.*.label`).
+- **Known mismatch (Phase 8, not Phase 5):** the homestead sheet reads/writes
+  `system.stats.cost`/`system.stats.consumables`, but template.json — and this
+  schema — keep them at top level (`system.cost`/`system.consumables`). This is
+  a pre-existing sheet bug; Phase 5 mirrors template.json and does not change it
+  (no regression: the sheet already read a path absent from the stored data).
 
 **Derived data / prepare hooks:** none — leave `prepare*` empty (schema-only).
 

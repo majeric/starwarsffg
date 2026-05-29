@@ -403,6 +403,65 @@ For both:
 
 ---
 
+## ADR-010: 2026-05-29 — Phase 5 DataModel conversion conventions
+
+**Status:** accepted
+**Phase:** 05
+
+**Context:** Executing the first Phase 5 conversion (homestead) surfaced three
+recurring decisions the phase file left open. Recording them once keeps all 26
+per-type conversions consistent.
+
+**Decisions:**
+
+1. **Schema-only scope.** Phase 1 deferred calculator call-site migration to
+   Phase 6, and the legacy `ActorFFG`/`ItemFFG` classes still own all derived
+   computation in their `prepareDerivedData`. Each Phase 5 DataModel implements
+   only `static defineSchema()` (mirroring the type's `template.json` shape);
+   `prepareBaseData`/`prepareDerivedData` are left empty. Moving derivation into
+   the DataModel and wiring the Phase 1 calculators is Phase 6. This keeps every
+   conversion behavior-preserving (ADR-002) and individually shippable.
+
+2. **Tests use a thin field-introspection mock, not a behavioral mock.**
+   DataModels extend `foundry.abstract.TypeDataModel` and use
+   `foundry.data.fields.*`, which do not exist in the vitest environment (Phase
+   0 mocked only `foundry.utils`). Fully simulating Foundry's DataModel
+   cleaning/validation is the tarpit Phase 0 task 0.5 warned against. Instead,
+   `tests/setup.ts` provides minimal field stubs that record their declared
+   options and expose `getInitial()`. Schema tests assert the *declared* shape
+   and defaults (e.g. "homestead declares `cost.value` as a NumberField with
+   initial 0") — the Phase 5 contract. Cleaning/validation correctness is
+   Foundry's responsibility, verified by the operator Foundry smoke in the phase
+   postconditions, not by unit tests. A future phase needing behavioral
+   DataModel tests is a separate ADR.
+
+3. **Omit redundant template.json hint keys by default.** Many sub-objects bake
+   in `type`/`label`/`abrev` keys (e.g. `cost: { value, type:"Number",
+   label:"Cost", adjusted }`). These are template.json's pre-DataModel type
+   system, which the field classes replace, and FFG sheets localise their own
+   labels (the homestead sheet passes `title="SWFFG.ItemsPrice"`). Schemas
+   declare only meaningful data fields; Foundry cleaning drops the hint keys on
+   next write (lossless of functional data). **Exception:** where a template
+   actually reads a hint key — verified by grep, e.g. weapons render
+   `{{localize item.system.range.label}}` — declare that key. Verify per type
+   before omitting.
+
+**Options considered (each decision):** keep prototype-era patterns / a full
+behavioral mock / carry every template.json key verbatim — all rejected for the
+reasons above.
+
+**Consequences:**
+- `tests/setup.ts` gains the introspection field stubs and a `TypeDataModel`
+  base; per-type tasks add a `*-data.js` (schema only) plus a schema test
+  asserting declared fields/defaults.
+- Schemas stay small and idiomatic; hint-key cleanup is automatic via cleaning.
+- Sheets that read a path absent from `template.json` (e.g. the homestead
+  sheet's `system.stats.cost`) are pre-existing bugs owned by Phase 8; Phase 5
+  mirrors `template.json` and documents the mismatch rather than fixing the
+  sheet.
+
+---
+
 ## ADR template (for future entries)
 
 ```
