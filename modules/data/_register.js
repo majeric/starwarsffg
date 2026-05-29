@@ -15,6 +15,7 @@ import { MinionData } from "./actor/minion-data.js";
 import { RivalData } from "./actor/rival-data.js";
 import { NemesisData } from "./actor/nemesis-data.js";
 import { CharacterData } from "./actor/character-data.js";
+import { VehicleData } from "./actor/vehicle-data.js";
 
 const ACTOR_DATA_MODELS = {
   homestead: HomesteadData,
@@ -22,6 +23,7 @@ const ACTOR_DATA_MODELS = {
   rival: RivalData,
   nemesis: NemesisData,
   character: CharacterData,
+  vehicle: VehicleData,
 };
 
 const ITEM_DATA_MODELS = {

@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.7 — Convert vehicle actor type to DataModel
-**Last verified:** 2026-05-29T04:04:26Z (after task 5.6; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 82 unit tests — 51 calculator + 12 migration + 19 datamodel)
-**Last commit on plan:** 205a1ab
+**Current task:** 5.8 — Convert criticalinjury, criticaldamage item types
+**Last verified:** 2026-05-29T04:06:23Z (after task 5.7; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 85 unit tests — 51 calculator + 12 migration + 22 datamodel)
+**Last commit on plan:** 6d92fff
 
 ---
 
@@ -37,12 +37,12 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.4 — Convert rival actor type to DataModel
 - [x] 5.5 — Convert nemesis actor type to DataModel
 - [x] 5.6 — Convert character actor type to DataModel
-- [ ] 5.7 — Convert vehicle actor type to DataModel   ← CURRENT
+- [x] 5.7 — Convert vehicle actor type to DataModel
 - [ ] 5.4 — Convert rival actor type to DataModel
 - [ ] 5.5 — Convert nemesis actor type to DataModel
 - [ ] 5.6 — Convert character actor type to DataModel
 - [ ] 5.7 — Convert vehicle actor type to DataModel
-- [ ] 5.8 — Convert criticalinjury, criticaldamage item types
+- [ ] 5.8 — Convert criticalinjury, criticaldamage item types   ← CURRENT
 - [ ] 5.9 — Convert motivation, obligation, background item types
 - [ ] 5.10 — Convert species, career item types
 - [ ] 5.11 — Convert ability, gear item types
@@ -379,6 +379,15 @@ proceed independently since prototype patches and dice presets don't overlap.)
   Note: skills count is 35 (the phase doc's "~36" was an estimate); each skill's
   `type` holds its category, and `characteristic`/category drive per-skill
   defaults. Schema-only per ADR-010 (legacy minion prep stays on ActorFFG).
+- 2026-05-29 — Phase 5 ACTORS complete (tasks 5.2-5.7). All six actor types
+  (homestead, minion, rival, nemesis, character, vehicle) have DataModels
+  registered in `_register.js`; 22 schema tests (85 total). Shared fragments in
+  `modules/data/shared/`: actor-biography, attributes, actor-meta, actor-stats
+  (strain flag), characteristics, skills, actor-species, actor-general,
+  actor-career, actor-specialisation; vehicle stats are vehicle-specific (local
+  helper). Per-type hint-key omission verified against sheets per ADR-010. Items
+  5.8-5.18 remain. All conversions schema-only; derived computation still on the
+  legacy ActorFFG until Phase 6.
 
 ---
 
