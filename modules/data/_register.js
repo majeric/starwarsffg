@@ -34,6 +34,7 @@ import { ArmourData } from "./item/armour-data.js";
 import { ShipWeaponData } from "./item/shipweapon-data.js";
 import { ItemAttachmentData } from "./item/itemattachment-data.js";
 import { ItemModifierData } from "./item/itemmodifier-data.js";
+import { ShipAttachmentData } from "./item/shipattachment-data.js";
 
 const ACTOR_DATA_MODELS = {
   homestead: HomesteadData,
@@ -63,6 +64,7 @@ const ITEM_DATA_MODELS = {
   shipweapon: ShipWeaponData,
   itemattachment: ItemAttachmentData,
   itemmodifier: ItemModifierData,
+  shipattachment: ShipAttachmentData,
 };
 
 export function registerDataModels() {

@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.17 — Convert shipattachment item type
-**Last verified:** 2026-05-29T04:45:40Z (after task 5.16; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 141 unit tests — 51 calculator + 12 migration + 78 datamodel)
-**Last commit on plan:** c48a759
+**Current task:** 5.18 — Convert homesteadupgrade item type
+**Last verified:** 2026-05-29T04:48:22Z (after task 5.17; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 144 unit tests — 51 calculator + 12 migration + 81 datamodel)
+**Last commit on plan:** 2b46275
 
 ---
 
@@ -47,8 +47,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.14 — Convert forcepower, signatureability item types
 - [x] 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
 - [x] 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)
-- [ ] 5.17 — Convert shipattachment item type   ← CURRENT
-- [ ] 5.18 — Convert homesteadupgrade item type (added during detailing — see Open issues)
+- [x] 5.17 — Convert shipattachment item type
+- [ ] 5.18 — Convert homesteadupgrade item type (added during detailing — see Open issues)   ← CURRENT
 - [ ] 5.last — Verify Phase 5 stop gate
 
 Per-type tasks 5.2–5.18 were expanded from one-line bullets into full
@@ -460,6 +460,10 @@ proceed independently since prototype patches and dice presets don't overlap.)
   7-coupled modifier carrier types. Item attachments compose core/basic/
   hardpoints/qualities/itemAttachments; item modifiers compose core/qualities
   plus `type` and `rank`. Six schema tests added; no migration needed.
+- 2026-05-29 — Phase 5 task 5.17 complete (shipattachment → DataModel). Added
+  and registered the schema-only shipattachment DataModel composed from
+  core/basic/hardpoints/equippable/itemAttachments/qualities plus label
+  `Ship Attachment`. Three schema tests added; no migration needed.
 
 ---
 
