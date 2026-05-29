@@ -29,6 +29,6 @@ describe("ObligationData schema", () => {
     expect(schema.quantity.getInitial()).toEqual({ value: 1 });
     expect(schema.encumbrance.getInitial()).toEqual({ value: 0, adjusted: 0 });
     expect(schema.price.getInitial()).toEqual({ value: 0, adjusted: 0 });
-    expect(schema.rarity.getInitial()).toEqual({ value: 0, adjusted: 0 });
+    expect(schema.rarity.getInitial()).toEqual({ value: 0, adjusted: 0, isrestricted: false });
   });
 });

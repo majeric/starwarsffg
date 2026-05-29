@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.11 — Convert ability, gear item types
-**Last verified:** 2026-05-29T04:29:13Z (after task 5.10; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 106 unit tests — 51 calculator + 12 migration + 43 datamodel)
-**Last commit on plan:** 2bab7be
+**Current task:** 5.12 — Convert talent item type
+**Last verified:** 2026-05-29T04:33:11Z (after task 5.11; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 111 unit tests — 51 calculator + 12 migration + 48 datamodel)
+**Last commit on plan:** a4c19a6
 
 ---
 
@@ -41,8 +41,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.8 — Convert criticalinjury, criticaldamage item types
 - [x] 5.9 — Convert motivation, obligation, background item types
 - [x] 5.10 — Convert species, career item types
-- [ ] 5.11 — Convert ability, gear item types   ← CURRENT
-- [ ] 5.12 — Convert talent item type
+- [x] 5.11 — Convert ability, gear item types
+- [ ] 5.12 — Convert talent item type   ← CURRENT
 - [ ] 5.13 — Convert specialization item type
 - [ ] 5.14 — Convert forcepower, signatureability item types
 - [ ] 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
@@ -417,6 +417,18 @@ proceed independently since prototype patches and dice presets don't overlap.)
   `signatureabilities` as free-form maps and preserves the eight positional
   `careerSkill0`-`careerSkill7` defaults as `"(none)"`. Six schema tests added;
   no migration needed.
+- 2026-05-29 — Phase 5 task 5.11 source-shape discrepancy. `template.json`'s
+  `basic.rarity` block omits `isrestricted`, but OggDude item importers write
+  `system.rarity.isrestricted`, item sheets edit it, chat cards render it, and
+  character creation filtering reads it. Per ADR-002, Phase 5 must preserve real
+  persisted data even when template.json is incomplete. Resolved in task 5.11
+  by adding `isrestricted: BooleanField(false)` to the shared `basic()` rarity
+  schema and updating the earlier basic-fragment tests accordingly.
+- 2026-05-29 — Phase 5 task 5.11 complete (ability, gear → DataModels).
+  Added schema-only item DataModels for ability and gear. Ability is `core()`-
+  only; gear composes `core()`, `basic()`, `itemAttachments()`, and
+  `qualities()`, preserving the legacy misspelled `adjusteditemmodifer` key.
+  Five schema tests added; no migration needed.
 
 ---
 

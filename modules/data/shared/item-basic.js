@@ -6,13 +6,17 @@
  * @returns {Record<string, object>} partial schema declaring basic item fields
  */
 export function basic() {
-  const { SchemaField, NumberField } = foundry.data.fields;
+  const { SchemaField, NumberField, BooleanField } = foundry.data.fields;
   const num = (initial = 0) => new NumberField({ initial });
   const adjustedNumber = () => new SchemaField({ value: num(), adjusted: num() });
   return {
     quantity: new SchemaField({ value: num(1) }),
     encumbrance: adjustedNumber(),
     price: adjustedNumber(),
-    rarity: adjustedNumber(),
+    rarity: new SchemaField({
+      value: num(),
+      adjusted: num(),
+      isrestricted: new BooleanField({ initial: false }),
+    }),
   };
 }

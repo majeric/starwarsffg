@@ -23,6 +23,8 @@ import { ObligationData } from "./item/obligation-data.js";
 import { BackgroundData } from "./item/background-data.js";
 import { SpeciesData } from "./item/species-data.js";
 import { CareerData } from "./item/career-data.js";
+import { AbilityData } from "./item/ability-data.js";
+import { GearData } from "./item/gear-data.js";
 
 const ACTOR_DATA_MODELS = {
   homestead: HomesteadData,
@@ -41,6 +43,8 @@ const ITEM_DATA_MODELS = {
   background: BackgroundData,
   species: SpeciesData,
   career: CareerData,
+  ability: AbilityData,
+  gear: GearData,
 };
 
 export function registerDataModels() {
