@@ -18,6 +18,9 @@ import { CharacterData } from "./actor/character-data.js";
 import { VehicleData } from "./actor/vehicle-data.js";
 import { CriticalInjuryData } from "./item/criticalinjury-data.js";
 import { CriticalDamageData } from "./item/criticaldamage-data.js";
+import { MotivationData } from "./item/motivation-data.js";
+import { ObligationData } from "./item/obligation-data.js";
+import { BackgroundData } from "./item/background-data.js";
 
 const ACTOR_DATA_MODELS = {
   homestead: HomesteadData,
@@ -31,6 +34,9 @@ const ACTOR_DATA_MODELS = {
 const ITEM_DATA_MODELS = {
   criticalinjury: CriticalInjuryData,
   criticaldamage: CriticalDamageData,
+  motivation: MotivationData,
+  obligation: ObligationData,
+  background: BackgroundData,
 };
 
 export function registerDataModels() {

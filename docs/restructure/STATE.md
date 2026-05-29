@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.9 — Convert motivation, obligation, background item types
-**Last verified:** 2026-05-29T04:17:07Z (after task 5.8; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 91 unit tests — 51 calculator + 12 migration + 28 datamodel)
-**Last commit on plan:** 815aee5
+**Current task:** 5.10 — Convert species, career item types
+**Last verified:** 2026-05-29T04:27:03Z (after task 5.9; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 100 unit tests — 51 calculator + 12 migration + 37 datamodel)
+**Last commit on plan:** 613e6c1
 
 ---
 
@@ -39,8 +39,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.6 — Convert character actor type to DataModel
 - [x] 5.7 — Convert vehicle actor type to DataModel
 - [x] 5.8 — Convert criticalinjury, criticaldamage item types
-- [ ] 5.9 — Convert motivation, obligation, background item types   ← CURRENT
-- [ ] 5.10 — Convert species, career item types
+- [x] 5.9 — Convert motivation, obligation, background item types
+- [ ] 5.10 — Convert species, career item types   ← CURRENT
 - [ ] 5.11 — Convert ability, gear item types
 - [ ] 5.12 — Convert talent item type
 - [ ] 5.13 — Convert specialization item type
@@ -398,6 +398,18 @@ proceed independently since prototype patches and dice presets don't overlap.)
   because the schemas mirror `template.json`. While updating the phase
   checklist, removed duplicate stale unchecked 5.4-5.7 actor entries so the
   current task list matches the completed actor conversions.
+- 2026-05-29 — Session start verification note for task 5.9. Escalated
+  `npm run verify` matched the task 5.8 baseline: typecheck/comments/unit
+  tests/build/smoke/migration passed; lint remains the documented known-red
+  gate (0 errors, 999 warnings). Corrected this file's stale `Last commit on
+  plan` pointer from `815aee5` to the actual task 5.8 commit `613e6c1`.
+- 2026-05-29 — Phase 5 task 5.9 complete (motivation, obligation, background →
+  DataModels). Added shared `modules/data/shared/item-basic.js` for quantity,
+  encumbrance, price, and rarity, preserving `adjusted` fields for Phase 6.
+  Added and registered three schema-only item DataModels and nine schema tests.
+  No migration needed because the schemas mirror `template.json` and omit only
+  redundant hint keys plus the duplicate per-type `description` already
+  supplied by `core()`.
 
 ---
 
