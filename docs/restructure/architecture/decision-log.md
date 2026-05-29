@@ -462,6 +462,74 @@ reasons above.
 
 ---
 
+## ADR-011: 2026-05-29 — Derived values live on `parent.derived`, reset each prepare
+
+**Status:** accepted
+**Phase:** 06
+
+**Context:** Phase 6 moves computed values out of `system.*` into a derived
+namespace recomputed every prepare and never persisted. Foundry's TypeDataModel
+has no built-in derived layer, so the mechanism must be chosen explicitly.
+
+**Options considered:**
+- (a) A getter on the DataModel (`get derived()`) — awkward for writing many
+  computed values; caching/recompute semantics unclear.
+- (b) A plain `derived` object on the parent Document, reset in the base
+  `prepareBaseData()` and populated in each type's `prepareDerivedData()`.
+- (c) Keep using `system.*` with a naming convention — rejected; that is the
+  anti-pattern Phase 6 exists to remove.
+
+**Decision:** (b). `BaseActorData.prepareBaseData()` sets `this.parent.derived =
+{}` (fresh each prepare cycle); each actor type's `prepareDerivedData()` fills
+`this.parent.derived.*` by delegating to the Phase 1 calculators. Sheets and code
+read `actor.derived.*`. Per-type `prepareBaseData` overrides must call
+`super.prepareBaseData()`.
+
+**Consequences:**
+- Derived state can never be persisted (it lives off-schema on the document),
+  eliminating the "stale derived value" bug class.
+- Derived unit tests need a harness that executes the prepare hooks; the ADR-010
+  field mock only introspects the schema. Task 6.1 adds the harness.
+- Item derived state follows the same pattern when Phase 7 handles it (ADR-012);
+  `BaseItemData` gains the same init then.
+
+---
+
+## ADR-012: 2026-05-29 — Phase 6 covers actor derived state; item `*.adjusted` deferred to Phase 7
+
+**Status:** accepted (supersedes the all-DataModels wording in the Phase 6 postconditions)
+**Phase:** 06 / 07
+
+**Context:** Phase 6's postconditions, as written, require stripping `*.adjusted`
+from *every* DataModel (actors and items). But `*.adjusted` is overwhelmingly
+item-side: `item-ffg.js` computes it in ~58 places and item / weapon / chat
+templates render it across ~70 references. That computation is the bespoke
+`item.system.attributes` modifier pipeline that ADR-004 / Phase 7 replaces
+wholesale with Active Effects.
+
+**Options considered:**
+- (a) Phase 6 splits both actor and item derived state (the literal written
+  scope), then Phase 7 reworks the item computation onto Active Effects — two
+  passes over the most entangled code in the system.
+- (b) Phase 6 splits ACTOR derived state only (calculator-backed, contained);
+  the item `*.adjusted` derived-split folds into Phase 7, which already owns the
+  item modifier computation it depends on.
+
+**Decision:** (b) — chosen on the operator's stated criteria of minimizing error
+risk and producing the cleanest code. Touching the item modifier layer once (in
+Phase 7) instead of twice avoids the highest-risk double-churn.
+
+**Consequences:**
+- Phase 6 postconditions re-scope to actors: no `*.adjusted` in any ACTOR
+  DataModel schema; actor derived values live in `derived.*`.
+- Phase 7 gains postconditions: strip `item.system.*.adjusted` from item schemas
+  and expose item derived values via the `parent.derived` pattern (ADR-011), as
+  part of moving item modifiers to Active Effects.
+- The restructure end state is unchanged (no `*.adjusted` anywhere, derived
+  everywhere); only the phase boundary moves.
+
+---
+
 ## ADR template (for future entries)
 
 ```

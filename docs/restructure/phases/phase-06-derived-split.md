@@ -24,7 +24,7 @@ exist and declare a clean schema).
 
 ## Phase postconditions
 
-- [ ] No `*.adjusted` fields in any DataModel `defineSchema()`
+- [ ] No `*.adjusted` fields in any ACTOR DataModel `defineSchema()` (item `*.adjusted` moves with Phase 7 per ADR-012)
 - [ ] All derived computations live in `prepareDerivedData()` on the DataModel,
       delegating to Phase 1 calculators
 - [ ] Derived values are written to `this.parent.derived.*` (or equivalent
@@ -104,8 +104,9 @@ wounds/strain/soak/defence/encumbrance/forcePool thresholds — the actual
 "open-the-sheet-to-fix-it" bug class). **Item `*.adjusted` derived-split moves to
 Phase 7**, which already owns the item modifier computation. The postcondition
 "no `*.adjusted` in any DataModel" is met for actors here and for items in
-Phase 7. This re-scopes the phase boundary, so confirm with the operator and
-record ADR-012 before acting; update the Phase 6/7 postconditions to match.
+Phase 7. **Decided — ADR-012 (accepted):** Phase 6 = actor derived split; item
+`*.adjusted` derived-split moves to Phase 7. The Phase 6/7 postconditions are
+updated to match.
 
 **Decision C — thresholds become derived, current values stay persisted.** For
 `wounds`/`strain`/`encumbrance`, the *threshold* (`max`) is derived (species/base

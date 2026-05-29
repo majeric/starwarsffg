@@ -34,6 +34,9 @@ in unexpected configurations. The migration must be exhaustively tested.
 
 - [ ] `modules/helpers/modifiers.js` is DELETED
 - [ ] `item.system.attributes` no longer exists in any DataModel schema
+- [ ] No `*.adjusted` fields in any item DataModel schema; item derived values
+      are exposed via the `parent.derived` pattern (ADR-011) — absorbed from
+      Phase 6 per ADR-012
 - [ ] All previous modifier behaviors are reproduced via Active Effects
 - [ ] Custom FFG modifier semantics (dice symbol additions, characteristic
       caps, force boost, career skills) are registered as custom AE change
