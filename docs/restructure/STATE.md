@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-05-datamodels
-**Current task:** 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)
-**Last verified:** 2026-05-29T04:43:43Z (after task 5.15; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 135 unit tests — 51 calculator + 12 migration + 72 datamodel)
-**Last commit on plan:** f003dea
+**Current task:** 5.17 — Convert shipattachment item type
+**Last verified:** 2026-05-29T04:45:40Z (after task 5.16; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 141 unit tests — 51 calculator + 12 migration + 78 datamodel)
+**Last commit on plan:** c48a759
 
 ---
 
@@ -46,8 +46,8 @@ See `phases/phase-05-datamodels.md` for the full task definitions.
 - [x] 5.13 — Convert specialization item type
 - [x] 5.14 — Convert forcepower, signatureability item types
 - [x] 5.15 — Convert weapon, armour, shipweapon item types (Phase 7-coupled)
-- [ ] 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)   ← CURRENT
-- [ ] 5.17 — Convert shipattachment item type
+- [x] 5.16 — Convert itemattachment, itemmodifier item types (Phase 7-coupled)
+- [ ] 5.17 — Convert shipattachment item type   ← CURRENT
 - [ ] 5.18 — Convert homesteadupgrade item type (added during detailing — see Open issues)
 - [ ] 5.last — Verify Phase 5 stop gate
 
@@ -455,6 +455,11 @@ proceed independently since prototype patches and dice presets don't overlap.)
   registered schema-only DataModels for all three equipment item types. Phase
   7-coupled modifier and attachment arrays stay free-form; adjusted combat stats
   stay persisted for Phase 5. Eleven schema tests added; no migration needed.
+- 2026-05-29 — Phase 5 task 5.16 complete (itemattachment, itemmodifier →
+  DataModels). Added and registered schema-only DataModels for both Phase
+  7-coupled modifier carrier types. Item attachments compose core/basic/
+  hardpoints/qualities/itemAttachments; item modifiers compose core/qualities
+  plus `type` and `rank`. Six schema tests added; no migration needed.
 
 ---
 
