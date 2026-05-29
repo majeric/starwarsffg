@@ -1,9 +1,9 @@
 # Restructure State
 
-**Current phase:** phase-06-derived-split
-**Current task:** 6.2 — Character derived — BLOCKED on a re-sequencing decision (Phase-7 entanglement; see Open issues 2026-05-29)
-**Last verified:** 2026-05-29T16:25:12Z (after task 6.1; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 151 unit tests — +3 derived-namespace)
-**Last commit on plan:** 0aff883
+**Current phase:** phase-07-ae-unification
+**Current task:** 7.0 — Detail Phase 7 atomic tasks (execution gated on test-world modifier fixtures — operator-provided)
+**Last verified:** 2026-05-29T23:33:57Z (Phase 6 relaxed-complete per ADR-013; additive derived, no behavior change; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 153 unit tests)
+**Last commit on plan:** 4410b21
 
 ---
 
@@ -15,8 +15,8 @@
 - [x] phase-03-hooks (task 3.8 diceSoNiceReady deferred — see Open issues)
 - [x] phase-04-prototype-cleanup
 - [x] phase-05-datamodels
-- [ ] phase-06-derived-split       ← CURRENT
-- [ ] phase-07-ae-unification
+- [x] phase-06-derived-split       (relaxed per ADR-013; AE-dependent derived folded into phase-07)
+- [ ] phase-07-ae-unification      ← CURRENT
 - [ ] phase-08-sheets
 - [ ] phase-09-importer
 - [ ] phase-10-system-abstraction
@@ -32,25 +32,27 @@ Phase 5 complete — all 26 types (6 actor + 20 item) have DataModels; the actor
 sheet render path was fixed via `buildActorSheetSystemData()`; operator Foundry
 smoke passed. See `phases/phase-05-datamodels.md` for the per-type task history.
 
-Phase 6 is detailed in `phases/phase-06-derived-split.md` (task 6.0 done):
+## Current phase tasks (phase-07-ae-unification)
 
-- [x] 6.0 — Detail Phase 6 atomic tasks
-- [x] 6.1 — Establish the derived-namespace pattern on base DataModels (+ ADR-011)
-- [ ] 6.2 — Character derived (full stats + talent list + skilltypes)   ← CURRENT
-- [ ] 6.3 — Nemesis derived
-- [ ] 6.4 — Rival derived (no strain)
-- [ ] 6.5 — Minion derived (group-wound formula + calculators)
-- [ ] 6.6 — Vehicle derived (encumbrance + hull/system thresholds)
-- [ ] 6.7 — Remove `_preUpdate` delta math from `actor-ffg.js`
-- [ ] 6.8 — Remove `prepareDerivedData` mutations from `actor-ffg.js`
-- [ ] 6.9 — Update actor sheet templates to read `derived.*`
-- [ ] 6.10 — Migration: strip actor `*.adjusted` from persisted documents
-- [ ] 6.last — Verify Phase 6 stop gate (actor scope; item `*.adjusted` → Phase 7)
+Phase 6 is complete in its **relaxed scope (ADR-013)** — the AE-independent
+derived work landed additively (no behavior change): 6.0 detail; 6.1 derived
+namespace (ADR-011); AE-independent derived = encumbrance via the Phase 1
+calculator into `derived.*`, plus the `super.prepareDerivedData()` wiring that
+makes the DataModel hook actually run (ActorFFG never chained to super).
 
-Decisions recorded (operator delegated, chosen for low risk / clean code):
-**ADR-011** (derived-namespace mechanism) and **ADR-012** (Phase 6 = actors;
-item `*.adjusted` deferred to Phase 7). 6.1 implemented the pattern + a derived
-test harness.
+Deferred to Phase 7 (ADR-012/013 — they need the Active Effects rework): the
+AE-dependent stat derivation (wounds/strain/soak/defence/forcePool), `_preUpdate`
+removal, `prepareDerivedData` mutation removals, `*.adjusted` stripping + its
+migration, the template switch to `derived.*`, and item `*.adjusted`.
+
+Phase 7 (`phases/phase-07-ae-unification.md`) is the HIGHEST-RISK phase. Its
+preconditions require `test-worlds/` fixtures with rich modifier scenarios that
+**do not exist yet and need real exported worlds from the operator**. Detailing
+(7.0) is unblocked; execution (7.1+) is gated on those fixtures.
+
+- [ ] 7.0 — Detail Phase 7 atomic tasks   ← CURRENT
+- [ ] 7.1+ — detailed by 7.0 (AE migration + custom change modes + the derived
+  split deferred from Phase 6)
 
 ---
 
@@ -540,6 +542,19 @@ test harness.
   effects.push) are sheet-coupled (Phase 8). Note also Phase 7's preconditions
   require `test-worlds/` modifier fixtures that do not exist yet. 6.1 (derived-
   namespace pattern) stands regardless. Holding 6.2+ for the decision.
+- 2026-05-29 — Phase 6 blocker RESOLVED by operator direction ("remove the
+  blocking clause and continue"). Recorded ADR-013 relaxing Phase 6 to the
+  AE-independent derived work: the `derived` namespace, encumbrance computed via
+  the Phase 1 calculator into `derived.*`, and the `super.prepareDerivedData()`
+  wiring (ActorFFG.prepareDerivedData never chained to super, so the DataModel
+  hook was dead code — now fixed). All additive, no behavior change; 153 tests;
+  verify green except known-red lint. The AE-dependent stat derivation,
+  `_preUpdate`/mutation removals, `*.adjusted` stripping + migration, and the
+  template switch to `derived.*` are folded into Phase 7 (owns the AE
+  change-mode rework), alongside item `*.adjusted` (ADR-012). Phase 6 closed
+  (relaxed scope); current phase → phase-07-ae-unification. Phase 7 execution is
+  gated on operator-provided `test-worlds/` modifier fixtures; 7.0 detailing is
+  unblocked.
 
 ---
 

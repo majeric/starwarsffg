@@ -24,7 +24,17 @@ exist and declare a clean schema).
 
 ## Phase postconditions
 
-- [ ] No `*.adjusted` fields in any ACTOR DataModel `defineSchema()` (item `*.adjusted` moves with Phase 7 per ADR-012)
+> **Scope relaxed per ADR-013 (operator-directed) — the blocking clause is
+> removed.** Phase 6 now covers only the AE-INDEPENDENT derived work: the
+> `derived` namespace (ADR-011), the `super.prepareDerivedData()` wiring, and
+> encumbrance computed via the Phase 1 calculator into `derived.*` — done
+> additively with no behavior change. The AE-DEPENDENT postconditions below (the
+> stat-threshold recompute, `_preUpdate` removal, the `prepareDerivedData`
+> mutation removals, `*.adjusted` stripping + its migration, and the template
+> switch to `derived.*`) move to **Phase 7**, which owns the Active Effects
+> change-mode rework they depend on. Treat those as Phase 7 postconditions.
+
+- [ ] No `*.adjusted` fields in any ACTOR DataModel `defineSchema()` (→ Phase 7 per ADR-013)
 - [ ] All derived computations live in `prepareDerivedData()` on the DataModel,
       delegating to Phase 1 calculators
 - [ ] Derived values are written to `this.parent.derived.*` (or equivalent

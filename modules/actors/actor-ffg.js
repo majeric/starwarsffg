@@ -253,6 +253,11 @@ export class ActorFFG extends Actor {
       this._prepareCharacterData(actor);
       this._prepareSources(actor);
     }
+
+    // Phase 6: chain to the system DataModel's prepareDerivedData (this override
+    // never called super, so the DataModel hook never ran). Populates the
+    // derived namespace (ADR-011/013).
+    super.prepareDerivedData();
   }
 
   _prepareSharedData(actorData) {

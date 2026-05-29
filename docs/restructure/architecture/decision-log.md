@@ -530,6 +530,47 @@ Phase 7) instead of twice avoids the highest-risk double-churn.
 
 ---
 
+## ADR-013: 2026-05-29 — Phase 6 relaxed: AE-independent derived now, AE-dependent stat derivation in Phase 7
+
+**Status:** accepted (operator-directed; relaxes the Phase 6 postconditions)
+**Phase:** 06 / 07
+
+**Context:** Executing Phase 6 (task 6.2) revealed that the actor stat totals
+(wounds/strain/soak/defence/forcePool) are produced by the Active Effects
+pipeline — AE changes target `system.stats.*` and `applyActiveEffects`
+(actor-ffg.js:725) injects values; `_preUpdate` patches persisted thresholds in
+edit mode where AEs are suspended. Recomputing these via the Phase 1 calculators
+needs a `modifiers` input that faithfully replays AE change modes
+(add/multiply/override/upgrade) — exactly Phase 7's work. As written, the Phase 6
+postconditions (recompute *all* stats via calculators, drop *all* `*.adjusted`,
+remove `_preUpdate`/mutations) cannot be met before Phase 7 without changing
+behavior or duplicating effort. The operator directed removing this blocking
+clause so it stops gating future work.
+
+Also discovered: `ActorFFG.prepareDerivedData` never called
+`super.prepareDerivedData()`, so the system DataModel's `prepareDerivedData`
+hook never ran. Phase 6 adds the `super` call so the derived pattern functions.
+
+**Decision:** Relax Phase 6 to the AE-independent derived work:
+- Establish the `derived` namespace (ADR-011) and wire `super.prepareDerivedData()`.
+- Compute the AE-independent derived values via the Phase 1 calculators —
+  currently encumbrance (sum of item encumbrance) — into `this.parent.derived.*`,
+  additively (the legacy `system.*` writes remain; nothing is removed yet).
+- Defer to Phase 7 (which owns the AE change-mode rework): the AE-dependent stat
+  derivation (wounds/strain/soak/defence/forcePool), `_preUpdate` removal, the
+  `prepareDerivedData` mutation removals, `*.adjusted` schema stripping + its
+  migration, and switching templates to `derived.*`.
+
+**Consequences:**
+- Phase 6 is behavior-preserving and additive (no removal, so no regression risk
+  before the operator smoke); it unblocks future work by establishing the
+  derived namespace and the AE-independent values.
+- Phase 7 absorbs the AE-dependent derived split (already aligned with ADR-012,
+  which moved item `*.adjusted` there).
+- The restructure end state is unchanged; only the phase boundary moves.
+
+---
+
 ## ADR template (for future entries)
 
 ```

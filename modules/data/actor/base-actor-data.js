@@ -18,6 +18,8 @@
  *  - Delegate computation to Phase 1 calculators (modules/rules/calculators/)
  *    where applicable.
  */
+import { computeEncumbrance } from "../../rules/calculators/encumbrance.js";
+
 export class BaseActorData extends foundry.abstract.TypeDataModel {
   static defineSchema() {
     return {};
@@ -30,5 +32,20 @@ export class BaseActorData extends foundry.abstract.TypeDataModel {
    */
   prepareBaseData() {
     this.parent.derived = {};
+  }
+
+  /**
+   * Phase 6 (relaxed per ADR-013): compute the AE-independent derived values
+   * into `this.parent.derived`. Currently the encumbrance total (sum of item
+   * encumbrance, via the Phase 1 calculator). AE-dependent stat totals
+   * (wounds/strain/soak/defence/forcePool) stay in `system.*` until Phase 7
+   * owns the Active Effects change-mode rework.
+   */
+  prepareDerivedData() {
+    if (!this.stats?.encumbrance) return;
+    this.parent.derived.stats ??= {};
+    this.parent.derived.stats.encumbrance = {
+      value: computeEncumbrance(this.parent.items ?? []),
+    };
   }
 }

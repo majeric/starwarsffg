@@ -27,4 +27,23 @@ describe("derived namespace pattern (ADR-011)", () => {
     model.prepareBaseData();
     expect(model.parent.derived).toEqual({});
   });
+
+  it("computes encumbrance into derived from item encumbrance (Phase 6, ADR-013)", () => {
+    const parent = prepareDerived(
+      BaseActorData,
+      { stats: { encumbrance: { value: 0, max: 5 } } },
+      {
+        items: [
+          { type: "gear", system: { encumbrance: { value: 2 }, quantity: { value: 3 } } },
+          { type: "gear", system: { encumbrance: { value: 1 }, quantity: { value: 1 } } },
+        ],
+      }
+    );
+    expect(parent.derived.stats.encumbrance).toEqual({ value: 7 });
+  });
+
+  it("skips encumbrance for types without stats.encumbrance (e.g. homestead)", () => {
+    const parent = prepareDerived(BaseActorData, { cost: { value: 0 } }, { items: [] });
+    expect(parent.derived.stats).toBeUndefined();
+  });
 });
