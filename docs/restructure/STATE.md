@@ -1,7 +1,7 @@
 # Restructure State
 
 **Current phase:** phase-06-derived-split
-**Current task:** 6.2 — Character derived (full stats + talent list + skilltypes)
+**Current task:** 6.2 — Character derived — BLOCKED on a re-sequencing decision (Phase-7 entanglement; see Open issues 2026-05-29)
 **Last verified:** 2026-05-29T16:25:12Z (after task 6.1; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 151 unit tests — +3 derived-namespace)
 **Last commit on plan:** 0aff883
 
@@ -516,6 +516,30 @@ test harness.
   needs operator/ADR sign-off (PRINCIPLES 24).
   Also: Phase 6 derived tests need a harness that executes prepare hooks (the
   ADR-010 introspection mock only inspects schema); task 6.1 adds it.
+- 2026-05-29 — Phase 6 execution BLOCKER: the actor stat-derived split is
+  Phase-7-entangled. Investigating 6.2 (character) showed the stat totals
+  (wounds/strain/soak/defence/forcePool) are NOT recomputed in
+  `prepareDerivedData` for character/nemesis/rival — they are produced by the
+  Active Effects pipeline: AE changes target `system.stats.*`, and the
+  `applyActiveEffects` override (actor-ffg.js:725) sums forcePool AE changes and
+  injects the force-dice value. `_preUpdate` (117-206) exists only to patch the
+  persisted thresholds when a characteristic is edited directly (AEs suspended in
+  edit mode). Only minion `wounds.max` (unit_wounds*quantity) and encumbrance
+  (sum of item encumbrance) are computed without AEs.
+  Consequence: moving these stats to `derived.*` via the Phase 1 calculators
+  needs the `modifiers` input = faithfully replaying AE change modes (add/
+  multiply/override/upgrade) — exactly Phase 7's "custom AE change modes" +
+  "applyActiveEffects no longer mutates change.value" work. Doing it in Phase 6
+  means changing behavior (naive summation ignores non-add modes → the bug class
+  Phase 6 targets; violates anti-creep) or duplicating Phase 7. Same entanglement
+  ADR-012 used to defer item `*.adjusted` to Phase 7.
+  Recommendation (candidate ADR-013, pending operator decision): fold the actor
+  stat-derived split + `_preUpdate` removal into Phase 7 (which owns the AE
+  mechanism). Phase 6's AE-independent slice is thin (encumbrance value, minion
+  group-wounds); the presentation cleanups (skills mergeObject, skilltypes,
+  effects.push) are sheet-coupled (Phase 8). Note also Phase 7's preconditions
+  require `test-worlds/` modifier fixtures that do not exist yet. 6.1 (derived-
+  namespace pattern) stands regardless. Holding 6.2+ for the decision.
 
 ---
 
