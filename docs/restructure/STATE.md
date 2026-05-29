@@ -486,6 +486,26 @@ proceed independently since prototype patches and dice presets don't overlap.)
   `buildActorSheetSystemData()`, which starts with serialized source data,
   overlays prepared `actor.system` defaults/derived fields, and preserves
   source-only custom skill keys. Added two regression tests.
+- 2026-05-29 — Independent review of the item-conversion work (tasks 5.8-5.18
+  and the 5.last sheet fix). Verdict: correct and consistent with the Phase 5
+  conventions. Checks: `_register.js` registers all 6 actor + 20 item types (26,
+  matching template.json — no missing/extra); item schemas mirror template.json
+  with diligent source-shape preservation per ADR-002 (rarity.isrestricted,
+  weapon.characteristic, shipweapon.skill, and weapon `range.label` kept because
+  the sheet localises it). `buildActorSheetSystemData()` is sound: it is strictly
+  ADDITIVE over the prior `data.data = actor.toObject(false).system` (overlays a
+  serialized source layer and restores transient skilltypes/effects), so it
+  fixes the `skills`/`skilltypes` `undefined` crash with no possible regression.
+  Automated gates green except the known-red lint gate (0 errors); 148 tests.
+  RISK to confirm during the operator smoke: under DataModels the sheet render
+  data's `skills[x].label` is absent (the skills schema does not declare
+  `label`, and `toObject` strips the runtime-localised one). `_createSkillColumns`
+  uses `skills[a].label.localeCompare` only when the `skillSorting` setting is
+  ON. Smoke a humanoid sheet with skillSorting enabled to confirm no error and
+  that skill names still display localised. If broken, the fix is to have
+  `buildActorSheetSystemData` carry skill labels (or localise in the sheet) —
+  sheet-layer (Phase 8) territory, not a schema problem. 5.last remains open
+  pending the operator Foundry smoke (all actor + item sheets render cleanly).
 
 ---
 
