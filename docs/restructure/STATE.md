@@ -1,7 +1,7 @@
 # Restructure State
 
-**Current phase:** phase-09-importer
-**Current task:** 9.x — Extract remaining import-helpers methods
+**Current phase:** phase-10-system-abstraction (closing)
+**Current task:** complete
 **Last verified:** 2026-05-30T09:50:00Z (phase 7 close; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 187 unit tests)
 **Last commit on plan:** 01beceb
 
@@ -18,8 +18,8 @@
 - [x] phase-06-derived-split       (relaxed per ADR-013; AE-dependent derived folded into phase-07)
 - [x] phase-07-ae-unification      (7.9 modifiers.js kept as 1.907 compat shim; 7.3 test-world fixtures deferred)
 - [x] phase-08-sheets              (26 per-type sheets; V2 reskins deleted; monoliths retained as base classes)
-- [ ] phase-09-importer            ← NEXT
-- [ ] phase-10-system-abstraction
+- [x] phase-09-importer            (import-helpers.js 3322→2458 lines, 26% reduction; AE/template/OggDude utils extracted)
+- [x] phase-10-system-abstraction  (RulesSystem interface; 6 theme branches replaced with method calls; 8 tests)
 - [x] phase-11-migration-infra    (closed early; inline parseFloat checks in swffg-main.js ready body deferred — see Open issues)
 - [ ] phase-12-typescript
 - [ ] phase-13-v14-compat
