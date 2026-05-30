@@ -2,6 +2,7 @@ import Helpers from "../helpers/common.js";
 import {migrateDataToSystem} from "../helpers/migration.js";
 import {ItemFFG} from "../items/item-ffg.js";
 import { explodeMod, getModKeyPath } from "../active-effects/modifier-map.js";
+import { createInherentEffect, applyTalentActiveEffects as applyTalentAEs } from "./import-ae-utils.js";
 
 export default class ImportHelpers {
   /**
@@ -2975,92 +2976,7 @@ export default class ImportHelpers {
   }
 
   static async createActiveEffects(item) {
-    if (["species", "gear", "weapon", "armour", "shipattachment"].includes(item.type)) {
-      const existingEffects = item.getEmbeddedCollection("ActiveEffect");
-      // items are "created" when they are pulled from Compendiums, so don't duplicate Active Effects
-      const inherentEffect = existingEffects.find(i => i.name === `(inherent)`);
-      if (!inherentEffect) {
-        CONFIG.logger.debug(`Creating inherent Active Effect for item ${item.name}`);
-        const effects = {
-          name: `(inherent)`,
-          img: item.img,
-          changes: [],
-        };
-        if (item.type === "species") {
-          for (const attribute of Object.keys(item.system.attributes)) {
-            const explodedMods = explodeMod(
-              item.system.attributes[attribute].modtype,
-              attribute
-            );
-            for (const cur_mod of explodedMods) {
-              const path = getModKeyPath(
-                cur_mod['modType'],
-                cur_mod['mod']
-              );
-              effects.changes.push({
-                key: path,
-                mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-                value: item.system.attributes[attribute].value,
-              });
-            }
-          }
-        } else if (["gear", "weapon"].includes(item.type)) {
-          const explodedMods = explodeMod(
-            "Stat",
-            "Encumbrance"
-          );
-          for (const cur_mod of explodedMods) {
-            const path = getModKeyPath(
-              cur_mod['modType'],
-              cur_mod['mod']
-            );
-            effects.changes.push({
-              key: path,
-              mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-              value: 0,
-            });
-          }
-        } else if (item.type === "armour") {
-          for (const key of ["Encumbrance", "Defence", "Soak"]) {
-            const explodedMods = explodeMod(
-              "Stat",
-              key
-            );
-            for (const cur_mod of explodedMods) {
-              const path = getModKeyPath(
-                cur_mod['modType'],
-                cur_mod['mod']
-              );
-              effects.changes.push({
-                key: path,
-                mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-                value: 0,
-              });
-            }
-          }
-        } else if (item.type === "shipattachment") {
-          const explodedMods = explodeMod(
-            "Vehicle Stat",
-            "Vehicle.Hardpoints"
-          );
-          for (const cur_mod of explodedMods) {
-            const path = getModKeyPath(
-              cur_mod['modType'],
-              cur_mod['mod']
-            );
-            effects.changes.push({
-              key: path,
-              mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-              value: 0,
-            });
-          }
-        }
-
-        CONFIG.logger.debug(`Creating Active Effect for ${item.name}/${item.type} on item creation`);
-        CONFIG.logger.debug(effects);
-        await item.createEmbeddedDocuments("ActiveEffect", [effects]);
-      }
-    }
+    return createInherentEffect(item);
   }
 
   /**
@@ -3255,50 +3171,7 @@ export default class ImportHelpers {
    * @returns {Promise<void>}
    */
   static async applyTalentActiveEffects(specialization) {
-    if (specialization.type !== "specialization") {
-      return;
-    }
-    CONFIG.logger.debug(`Transferring Active Effects from talents for specialization ${specialization.name}`);
-    const toCreate = [];
-    // iterate over talents, find attributes on them, and create active effects
-    for (const talentId of Object.keys(specialization.system.talents)) {
-      const talent = specialization.system.talents[talentId];
-      if (Object.keys(talent).includes("attributes")) {
-        for (const attributeName of Object.keys(talent.attributes)) {
-          const attribute = talent.attributes[attributeName];
-          const explodedMods = explodeMod(
-            attribute.modtype,
-            attribute.mod
-          );
-
-          const changes = [];
-          for (const curMod of explodedMods) {
-            const changeKey = getModKeyPath(curMod['modType'], curMod['mod']);
-            // only create an active effect if the mod is a type requiring one (e.g., weapon stats don't)
-            if (changeKey) {
-              changes.push({
-                key: changeKey,
-                mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-                value: attribute.value,
-              });
-            }
-          }
-
-          if (changes.length) {
-            toCreate.push({
-              name: attributeName,
-              img: talent.img,
-              changes: changes,
-              disabled: true,
-            });
-          }
-        }
-      }
-    }
-    CONFIG.logger.debug(toCreate);
-    if (toCreate.length) {
-      await specialization.createEmbeddedDocuments("ActiveEffect", toCreate);
-    }
+    return applyTalentAEs(specialization);
   }
 }
 
