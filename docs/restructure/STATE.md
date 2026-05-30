@@ -53,7 +53,8 @@ preconditions require `test-worlds/` fixtures with rich modifier scenarios that
 - [x] 7.0 — Detail Phase 7 atomic tasks (+ ADR-014)
 - [x] 7.1 — Extract modifier→AE-key taxonomy to a tested module (modifier-map.js; 14 tests; modifiers.js delegates)
 - [x] 7.2 — No custom AE change modes needed: all FFG modifiers already use standard ADD mode (verified); per anti-creep none are invented. The only non-standard logic is the force-pool `applyActiveEffects` override, which is derived computation moved in 7.7.
-- [~] 7.4 — Pure `attributes`→AE-changes transform extracted + tested (`attribute-to-ae.js`, 6 tests). Migration orchestration + auto-registration held pending real-world validation (ADR-002 — see Open issues).   ← CURRENT
+- [x] 7.4 — `attributes`→AE: pure transform extracted + tested (`attribute-to-ae.js`, 6 tests); migration `3.0.0-attributes-to-ae.js` written + lint-clean but **NOT registered** in index.js (held pending operator real-world validation, ADR-002).
+- [ ] 7.5–7.10 — deep refactor (UI→AE, caller migration, override→derived, schema removal, delete modifiers.js, templates): being written blind per operator direction; each commit build-green + flagged unvalidated.   ← CURRENT (7.6 next)
 - [ ] 7.2 — Register custom FFG AE change modes (+ force-pool)
 - [ ] 7.3 — Synthetic test-world modifier fixtures
 - [ ] 7.4 — Migration: attributes → AEs, clear attributes
