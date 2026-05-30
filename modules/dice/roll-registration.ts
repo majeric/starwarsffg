@@ -12,6 +12,7 @@ import { RollFFG } from "../dice-pool-ffg.js";
  * Per ADR-008, V14 may have introduced a dedicated registration helper;
  * Phase 13's V14 compatibility certification will revisit this file.
  */
-export function registerRollFFG() {
-  CONFIG.Dice.rolls.unshift(RollFFG);
+export function registerRollFFG(): void {
+  // FIXME(types): RollFFG extends Roll but fvtt-types expects a narrower constructor
+  CONFIG.Dice.rolls.unshift(RollFFG as any);
 }

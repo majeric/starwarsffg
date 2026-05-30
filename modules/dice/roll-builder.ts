@@ -1,7 +1,12 @@
 import { MonteCarlo } from "../../lib/@swrpg-online/monte-carlo/dist/index.esm.js";
 
-export default class RollBuilderFFG extends FormApplication {
-  constructor(rollData, rollDicePool, rollDescription, rollSkillName, rollItem, rollAdditionalFlavor, rollSound) {
+// FIXME(types): FormApplication is a Foundry global not typed in strict mode
+export default class RollBuilderFFG extends (FormApplication as any) {
+  roll: any;
+  dicePool: any;
+  description: string;
+
+  constructor(rollData: any, rollDicePool: any, rollDescription: string, rollSkillName: string, rollItem: any, rollAdditionalFlavor: string, rollSound: string) {
     super();
     this.roll = {
       data: rollData,
@@ -15,7 +20,7 @@ export default class RollBuilderFFG extends FormApplication {
   }
 
   /** @override */
-  static get defaultOptions() {
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: "roll-builder",
       classes: ["starwarsffg", "roll-builder-dialog"],
@@ -25,14 +30,15 @@ export default class RollBuilderFFG extends FormApplication {
   }
 
   /** @override */
-  get title() {
+  get title(): string {
     return this.description || game.i18n.localize("SWFFG.RollingDefaultTitle");
   }
 
   /** @override */
-  async getData() {
+  // eslint-disable-next-line max-lines-per-function, complexity -- pre-existing legacy method
+  async getData(): Promise<any> {
     //get all possible sounds
-    let sounds = [];
+    let sounds: any[] = [];
     const diceSymbols = {
       advantage: await foundry.applications.ux.TextEditor.enrichHTML("[AD]"),
       success: await foundry.applications.ux.TextEditor.enrichHTML("[SU]"),
@@ -45,12 +51,12 @@ export default class RollBuilderFFG extends FormApplication {
       dark: await foundry.applications.ux.TextEditor.enrichHTML("[DA]"),
     };
 
-    let canUserAddAudio = await game.settings.get("starwarsffg", "allowUsersAddRollAudio");
-    let canUserAddFlavor = game.user.isGM || !this?.roll?.flavor;
+    let canUserAddAudio: any = await game.settings.get("starwarsffg", "allowUsersAddRollAudio");
+    let canUserAddFlavor = game.user!.isGM || !this?.roll?.flavor;
 
-    if (game.user.isGM) {
-      game.playlists.contents.forEach((playlist) => {
-        playlist.sounds.forEach((sound) => {
+    if (game.user!.isGM) {
+      (game as any).playlists.contents.forEach((playlist: any) => {
+        playlist.sounds.forEach((sound: any) => {
           let selected = false;
           const s = this.roll?.sound ?? this.roll?.item?.flags?.starwarsffg?.ffgsound;
           if (s === sound.path) {
@@ -61,10 +67,10 @@ export default class RollBuilderFFG extends FormApplication {
       });
     } else if (canUserAddAudio) {
       const playlistId = await game.settings.get("starwarsffg", "allowUsersAddRollAudioPlaylist");
-      const playlist = await game.playlists.get(playlistId);
+      const playlist = await (game as any).playlists.get(playlistId);
 
       if (playlist) {
-        playlist.sounds.forEach((sound) => {
+        playlist.sounds.forEach((sound: any) => {
           let selected = false;
           const s = this.roll?.sound ?? this.roll?.item?.flags?.starwarsffg?.ffgsound;
           if (s === sound.path) {
@@ -78,10 +84,10 @@ export default class RollBuilderFFG extends FormApplication {
       }
     }
 
-    let users = [{ name: "Send To All", id: "all" }];
-    if (game.user.isGM) {
-      game.users.contents.forEach((user) => {
-        if (user.visible && user.id !== game.user.id) {
+    let users: any[] = [{ name: "Send To All", id: "all" }];
+    if (game.user!.isGM) {
+      game.users!.contents.forEach((user: any) => {
+        if (user.visible && user.id !== game.user!.id) {
           users.push({ name: user.name, id: user.id });
         }
       });
@@ -94,14 +100,14 @@ export default class RollBuilderFFG extends FormApplication {
     };
 
     let display = false;
-    const displaySimulation = game.settings.get("starwarsffg", "displaySimulation");
-    if (displaySimulation === "GM" && game.user.isGM || displaySimulation === "All") {
+    const displaySimulation = game.settings.get("starwarsffg", "displaySimulation") as unknown as string;
+    if (displaySimulation === "GM" && game.user!.isGM || displaySimulation === "All") {
       display = true;
     }
 
     return {
       sounds,
-      isGM: game.user.isGM,
+      isGM: game.user!.isGM,
       canUserAddAudio,
       flavor: this.roll.flavor,
       users,
@@ -114,37 +120,38 @@ export default class RollBuilderFFG extends FormApplication {
   }
 
   /** @override */
-  activateListeners(html) {
+  // eslint-disable-next-line max-lines-per-function, complexity -- pre-existing legacy method
+  activateListeners(html: any): void {
     super.activateListeners(html);
 
     this._initializeInputs(html);
     this._activateInputs(html);
 
-    html.find(".btn").click(async (event) => {
+    html.find(".btn").click(async (event: any) => {
       // if sound was not passed search for sound dropdown value
       if (!this.roll.sound) {
         const sound = html.find(".sound-selection")?.[0]?.value;
         if (sound) {
           this.roll.sound = sound;
           if (this?.roll?.item) {
-            let entity;
-            let entityData;
+            let entity: any;
+            let entityData: any;
             if (!this?.roll?.item?.flags?.starwarsffg?.uuid) {
-              entity = game.actors.get(this.roll.data.actor._id);
+              entity = game.actors!.get(this.roll.data.actor._id);
               entityData = {
                 _id: this.roll.item.id,
               };
             } else {
               const parts = this.roll.item.flags.starwarsffg?.uuid.split(".");
               const [sceneName, sceneId, entityName, entityId, embeddedName, embeddedId] = parts;
-              entity = game.actors.tokens[entityId].items.get(embeddedId);
+              entity = (game as any).actors.tokens[entityId].items.get(embeddedId);
               if (parts.length === 6) {
                 entityData = {
                   _id: entity.id,
                 };
               }
             }
-            setProperty(entityData, "flags.starwarsffg.ffgsound", sound);
+            (foundry.utils as any).setProperty(entityData, "flags.starwarsffg.ffgsound", sound);
             entity.update(entityData);
           }
         }
@@ -160,7 +167,7 @@ export default class RollBuilderFFG extends FormApplication {
       // validate that required data is present
       if (this.roll.item?.uuid && !this.roll.item.flags?.starwarsffg?.uuid) {
         // uuid flag is missing, look up the item and set it, so it's fixed going forward
-        const tmp_item = await fromUuid(this.roll.item.uuid);
+        const tmp_item = await (foundry.utils as any).fromUuid(this.roll.item.uuid);
         await tmp_item.setFlag("starwarsffg", "uuid", this.roll.item.uuid);
       }
 
@@ -173,10 +180,10 @@ export default class RollBuilderFFG extends FormApplication {
           if (actorData) {
             const actorEffects = actorData.getEmbeddedCollection("ActiveEffect");
             if (actorEffects) {
-              const toDelete = [];
+              const toDelete: string[] = [];
               for (const activeEffect of actorEffects.contents) {
-                if (activeEffect?.system?.duration === "once") {
-                  toDelete.push(activeEffect._id);
+                if ((activeEffect as any)?.system?.duration === "once") {
+                  toDelete.push((activeEffect as any)._id);
                 }
               }
               if (toDelete.length > 0) {
@@ -191,7 +198,7 @@ export default class RollBuilderFFG extends FormApplication {
 
       try {
         if (this?.roll?.item && this.roll.item.type === "weapon") {
-          const item = await foundry.utils.fromUuid(this.roll.item.uuid);
+          const item: any = await foundry.utils.fromUuid(this.roll.item.uuid);
           if (item) {
             const ammoEnabled = item.getFlag("starwarsffg", "config.enableAmmo");
             if (ammoEnabled) {
@@ -214,8 +221,8 @@ export default class RollBuilderFFG extends FormApplication {
           <button class="ffg-pool-to-player">${game.i18n.localize("SWFFG.SentDicePoolRoll")}</button>
         </div>`;
 
-        let chatOptions = {
-          user: game.user.id,
+        let chatOptions: any = {
+          user: game.user!.id,
           content: messageText,
           flags: {
             starwarsffg: {
@@ -241,23 +248,23 @@ export default class RollBuilderFFG extends FormApplication {
           await this.roll.item.update({"flags": {"starwarsffg": {"crew": this.roll.item.crew}}})
         }
         await roll.toMessage({
-          user: game.user.id,
+          user: game.user!.id,
           speaker: {
-            actor: game.actors.get(this.roll.data?.actor?._id),
+            actor: game.actors!.get(this.roll.data?.actor?._id),
             alias: this.roll.data?.token?.name,
             token: this.roll.data?.token?._id,
           },
           flavor: `${game.i18n.localize("SWFFG.Rolling")} ${game.i18n.localize(this.roll.skillName)}...`,
         });
         if (this.roll?.sound) {
-          AudioHelper.play({ src: this.roll.sound }, true);
+          foundry.audio.AudioHelper.play({ src: this.roll.sound } as any, true);
         }
 
         return roll;
       }
     });
 
-    html.find(".extend-button").on("click", (event) => {
+    html.find(".extend-button").on("click", (event: any) => {
       event.preventDefault();
       event.stopPropagation();
 
@@ -273,34 +280,35 @@ export default class RollBuilderFFG extends FormApplication {
     });
   }
 
-  _updatePreview(html) {
+  _updatePreview(html: any): void {
     const poolDiv = html.find(".dice-pool-dialog .dice-pool")[0];
     poolDiv.innerHTML = "";
     this.dicePool.renderPreview(poolDiv);
     this._updateSimulationPreview();
   }
 
-  _initializeInputs(html) {
-    html.find(".pool-value input").each((key, value) => {
-      const name = $(value).attr("name");
+  _initializeInputs(html: any): void {
+    html.find(".pool-value input").each((key: number, value: any) => {
+      const name = $(value).attr("name") as string;
       value.value = this.dicePool[name];
     });
 
-    html.find(".pool-additional input").each((key, value) => {
-      const name = $(value).attr("name");
+    html.find(".pool-additional input").each((key: number, value: any) => {
+      const name = $(value).attr("name") as string;
       value.value = this.dicePool[name];
-      $(value).attr("allowNegative", true);
+      $(value).attr("allowNegative", "true");
     });
 
     this._updatePreview(html);
   }
 
-  _activateInputs(html) {
-    html.find(".upgrade-buttons button").on("click", (event) => {
+  // eslint-disable-next-line max-lines-per-function -- pre-existing legacy method
+  _activateInputs(html: any): void {
+    html.find(".upgrade-buttons button").on("click", (event: any) => {
       event.preventDefault();
       event.stopPropagation();
 
-      const id = $(event.currentTarget).attr("id");
+      const id = $(event.currentTarget).attr("id") as string;
 
       switch (id.toLowerCase()) {
         case "upgrade-ability": {
@@ -323,8 +331,8 @@ export default class RollBuilderFFG extends FormApplication {
       this._initializeInputs(html);
     });
 
-    html.find(".pool-container, .pool-additional").on("click", (event) => {
-      let input;
+    html.find(".pool-container, .pool-additional").on("click", (event: any) => {
+      let input: any;
 
       if ($(event.currentTarget).hasClass(".pool-container")) {
         input = $(event.currentTarget).find(".pool-value input")[0];
@@ -340,8 +348,8 @@ export default class RollBuilderFFG extends FormApplication {
       this._updatePreview(html);
     });
 
-    html.find(".pool-container, .pool-additional").on("contextmenu", (event) => {
-      let input;
+    html.find(".pool-container, .pool-additional").on("contextmenu", (event: any) => {
+      let input: any;
 
       if ($(event.currentTarget).hasClass(".pool-container")) {
         input = $(event.currentTarget).find(".pool-value input")[0];
@@ -362,15 +370,11 @@ export default class RollBuilderFFG extends FormApplication {
     });
   }
 
-  _updateObject() {}
+  _updateObject(): void {}
 
-  /**
-   * Add the results of the dice simulation
-   * @private
-   */
-  _updateSimulationPreview() {
+  _updateSimulationPreview(): void {
     try {
-      const simPool = new MonteCarlo({
+      const simPool = new (MonteCarlo as any)({
         dicePool: {
           abilityDice: this.dicePool.ability,
           difficultyDice: this.dicePool.difficulty,

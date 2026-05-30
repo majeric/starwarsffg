@@ -2,7 +2,27 @@
  * Dice pool utility specializing in the FFG special dice
  */
 export class DicePoolFFG {
-  constructor(obj) {
+  proficiency: number;
+  ability: number;
+  challenge: number;
+  difficulty: number;
+  boost: number;
+  setback: number;
+  remsetback: number;
+  force: number;
+  advantage: number;
+  success: number;
+  threat: number;
+  failure: number;
+  light: number;
+  dark: number;
+  triumph: number;
+  despair: number;
+  upgrades: number;
+  source: Record<string, string[]>;
+  [key: string]: any;
+
+  constructor(obj?: any) {
     if (obj === undefined) {
       obj = {};
     }
@@ -33,137 +53,137 @@ export class DicePoolFFG {
 
     if (obj?.source?.skill?.length) {
       this.source.skill = obj.source.skill
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.name === "purchased") {
             return `Purchased: ${rank.value} rank(s)`;
           }
           if (rank.modtype === "Skill Rank") {
             return `${rank.name} (${rank.type}): ${rank.value} rank(s)`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
     if (obj?.source?.boost?.length) {
       this.source.boost = obj.source.boost
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Boost") {
             return `${rank.name} (${rank.type}): +${rank.value} boost dice`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): +${rank.value} boost dice`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): +${rank.value} boost dice`;
         });
     }
     if (obj?.source?.remsetback?.length) {
       this.source.remsetback = obj.source.remsetback
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Remove Setback") {
             return `${rank.name} (${rank.type}): -${rank.value} setback dice`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): -${rank.value} setback dice`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): -${rank.value} setback dice`;
         });
     }
     if (obj?.source?.setback?.length) {
       this.source.setback = obj.source.setback
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Setback") {
             return `${rank.name} (${rank.type}): +${rank.value} setback dice`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): +${rank.value} setback dice`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): +${rank.value} setback dice`;
         });
     }
     if (obj?.source?.upgrades?.length) {
       this.source.upgrades = obj.source.upgrades
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Add Upgrade") {
             return `${rank.name} (${rank.type}): ${rank.value} upgrade(s)`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
     if (obj?.source?.success?.length) {
       this.source.success = obj.source.success
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Add Success") {
             return `${rank.name} (${rank.type}): ${rank.value} Success`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
     if (obj?.source?.advantage?.length) {
       this.source.advantage = obj.source.advantage
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Add Advantage") {
             return `${rank.name} (${rank.type}): ${rank.value} Advantage`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
     if (obj?.source?.light?.length) {
       this.source.light = obj.source.light
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Add Light") {
             return `${rank.name} (${rank.type}): ${rank.value} Light`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
     if (obj?.source?.failure?.length) {
       this.source.failure = obj.source.failure
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Add Failure") {
             return `${rank.name} (${rank.type}): ${rank.value} Failure`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
     if (obj?.source?.threat?.length) {
       this.source.threat = obj.source.threat
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Add Threat") {
             return `${rank.name} (${rank.type}): ${rank.value} Threat`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
     if (obj?.source?.dark?.length) {
       this.source.dark = obj.source.dark
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Add Dark") {
             return `${rank.name} (${rank.type}): ${rank.value} Dark`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
 
     if (obj?.source?.despair?.length) {
       this.source.despair = obj.source.despair
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Add Despair") {
             return `${rank.name} (${rank.type}): ${rank.value} Despair`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
 
     if (obj?.source?.triumph?.length) {
       this.source.triumph = obj.source.triumph
-        .filter((item) => parseInt(item.value, 10) > 0)
-        .map((rank) => {
+        .filter((item: any) => parseInt(item.value, 10) > 0)
+        .map((rank: any) => {
           if (rank.modtype === "Skill Add Triumph") {
             return `${rank.name} (${rank.type}): ${rank.value} Triumph`;
           }
-          return `${modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
+          return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
   }
@@ -173,7 +193,7 @@ export class DicePoolFFG {
    * dice or adding an ability die if none remain.
    * @param times the number of times to perform this operation, defaults to 1
    */
-  upgrade(times) {
+  upgrade(times?: number): void {
     if (times === undefined) {
       times = 1;
     }
@@ -205,7 +225,7 @@ export class DicePoolFFG {
    * into challenge dice or adding an difficulty die if none remain.
    * @param times the number of times to perform this operation, defaults to 1
    */
-  upgradeDifficulty(times) {
+  upgradeDifficulty(times?: number): void {
     if (times === undefined) {
       times = 1;
     }
@@ -232,11 +252,7 @@ export class DicePoolFFG {
     }
   }
 
-  /**
-   * Transform the dice pool into a rollable expression
-   * @returns {string} a dice expression that can be used to roll the dice pool
-   */
-  renderDiceExpression() {
+  renderDiceExpression(): string {
     let setbackDice = game.settings.get("starwarsffg", "ApplyRemoveSetbackMods")
       ? Math.max(0, this.setback - this.remsetback)
       : this.setback;
@@ -252,17 +268,12 @@ export class DicePoolFFG {
     ];
     let finalPool = dicePool.filter((d) => {
       const test = d.split(/([0-9]+)/);
-      return test[1] > 0;
+      return (test[1] as any) > 0;
     });
     return finalPool.join("+");
   }
 
-  /**
-   * Create a preview of the dice pool using images
-   * @param container {HTMLElement} where to place the preview. A container will be generated if this is undefined
-   * @returns {HTMLElement}
-   */
-  renderPreview(container) {
+  renderPreview(container?: HTMLElement): HTMLElement {
     if (container === undefined) {
       container = document.createElement("div");
       container.classList.add("dice-pool");
@@ -303,11 +314,11 @@ export class DicePoolFFG {
     return container;
   }
 
-  renderAdvancedPreview(container) {
+  renderAdvancedPreview(container?: HTMLElement): HTMLElement {
     let advanceContainer = this.renderPreview(container);
 
-    let additionalSymbols = [];
-    ["advantage", "success", "threat", "failure", "light", "dark", "triumph", "despair"].forEach((symbol) => {
+    let additionalSymbols: string[] = [];
+    (["advantage", "success", "threat", "failure", "light", "dark", "triumph", "despair"] as const).forEach((symbol) => {
       let diceSymbol = "";
       switch (symbol) {
         case "advantage": {
@@ -354,7 +365,7 @@ export class DicePoolFFG {
     return advanceContainer;
   }
 
-  _addIcons(container, icon, times, height = 36, width = 36) {
+  _addIcons(container: HTMLElement, icon: string, times: number, height = 36, width = 36): void {
     for (let i = 0; i < times; i++) {
       const img = document.createElement("img");
       img.src = icon;
@@ -364,11 +375,11 @@ export class DicePoolFFG {
     }
   }
 
-  _addSourceToolTip(container) {
+  _addSourceToolTip(container: HTMLElement): void {
     const createToolTip = this.source?.skill?.length || this.source?.boost?.length || this.source?.remsetback?.length || this.source?.setback?.length || this.source?.upgrades?.length || this.source?.success?.length || this.source?.advantage?.length || this.source?.light?.length || this.source?.failure?.length || this.source?.threat?.length || this.source?.dark?.length || this.source?.triumph?.length || this.source?.despair?.length;
 
     if (createToolTip) {
-      const mapDataToString = (values) => {
+      const mapDataToString = (values: string[]) => {
         const item = document.createElement("div");
         item.innerHTML = values.map((i) => `<li class="">${i}</li>`).join("");
         tooltip.append(item);
@@ -421,29 +432,24 @@ export class DicePoolFFG {
     }
   }
 
-  /**
-   * Search the passed container for inputs that contain dice pool information
-   * @param container the container where the inputs are located
-   * @returns {DicePoolFFG}
-   */
-  static fromContainer(container) {
+  static fromContainer(container: HTMLElement): DicePoolFFG {
     return new DicePoolFFG({
-      proficiency: container.querySelector('[name="proficiency"]')?.value ? container.querySelector('[name="proficiency"]').value : 0,
-      ability: container.querySelector('[name="ability"]')?.value ? container.querySelector('[name="ability"]').value : 0,
-      challenge: container.querySelector('[name="challenge"]')?.value ? container.querySelector('[name="challenge"]').value : 0,
-      difficulty: container.querySelector('[name="difficulty"]')?.value ? container.querySelector('[name="difficulty"]').value : 0,
-      boost: container.querySelector('[name="boost"]')?.value ? container.querySelector('[name="boost"]').value : 0,
-      setback: container.querySelector('[name="setback"]')?.value ? container.querySelector('[name="setback"]').value : 0,
-      force: container.querySelector('[name="force"]')?.value ? container.querySelector('[name="force"]').value : 0,
-      advantage: container.querySelector('[name="advantage"]')?.value ? container.querySelector('[name="advantage"]').value : 0,
-      success: container.querySelector('[name="success"]')?.value ? container.querySelector('[name="success"]').value : 0,
-      threat: container.querySelector('[name="threat"]')?.value ? container.querySelector('[name="threat"]').value : 0,
-      failure: container.querySelector('[name="failure"]')?.value ? container.querySelector('[name="failure"]').value : 0,
-      light: container.querySelector('[name="light"]')?.value ? container.querySelector('[name="light"]').value : 0,
-      dark: container.querySelector('[name="dark"]')?.value ? container.querySelector('[name="dark"]').value : 0,
-      triumph: container.querySelector('[name="triumph"]')?.value ? container.querySelector('[name="triumph"]').value : 0,
-      despair: container.querySelector('[name="despair"]')?.value ? container.querySelector('[name="despair"]').value : 0,
-      upgrades: container.querySelector('[name="upgrades"]')?.value ? container.querySelector('[name="upgrades"]').value : 0,
+      proficiency: (container.querySelector('[name="proficiency"]') as HTMLInputElement)?.value || 0,
+      ability: (container.querySelector('[name="ability"]') as HTMLInputElement)?.value || 0,
+      challenge: (container.querySelector('[name="challenge"]') as HTMLInputElement)?.value || 0,
+      difficulty: (container.querySelector('[name="difficulty"]') as HTMLInputElement)?.value || 0,
+      boost: (container.querySelector('[name="boost"]') as HTMLInputElement)?.value || 0,
+      setback: (container.querySelector('[name="setback"]') as HTMLInputElement)?.value || 0,
+      force: (container.querySelector('[name="force"]') as HTMLInputElement)?.value || 0,
+      advantage: (container.querySelector('[name="advantage"]') as HTMLInputElement)?.value || 0,
+      success: (container.querySelector('[name="success"]') as HTMLInputElement)?.value || 0,
+      threat: (container.querySelector('[name="threat"]') as HTMLInputElement)?.value || 0,
+      failure: (container.querySelector('[name="failure"]') as HTMLInputElement)?.value || 0,
+      light: (container.querySelector('[name="light"]') as HTMLInputElement)?.value || 0,
+      dark: (container.querySelector('[name="dark"]') as HTMLInputElement)?.value || 0,
+      triumph: (container.querySelector('[name="triumph"]') as HTMLInputElement)?.value || 0,
+      despair: (container.querySelector('[name="despair"]') as HTMLInputElement)?.value || 0,
+      upgrades: (container.querySelector('[name="upgrades"]') as HTMLInputElement)?.value || 0,
     });
   }
 }

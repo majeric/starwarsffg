@@ -6,8 +6,21 @@ import {ItemFFG} from "../items/item-ffg.js";
 /**
  * New extension of the core DicePool class for evaluating rolls with the FFG DiceTerms
  */
-export class RollFFG extends Roll {
-  constructor(...args) {
+// FIXME(types): Roll generic parameter and constructor signature gaps in fvtt-types
+export class RollFFG extends (Roll as any) {
+  ffg!: FFGDiceResult;
+  hasFFG!: boolean;
+  hasStandard!: boolean;
+  addedResults!: FFGAddedResult[];
+  flavorText?: string;
+  data: any;
+  results: any;
+
+  static CHAT_TEMPLATE = "systems/starwarsffg/templates/dice/roll-ffg.html";
+  static TOOLTIP_TEMPLATE = "systems/starwarsffg/templates/dice/tooltip-ffg.html";
+
+  // eslint-disable-next-line max-lines-per-function, complexity -- pre-existing legacy constructor
+  constructor(...args: any[]) {
     super(...args);
     this.ffg = { success: 0, failure: 0, advantage: 0, threat: 0, triumph: 0, despair: 0, light: 0, dark: 0 };
     this.hasFFG = false;
@@ -96,11 +109,7 @@ export class RollFFG extends Roll {
     }
   }
 
-  static CHAT_TEMPLATE = "systems/starwarsffg/templates/dice/roll-ffg.html";
-
-  static TOOLTIP_TEMPLATE = "systems/starwarsffg/templates/dice/tooltip-ffg.html";
-
-  async updateSymbols() {
+  async updateSymbols(): Promise<void> {
     for (const addedResult of this.addedResults) {
       addedResult.symbol = await foundry.applications.ux.TextEditor.enrichHTML(addedResult.symbol);
     }
@@ -110,7 +119,8 @@ export class RollFFG extends Roll {
 
   /* -------------------------------------------- */
   /** @override */
-  async evaluate({ minimize = false, maximize = false } = {}) {
+  // eslint-disable-next-line max-lines-per-function, complexity -- pre-existing legacy method
+  async evaluate({ minimize = false, maximize = false } = {}): Promise<this> {
     if (this._evaluated) throw new Error("This Roll object has already been rolled.");
 
     // Step 0 - is this rolling nothing?
@@ -122,7 +132,7 @@ export class RollFFG extends Roll {
 
     // Step 1 - evaluate any inner Rolls and recompile the formula
     let hasInner = false;
-    this.terms = await Promise.all(this.terms.map(async (t) => {
+    this.terms = await Promise.all(this.terms.map(async (t: any) => {
       if (t instanceof RollFFG) {
         hasInner = true;
         await t.evaluate({ minimize, maximize });
@@ -134,12 +144,12 @@ export class RollFFG extends Roll {
 
     // Step 2 - if inner rolls occurred, re-compile the formula and re-identify terms
     if (hasInner) {
-      const formula = this.constructor.cleanFormula(this.terms);
+      const formula = (this.constructor as any).cleanFormula(this.terms);
       this.terms = this._identifyTerms(formula);
     }
 
     // Step 3 - evaluate any remaining terms and return any non-FFG dice to the total.
-    this.results = await Promise.all(this.terms.map(async (term) => {
+    this.results = await Promise.all(this.terms.map(async (term: any) => {
       if (!game.ffg.diceterms.includes(term.constructor)) {
         if (term.evaluate && !(term instanceof foundry.dice.terms.OperatorTerm)) {
           this.hasStandard = true;
@@ -164,14 +174,14 @@ export class RollFFG extends Roll {
     }
 
     // Step 4 - safely evaluate the final total
-    const total = Roll.safeEval(this.results.join(" "));
+    const total = (Roll as any).safeEval(this.results.join(" "));
     if (!Number.isNumeric(total)) {
       throw new Error(game.i18n.format("DICE.ErrorNonNumeric", { formula: this.formula }));
     }
 
     // Step 5 - Retrieve all FFG results and combine into a single total.
     if (this.hasFFG) {
-      this.terms.forEach((term) => {
+      this.terms.forEach((term: any) => {
         if (game.ffg.diceterms.includes(term.constructor)) {
           this.ffg.success += parseInt(term.ffg.success);
           this.ffg.failure += parseInt(term.ffg.failure);
@@ -186,17 +196,17 @@ export class RollFFG extends Roll {
 
       // Step 6 - Calculate actual results by cancelling out success with failure, advantage with threat etc.
       if (this.ffg.success < this.ffg.failure) {
-        this.ffg.failure -= parseInt(this.ffg.success);
+        this.ffg.failure -= parseInt(this.ffg.success as any);
         this.ffg.success = 0;
       } else {
-        this.ffg.success -= parseInt(this.ffg.failure);
+        this.ffg.success -= parseInt(this.ffg.failure as any);
         this.ffg.failure = 0;
       }
       if (this.ffg.advantage < this.ffg.threat) {
-        this.ffg.threat -= parseInt(this.ffg.advantage);
+        this.ffg.threat -= parseInt(this.ffg.advantage as any);
         this.ffg.advantage = 0;
       } else {
-        this.ffg.advantage -= parseInt(this.ffg.threat);
+        this.ffg.advantage -= parseInt(this.ffg.threat as any);
         this.ffg.threat = 0;
       }
     }
@@ -209,14 +219,14 @@ export class RollFFG extends Roll {
 
   /* -------------------------------------------- */
   /** @override */
-  async roll() {
+  async roll(): Promise<this> {
     return await this.evaluate();
   }
 
   /* -------------------------------------------- */
   /** @override */
-  async getTooltip() {
-    const parts = this.dice.map((d) => {
+  async getTooltip(): Promise<string> {
+    const parts: any = this.dice.map((d: any) => {
       const cls = d.constructor;
       let isFFG = "notFFG";
       if (game.ffg.diceterms.includes(cls)) isFFG = "isFFG";
@@ -227,7 +237,7 @@ export class RollFFG extends Roll {
         flavor: d.options.flavor,
         isFFG: game.ffg.diceterms.includes(cls),
         notFFG: !game.ffg.diceterms.includes(cls),
-        rolls: d.results.map((r) => {
+        rolls: d.results.map((r: any) => {
           return {
             result: d.getResultLabel(r),
             classes: [cls.name.toLowerCase(), isFFG, "d" + d.faces, r.rerolled ? "rerolled" : null, r.exploded ? "exploded" : null, r.discarded ? "discarded" : null].filterJoin(" "),
@@ -237,17 +247,18 @@ export class RollFFG extends Roll {
     });
     parts.addedResults = this.addedResults;
     parts.flavorText = this.flavorText;
-    return foundry.applications.handlebars.renderTemplate(this.constructor.TOOLTIP_TEMPLATE, { parts });
+    return foundry.applications.handlebars.renderTemplate((this.constructor as any).TOOLTIP_TEMPLATE, { parts });
   }
 
   /* -------------------------------------------- */
   /** @override */
-  async render(chatOptions = {}) {
+  // eslint-disable-next-line max-lines-per-function, complexity -- pre-existing legacy method
+  async render(chatOptions: any = {}): Promise<string> {
     chatOptions = foundry.utils.mergeObject(
       {
-        user: game.user.id,
+        user: game.user!.id,
         flavor: null,
-        template: this.constructor.CHAT_TEMPLATE,
+        template: (this.constructor as any).CHAT_TEMPLATE,
         blind: false,
       },
       chatOptions
@@ -261,14 +272,14 @@ export class RollFFG extends Roll {
     // Define chat data
     if (this?.data) {
       if (this.data.flags?.starwarsffg?.uuid) {
-        const item = await fromUuid(this.data.flags.starwarsffg.uuid);
+        const item: any = await (fromUuid as any)(this.data.flags.starwarsffg.uuid);
         if (item) {
           this.data = item;
           this.data.system = await item.getItemDetails();
         }
       }
       else if (this.data.flags?.starwarsffg?.ffgUuid) {
-        const item = await fromUuid(this.data.flags.starwarsffg.ffgUuid);
+        const item: any = await (fromUuid as any)(this.data.flags.starwarsffg.ffgUuid);
         if (item) {
           this.data = item;
           this.data.system = await item.getItemDetails();
@@ -281,7 +292,7 @@ export class RollFFG extends Roll {
       };
     }
 
-    const chatData = {
+    const chatData: any = {
       formula: isPrivate ? "???" : this._formula,
       flavor: isPrivate ? null : chatOptions.flavor,
       user: chatOptions.user,
@@ -290,11 +301,11 @@ export class RollFFG extends Roll {
       ffg: isPrivate ? {} : this.ffg,
       ffgDice: isPrivate
         ? {}
-        : this.dice.map((d) => {
+        : this.dice.map((d: any) => {
             const cls = d.constructor;
             return {
               isFFG: game.ffg.diceterms.includes(cls),
-              rolls: d.results.map((r) => {
+              rolls: d.results.map((r: any) => {
                 return {
                   result: d.getResultLabel(r),
                 };
@@ -303,7 +314,7 @@ export class RollFFG extends Roll {
           }),
       hasFFG: this.hasFFG,
       hasStandard: this.hasStandard,
-      hasSuccess: this.dice.filter((i) => i.constructor !== ForceDie).length > 0,
+      hasSuccess: this.dice.filter((i: any) => i.constructor !== ForceDie).length > 0,
       diceresults: CONFIG.FFG.diceresults,
       data: this.data,
       addedResults: this.addedResults,
@@ -314,10 +325,10 @@ export class RollFFG extends Roll {
     }
     if (chatData.data.hasOwnProperty('data') && (chatData.data.data.adjusteditemmodifier === undefined || chatData.data.data.adjusteditemmodifier.length === 0)) {
       // extended metadata is missing, lookup the actor ID so we can embed it for future lookups
-      let candidate_actors = game.actors.filter(actor => actor.items.filter(item => item.id === chatData.data._id).length > 0);
+      let candidate_actors = game.actors!.filter((actor: any) => actor.items.filter((item: any) => item.id === chatData.data._id).length > 0);
       if (candidate_actors.length > 0) {
         if (game.settings.get("starwarsffg", "oldWorldCompatability")) {
-          let test_item = game.actors.get(candidate_actors[0].id).items.get(chatData.data._id);
+          let test_item: any = game.actors!.get(candidate_actors[0].id)!.items.get(chatData.data._id);
           // for whatever reason, sometimes the item we read doesn't have modifiers even though the chat item does
           // check if this is the case and correct it if it is
           try {
@@ -342,7 +353,8 @@ export class RollFFG extends Roll {
 
   /* -------------------------------------------- */
   /** @override */
-  async toMessage(messageData = {}, { rollMode = null, create = true } = {}) {
+  // eslint-disable-next-line complexity -- pre-existing legacy method
+  async toMessage(messageData: any = {}, { rollMode = null, create = true }: any = {}): Promise<any> {
     // Perform the roll, if it has not yet been rolled
     if (!this._evaluated) await this.evaluate();
 
@@ -352,12 +364,12 @@ export class RollFFG extends Roll {
       messageData.whisper = ChatMessage.getWhisperRecipients("GM");
     }
     if (rMode === "blindroll") messageData.blind = true;
-    if (rMode === "selfroll") messageData.whisper = [game.user.id];
+    if (rMode === "selfroll") messageData.whisper = [game.user!.id];
 
     // Prepare chat data
     messageData = foundry.utils.mergeObject(
       {
-        user: game.user.id,
+        user: game.user!.id,
         content: this.total,
         sound: CONFIG.sounds.dice,
       },
@@ -365,10 +377,11 @@ export class RollFFG extends Roll {
     );
     messageData.rolls = [this];
 
-    Hooks.call("ffgDiceMessage", this);
+    // FIXME(types): custom hook not in fvtt-types HookConfig
+    (Hooks as any).call("ffgDiceMessage", this);
 
     // Either create the message or just return the chat data
-    const cls = getDocumentClass("ChatMessage");
+    const cls: any = (getDocumentClass as any)("ChatMessage");
     const msg = new cls(messageData);
     if (rMode) msg.applyRollMode(rMode);
 
@@ -377,7 +390,7 @@ export class RollFFG extends Roll {
   }
 
   /** @override */
-  toJSON() {
+  toJSON(): any {
     const json = super.toJSON();
     json.ffg = this.ffg;
     json.hasFFG = this.hasFFG;
@@ -389,8 +402,8 @@ export class RollFFG extends Roll {
   }
 
   /** @override */
-  static fromData(data) {
-    const roll = super.fromData(data);
+  static fromData(data: any): any {
+    const roll: any = super.fromData(data);
     roll.ffg = data.ffg;
     roll.hasFFG = data.hasFFG;
     roll.hasStandard = data.hasStandard;
@@ -400,17 +413,16 @@ export class RollFFG extends Roll {
     return roll;
   }
 
-  //If the main parser hands back a StringTerm attempt to turn it into a die.
-  parseShortHand(terms) {
+  parseShortHand(terms: any[]): any[] {
     return terms
-      .flatMap(t => {
+      .flatMap((t: any) => {
         if(!(t instanceof foundry.dice.terms.StringTerm) || /\d/.test(t.term))
           return t;
 
-        return t.term.replaceAll('d', 'i').split('').reduce((acc, next) => {
+        return t.term.replaceAll('d', 'i').split('').reduce((acc: any[], next: string) => {
           if(next in CONFIG.Dice.terms)
           {
-            let cls = CONFIG.Dice.terms[next];
+            let cls = (CONFIG.Dice.terms as any)[next];
             acc.push(new cls(1));
           }
           else throw new Error(`Unknown die type '${next}'`)
@@ -418,7 +430,7 @@ export class RollFFG extends Roll {
           return acc;
         }, [])
       })
-      .flatMap((value, index, array) => {   //Put addition operators between each die, but not before or after another Operator
+      .flatMap((value: any, index: number, array: any[]) => {
         if (array.length - 1 !== index && !(array[index] instanceof foundry.dice.terms.OperatorTerm) && !(array[index + 1] instanceof foundry.dice.terms.OperatorTerm)) {
           return [value, new foundry.dice.terms.OperatorTerm({operator: '+'})]
         } else {
