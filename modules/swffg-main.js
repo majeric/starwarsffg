@@ -17,11 +17,8 @@ import CombatantFFG, {
 import { ActiveEffectFFG} from "./active-effects/active-effect-ffg.js";
 import { ItemFFG } from "./items/item-ffg.js";
 import { ItemSheetFFG } from "./items/item-sheet-ffg.js";
-import { ItemSheetFFGV2 } from "./items/item-sheet-ffg-v2.js";
 import { ActorSheetFFG } from "./actors/actor-sheet-ffg.js";
-import { ActorSheetFFGV2 } from "./actors/actor-sheet-ffg-v2.js";
 import { AdversarySheetFFG } from "./actors/adversary-sheet-ffg.js";
-import { AdversarySheetFFGV2 } from "./actors/adversary-sheet-ffg-v2.js";
 import { HomesteadSheet } from "./sheets/actor/homestead-sheet.js";
 import { VehicleSheet } from "./sheets/actor/vehicle-sheet.js";
 import { MinionSheet } from "./sheets/actor/minion-sheet.js";
@@ -492,10 +489,8 @@ Hooks.once("init", async function () {
 
   // Register sheet application classes
   foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
-  foundry.documents.collections.Actors.registerSheet("ffg", ActorSheetFFG, { label: "Actor Sheet v1" });
-  foundry.documents.collections.Actors.registerSheet("ffg", ActorSheetFFGV2, { makeDefault: true, label: "Actor Sheet v2" });
-  foundry.documents.collections.Actors.registerSheet("ffg", AdversarySheetFFG, { types: ["character"], label: "Adversary Sheet v1" });
-  foundry.documents.collections.Actors.registerSheet("ffg", AdversarySheetFFGV2, { types: ["character"], label: "Adversary Sheet v2" });
+  foundry.documents.collections.Actors.registerSheet("ffg", ActorSheetFFG, { label: "Actor Sheet (legacy)" });
+  foundry.documents.collections.Actors.registerSheet("ffg", AdversarySheetFFG, { types: ["character"], label: "Adversary Sheet" });
   foundry.documents.collections.Actors.registerSheet("ffg", HomesteadSheet, { types: ["homestead"], makeDefault: true, label: "Homestead Sheet" });
   foundry.documents.collections.Actors.registerSheet("ffg", VehicleSheet, { types: ["vehicle"], makeDefault: true, label: "Vehicle Sheet" });
   foundry.documents.collections.Actors.registerSheet("ffg", MinionSheet, { types: ["minion"], makeDefault: true, label: "Minion Sheet" });
@@ -503,8 +498,7 @@ Hooks.once("init", async function () {
   foundry.documents.collections.Actors.registerSheet("ffg", NemesisSheet, { types: ["nemesis"], makeDefault: true, label: "Nemesis Sheet" });
   foundry.documents.collections.Actors.registerSheet("ffg", CharacterSheet, { types: ["character"], makeDefault: true, label: "Character Sheet" });
   foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
-  foundry.documents.collections.Items.registerSheet("ffg", ItemSheetFFG, { label: "Item Sheet v1" });
-  foundry.documents.collections.Items.registerSheet("ffg", ItemSheetFFGV2, { makeDefault: true, label: "Item Sheet v2" });
+  foundry.documents.collections.Items.registerSheet("ffg", ItemSheetFFG, { label: "Item Sheet (legacy)" });
   foundry.documents.collections.Items.registerSheet("ffg", AbilitySheet, { types: ["ability"], makeDefault: true, label: "Ability Sheet" });
   foundry.documents.collections.Items.registerSheet("ffg", ArmourSheet, { types: ["armour"], makeDefault: true, label: "Armour Sheet" });
   foundry.documents.collections.Items.registerSheet("ffg", BackgroundSheet, { types: ["background"], makeDefault: true, label: "Background Sheet" });
