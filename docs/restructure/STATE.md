@@ -1,7 +1,7 @@
 # Restructure State
 
 **Current phase:** phase-12-typescript
-**Current task:** 12.2 — Convert modules/rules/calculators/
+**Current task:** 12.3 — Convert modules/rules/systems/
 **Last verified:** 2026-05-30T09:50:00Z (phase 7 close; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 187 unit tests)
 **Last commit on plan:** 01beceb
 
@@ -30,7 +30,7 @@
 
 - [x] 12.0 — Detail Phase 12 task list
 - [x] 12.1 — Add TypeScript ESLint tooling
-- [ ] 12.2 — Convert `modules/rules/calculators/` (7 files, 317 lines)
+- [x] 12.2 — Convert `modules/rules/calculators/` (7 files, 317 lines)
 - [ ] 12.3 — Convert `modules/rules/systems/` (1 file, 43 lines)
 - [ ] 12.4 — Convert `modules/data/` (45 files, 1218 lines)
 - [ ] 12.5 — Convert `modules/settings/` (11 files, 1086 lines)

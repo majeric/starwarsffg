@@ -18,7 +18,7 @@
  *  - Delegate computation to Phase 1 calculators (modules/rules/calculators/)
  *    where applicable.
  */
-import { computeEncumbrance } from "../../rules/calculators/encumbrance.js";
+import { computeEncumbrance } from "../../rules/calculators/encumbrance";
 
 export class BaseActorData extends foundry.abstract.TypeDataModel {
   static defineSchema() {

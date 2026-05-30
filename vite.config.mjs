@@ -15,7 +15,12 @@ function foundryModuleInputs() {
   return Object.fromEntries(
     manifest.esmodules
       .filter((entry) => entry.startsWith("modules/"))
-      .map((entry) => [entry.replace(/\.js$/, ""), path.resolve(rootDir, entry)])
+      .map((entry) => {
+        const key = entry.replace(/\.js$/, "");
+        const jsPath = path.resolve(rootDir, entry);
+        const tsPath = jsPath.replace(/\.js$/, ".ts");
+        return [key, fs.existsSync(jsPath) ? jsPath : tsPath];
+      })
   );
 }
 
@@ -37,6 +42,9 @@ export default defineConfig(({ mode }) => {
   const isWatchBuild = process.argv.includes("--watch");
 
   return {
+    resolve: {
+      extensions: [".ts", ".js", ".mjs", ".cjs", ".json"],
+    },
     plugins: [copyFoundryAssets()],
     build: {
       outDir,

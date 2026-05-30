@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildTalentList } from "../../modules/rules/calculators/talent-list.js";
+import { buildTalentList } from "../../modules/rules/calculators/talent-list";
 
 function makeSpec(id, name, talents) {
   return { id, name, system: { talents } };

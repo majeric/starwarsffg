@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeEncumbrance } from "../../modules/rules/calculators/encumbrance.js";
+import { computeEncumbrance } from "../../modules/rules/calculators/encumbrance";
 
 describe("computeEncumbrance", () => {
   it("returns 0 for an empty array", () => {

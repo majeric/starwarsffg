@@ -1,3 +1,8 @@
+interface ForcePoolInput {
+  maxForceRating: number | string;
+  committedDice: number | string;
+}
+
 /**
  * Compute the force-pool dice available for force skill rolls.
  *
@@ -6,16 +11,13 @@
  * injects into AE change values. The mutation-of-AE-changes pattern itself
  * is replaced in Phase 7 with a custom AE change mode; this calculator
  * captures only the pure arithmetic.
- *
- * @param {{maxForceRating:(number|string), committedDice:(number|string)}} input
- * @returns {number}
  */
-export function computeForcePool({ maxForceRating, committedDice }) {
+export function computeForcePool({ maxForceRating, committedDice }: ForcePoolInput): number {
   const available = toInt(maxForceRating) - toInt(committedDice);
   return available > 0 ? available : 0;
 }
 
-function toInt(value) {
+function toInt(value: number | string | undefined): number {
   const n = Number(value);
   return Number.isFinite(n) ? Math.trunc(n) : 0;
 }

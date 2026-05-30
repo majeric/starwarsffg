@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeForcePool } from "../../modules/rules/calculators/force-pool.js";
+import { computeForcePool } from "../../modules/rules/calculators/force-pool";
 
 describe("computeForcePool", () => {
   it("returns the full pool when no dice are committed", () => {

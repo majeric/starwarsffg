@@ -1,3 +1,9 @@
+interface SoakInput {
+  brawn: number | string;
+  equippedArmourSoak?: number | string;
+  modifiers?: number | string;
+}
+
 /**
  * Compute soak value for a character-like actor.
  *
@@ -9,15 +15,12 @@
  * calculator takes the already-summed value.
  *
  * Inputs are coerced via Number(); non-numeric inputs become 0.
- *
- * @param {{brawn:number, equippedArmourSoak?:number, modifiers?:number}} input
- * @returns {number}
  */
-export function computeSoak({ brawn, equippedArmourSoak = 0, modifiers = 0 }) {
+export function computeSoak({ brawn, equippedArmourSoak = 0, modifiers = 0 }: SoakInput): number {
   return toInt(brawn) + toInt(equippedArmourSoak) + toInt(modifiers);
 }
 
-function toInt(value) {
+function toInt(value: number | string | undefined): number {
   const n = Number(value);
   return Number.isFinite(n) ? Math.trunc(n) : 0;
 }

@@ -1,3 +1,9 @@
+interface DefensiveItem {
+  system?: {
+    defence?: { adjusted?: number | string };
+  };
+}
+
 /**
  * Compute melee or ranged defense for a character-like actor.
  *
@@ -10,13 +16,12 @@
  * SUMS all items rather than picking the highest. This calculator preserves
  * that behavior because it is the published user-facing math. A future ADR
  * will decide whether to align the implementation with the comment.
- *
- * @param {Array<{system:{defence:{adjusted:(number|string)}}}>} defensiveItems
- * @param {number} [baseDefense]
- * @param {number} [modifiers]
- * @returns {number}
  */
-export function computeDefense(defensiveItems, baseDefense = 0, modifiers = 0) {
+export function computeDefense(
+  defensiveItems: DefensiveItem[],
+  baseDefense: number | string = 0,
+  modifiers: number | string = 0,
+): number {
   let total = toInt(baseDefense) + toInt(modifiers);
   for (const item of defensiveItems) {
     total += toInt(item?.system?.defence?.adjusted);
@@ -24,7 +29,7 @@ export function computeDefense(defensiveItems, baseDefense = 0, modifiers = 0) {
   return total;
 }
 
-function toInt(value) {
+function toInt(value: number | string | undefined): number {
   const n = Number(value);
   return Number.isFinite(n) ? Math.trunc(n) : 0;
 }

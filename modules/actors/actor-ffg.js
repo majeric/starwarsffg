@@ -1,6 +1,6 @@
 import PopoutEditor from "../popout-editor.js";
 import { getModTypeByModPath } from "../active-effects/modifier-map.js";
-import { computeForcePool } from "../rules/calculators/force-pool.js";
+import { computeForcePool } from "../rules/calculators/force-pool";
 
 /**
  * Extend the base Actor entity.

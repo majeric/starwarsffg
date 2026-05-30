@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeStrainThreshold } from "../../modules/rules/calculators/strain.js";
+import { computeStrainThreshold } from "../../modules/rules/calculators/strain";
 
 describe("computeStrainThreshold", () => {
   it("sums base strain and willpower", () => {

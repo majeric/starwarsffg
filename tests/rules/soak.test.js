@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeSoak } from "../../modules/rules/calculators/soak.js";
+import { computeSoak } from "../../modules/rules/calculators/soak";
 
 describe("computeSoak", () => {
   it("returns brawn when no armour or modifiers", () => {

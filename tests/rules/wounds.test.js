@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeWoundThreshold } from "../../modules/rules/calculators/wounds.js";
+import { computeWoundThreshold } from "../../modules/rules/calculators/wounds";
 
 describe("computeWoundThreshold", () => {
   it("sums base wounds and brawn", () => {

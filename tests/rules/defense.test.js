@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeDefense } from "../../modules/rules/calculators/defense.js";
+import { computeDefense } from "../../modules/rules/calculators/defense";
 
 describe("computeDefense", () => {
   it("returns 0 with empty items and no base", () => {
