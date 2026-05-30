@@ -8,7 +8,7 @@ import { qualities } from "../shared/item-qualities.js";
 
 function numericStat() {
   const { SchemaField, NumberField } = foundry.data.fields;
-  const num = () => new NumberField({ initial: 0 });
+  const num = () => new NumberField({ initial: 0, nullable: true });
   return new SchemaField({ value: num(), adjusted: num() });
 }
 
