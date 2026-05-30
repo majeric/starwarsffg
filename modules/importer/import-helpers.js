@@ -3,6 +3,13 @@ import {migrateDataToSystem} from "../helpers/migration.js";
 import {ItemFFG} from "../items/item-ffg.js";
 import { explodeMod, getModKeyPath } from "../active-effects/modifier-map.js";
 import { createInherentEffect, applyTalentActiveEffects as applyTalentAEs } from "./import-ae-utils.js";
+import {
+  convertOGCharacteristic as convertOGCharImpl,
+  getAttributeObject as getAttributeObjectImpl,
+  getSources as getSourcesImpl,
+  getSourcesAsArray as getSourcesAsArrayImpl,
+  prepareBaseObject as prepareBaseObjectImpl,
+} from "./oggdude/oggdude-utils.js";
 
 export default class ImportHelpers {
   /**
@@ -285,28 +292,7 @@ export default class ImportHelpers {
 
   static getAttributeObject(attributes) {
     const attrs = JXON.xmlToJs(attributes);
-
-    let itemAttributes = {};
-    if (attrs.SoakValue) {
-      itemAttributes.Soak = { mod: "Soak", modtype: "Stat", value: attrs.SoakValue };
-    }
-    if (attrs.ForceRating) {
-      itemAttributes.ForcePool = { mod: "ForcePool", modtype: "Stat", value: attrs.ForceRating };
-    }
-    if (attrs.StrainThreshold) {
-      itemAttributes.Strain = { mod: "Strain", modtype: "Stat", value: attrs.StrainThreshold };
-    }
-    if (attrs.DefenseRanged) {
-      itemAttributes["Defence-Ranged"] = { mod: "Defence-Ranged", modtype: "Stat", value: attrs.DefenseRanged };
-    }
-    if (attrs.DefenseMelee) {
-      itemAttributes["Defence-Melee"] = { mod: "Defence-Melee", modtype: "Stat", value: attrs.DefenseMelee };
-    }
-    if (attrs.WoundThreshold) {
-      itemAttributes.Wounds = { mod: "Wounds", modtype: "Stat", value: attrs.WoundThreshold };
-    }
-
-    return itemAttributes;
+    return getAttributeObjectImpl(attrs);
   }
 
   static getBaseModAttributeObject(mod) {
@@ -2182,30 +2168,7 @@ export default class ImportHelpers {
   }
 
   static convertOGCharacteristic(value) {
-    let type;
-
-    switch (value) {
-      case "BR":
-        type = "Brawn";
-        break;
-      case "AG":
-        type = "Agility";
-        break;
-      case "INT":
-        type = "Intellect";
-        break;
-      case "CUN":
-        type = "Cunning";
-        break;
-      case "WIL":
-        type = "Willpower";
-        break;
-      case "PR":
-        type = "Presence";
-        break;
-    }
-
-    return type;
+    return convertOGCharImpl(value);
   }
 
   /**
@@ -2214,81 +2177,15 @@ export default class ImportHelpers {
    * @returns {*[]}
    */
   static getSourcesAsArray(sources) {
-    let parsedSources = [];
-
-    // if there are no sources, don't bother trying to parse
-    if (!sources) {
-      return parsedSources;
-    }
-
-    // sometimes there's a single source not inside a `source` block
-    if (sources?._) {
-      sources.Source = [sources];
-    }
-
-    try {
-      // convert the sources to an array if they aren't already one (silly XML)
-      if (!Array.isArray(sources.Source)) {
-        sources.Source = [sources.Source];
-      }
-
-      for (const source of sources.Source) {
-        if (source?.$Page) {
-          parsedSources.push(`${source._} pg.${source.$Page}`);
-        } else {
-          parsedSources.push(source._);
-        }
-      }
-    } catch {
-      // in all the cases I looked at, this is due to bad data. just return what we've got so far
-      return parsedSources;
-    }
-    return parsedSources;
+    return getSourcesAsArrayImpl(sources);
   }
 
-  /**
-   * Converts sources to text
-   * @param  {} sources
-   */
   static getSources(sources) {
-    if (!sources) return "";
-
-    let sourceArray = [];
-
-    if (!sources?.Source) {
-      sourceArray = [sources];
-    } else {
-      if (!Array.isArray(sources.Source)) {
-        sourceArray = [sources.Source];
-      } else {
-        sourceArray = sources.Source;
-      }
-    }
-
-    const text = sourceArray.map((s) => {
-      if (s?.$Page) {
-        return `Page ${s.$Page} - ${s._}<br>`;
-      } else {
-        return `${s}<br>`;
-      }
-    });
-
-    const sourceText = `<p><h3>Sources:</h3>${text.join("")}</p>`;
-
-    return sourceText;
+    return getSourcesImpl(sources);
   }
 
   static prepareBaseObject(obj, type) {
-    return {
-      name: obj.Name,
-      type,
-      flags: {
-        starwarsffg: {
-          ffgimportid: obj.Key
-        }
-      },
-      data: {},
-    };
+    return prepareBaseObjectImpl(obj, type);
   }
 
   static async addImportItemToCompendium(type, data, pack, removeFirst) {
