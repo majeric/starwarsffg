@@ -2,7 +2,7 @@ import ItemBaseFFG from "./itembase-ffg.js";
 import PopoutEditor from "../popout-editor.js";
 import ActorOptions from "../actors/actor-ffg-options.js";
 import ImportHelpers from "../importer/import-helpers.js";
-import ModifierHelpers from "../helpers/modifiers.js";
+import { getCalculatedValueFromCurrentAndArray, shouldApplyCharacteristicToDamage } from "../active-effects/legacy-modifier-values.js";
 import { explodeMod, getModKeyPath } from "../active-effects/modifier-map.js";
 import Helpers from "../helpers/common.js";
 import ItemHelpers from "../helpers/item-helpers.js";
@@ -331,13 +331,13 @@ export class ItemFFG extends ItemBaseFFG {
               modifier.system.rank_current = modifier.system.rank;
             }
             data.adjusteditemmodifier.push({ ...modifier });
-            data.damage.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "damage", "Weapon Stat");
-            data.crit.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "critical", "Weapon Stat");
-            data.encumbrance.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "encumbrance", "Weapon Stat");
-            data.price.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "price", "Weapon Stat");
-            data.rarity.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "rarity", "Weapon Stat");
-            data.hardpoints.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "hardpoints", "Weapon Stat");
-            const range = ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "range", "Weapon Stat");
+            data.damage.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "damage", "Weapon Stat");
+            data.crit.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "critical", "Weapon Stat");
+            data.encumbrance.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "encumbrance", "Weapon Stat");
+            data.price.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "price", "Weapon Stat");
+            data.rarity.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "rarity", "Weapon Stat");
+            data.hardpoints.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "hardpoints", "Weapon Stat");
+            const range = getCalculatedValueFromCurrentAndArray(modifier, [], "range", "Weapon Stat");
             const currentRangeIndex = Object.values(rangeSetting).findIndex((r) => r.value === data.range.value);
             let newRange = currentRangeIndex + range;
             if (newRange < 0) newRange = 0;
@@ -350,14 +350,14 @@ export class ItemFFG extends ItemBaseFFG {
         if (data?.itemattachment) {
           data.itemattachment.forEach((attachment) => {
             const activeModifiers = attachment.system?.itemmodifier?.filter((i) => i?.system?.active) || [];
-            data.damage.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "damage", "Weapon Stat");
-            data.crit.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "critical", "Weapon Stat");
+            data.damage.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "damage", "Weapon Stat");
+            data.crit.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "critical", "Weapon Stat");
             if (data.crit.adjusted < 1) data.crit.adjusted = 1;
-            data.encumbrance.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "encumbrance", "Weapon Stat");
-            data.price.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "price", "Weapon Stat");
-            data.rarity.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "rarity", "Weapon Stat");
-            data.hardpoints.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "hardpoints", "Weapon Stat");
-            const range = ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "range", "Weapon Stat");
+            data.encumbrance.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "encumbrance", "Weapon Stat");
+            data.price.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "price", "Weapon Stat");
+            data.rarity.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "rarity", "Weapon Stat");
+            data.hardpoints.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "hardpoints", "Weapon Stat");
+            const range = getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "range", "Weapon Stat");
             const currentRangeIndex = Object.values(rangeSetting).findIndex((r) => r.value === data.range.value);
             let newRange = currentRangeIndex + range;
             if (newRange < 0) newRange = 0;
@@ -396,7 +396,7 @@ export class ItemFFG extends ItemBaseFFG {
             }
           }
           if (this.actor.type !== "vehicle") {
-            if (ModifierHelpers.shouldApplyCharacteristicToDamage(data)) {
+            if (shouldApplyCharacteristicToDamage(data)) {
               const extraDamage = parseInt(actor.system.characteristics[data.characteristic.value].value, 10) + damageAdd;
               data.damage.adjusted += extraDamage;
             } else {
@@ -433,25 +433,25 @@ export class ItemFFG extends ItemBaseFFG {
               modifier.system.rank_current = modifier.system.rank;
             }
             data.adjusteditemmodifier.push({ ...modifier });
-            data.soak.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "soak", "Armor Stat");
-            data.defence.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "defence", "Armor Stat");
-            data.encumbrance.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "encumbrance", "Armor Stat");
-            data.price.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "price", "Armor Stat");
-            data.rarity.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "rarity", "Armor Stat");
-            data.hardpoints.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(modifier, [], "hardpoints", "Armor Stat");
+            data.soak.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "soak", "Armor Stat");
+            data.defence.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "defence", "Armor Stat");
+            data.encumbrance.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "encumbrance", "Armor Stat");
+            data.price.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "price", "Armor Stat");
+            data.rarity.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "rarity", "Armor Stat");
+            data.hardpoints.adjusted += getCalculatedValueFromCurrentAndArray(modifier, [], "hardpoints", "Armor Stat");
           });
         }
 
         if (data?.itemattachment) {
           data.itemattachment.forEach((attachment) => {
             const activeModifiers = attachment.system?.itemmodifier?.filter((i) => i?.system?.active) || [];
-            data.soak.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "soak", "Armor Stat");
-            data.soak.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "Soak", "Stat");
-            data.defence.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "defence", "Armor Stat");
-            data.encumbrance.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "encumbrance", "Armor Stat");
-            data.price.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "price", "Armor Stat");
-            data.rarity.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "rarity", "Armor Stat");
-            data.hardpoints.adjusted += ModifierHelpers.getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "hardpoints", "Armor Stat");
+            data.soak.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "soak", "Armor Stat");
+            data.soak.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "Soak", "Stat");
+            data.defence.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "defence", "Armor Stat");
+            data.encumbrance.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "encumbrance", "Armor Stat");
+            data.price.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "price", "Armor Stat");
+            data.rarity.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "rarity", "Armor Stat");
+            data.hardpoints.adjusted += getCalculatedValueFromCurrentAndArray(attachment, activeModifiers, "hardpoints", "Armor Stat");
 
             if (attachment?.system?.itemmodifier) {
               const activeMods = attachment.system.itemmodifier.filter((i) => i?.system?.active);

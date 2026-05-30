@@ -3,8 +3,8 @@
  * @extends {FormApplication}
  */
 
-import ModifierHelpers from "./helpers/modifiers.js";
 import { getModifierEffectsAsAttributes, syncFormToEffects } from "./active-effects/modifier-ae-helpers.js";
+import { onClickAttributeControl } from "./active-effects/modifier-sheet-actions.js";
 export default class PopoutModifiers extends FormApplication {
   /** @override */
   static get defaultOptions() {
@@ -62,7 +62,7 @@ export default class PopoutModifiers extends FormApplication {
     if (!this.options.editable) return;
 
     //html.find(".attributes .attribute-control").on("click", () => { alert("here")});
-    html.find(".attributes").on("click", ".attribute-control", ModifierHelpers.onClickAttributeControl.bind(this));
+    html.find(".attributes").on("click", ".attribute-control", onClickAttributeControl.bind(this));
   }
 
   /* -------------------------------------------- */

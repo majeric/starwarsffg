@@ -1,6 +1,5 @@
 import PopoutEditor from "../popout-editor.js";
 import Helpers from "../helpers/common.js";
-import ModifierHelpers from "../helpers/modifiers.js";
 import ItemHelpers from "../helpers/item-helpers.js";
 import ImportHelpers from "../importer/import-helpers.js";
 import DiceHelpers from "../helpers/dice-helpers.js";
@@ -10,6 +9,8 @@ import ActorHelpers, {xpLogSpend} from "../helpers/actor-helpers.js";
 import ItemOptions from "./item-ffg-options.js";
 import {forcePowerEditor, itemEditor, talentEditor} from "./item-editor.js";
 import { getModifierEffectsAsAttributes } from "../active-effects/modifier-ae-helpers.js";
+import { popoutModiferWindow } from "../active-effects/modifier-popout-actions.js";
+import { onClickAttributeControl } from "../active-effects/modifier-sheet-actions.js";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -709,7 +710,7 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
     if (!this.options.editable) return;
 
     // Add or Remove Attribute
-    html.find(".attributes").on("click", ".attribute-control", ModifierHelpers.onClickAttributeControl.bind(this));
+    html.find(".attributes").on("click", ".attribute-control", onClickAttributeControl.bind(this));
 
     // Swap value input between checkbox and number when modtype changes
     html.find(".attributes").on("change", ".flat_editor.dropdown.modtype", (event) => {
@@ -725,19 +726,19 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
 
     if (["signatureability"].includes(this.object.type)) {
       html.find(".talent-action").on("click", this._onClickTalentControl.bind(this));
-      html.find(".talent-actions .fa-cog").on("click", ModifierHelpers.popoutModiferWindow.bind(this));
+      html.find(".talent-actions .fa-cog").on("click", popoutModiferWindow.bind(this));
       html.find(".talent-modifiers .fa-cog").on("click", this._onClickUpgradeEdit.bind(this));
     }
 
     if (["forcepower"].includes(this.object.type)) {
       html.find(".talent-action").on("click", this._onClickTalentControl.bind(this));
-      html.find(".talent-actions .fa-cog").on("click", ModifierHelpers.popoutModiferWindow.bind(this));
+      html.find(".talent-actions .fa-cog").on("click", popoutModiferWindow.bind(this));
       html.find(".talent-modifiers .fa-cog").on("click", this._onClickUpgradeEdit.bind(this));
     }
 
     if (this.object.type === "specialization") {
       html.find(".talent-action").on("click", this._onClickTalentControl.bind(this));
-      html.find(".talent-actions .fa-cog").on("click", ModifierHelpers.popoutModiferWindow.bind(this));
+      html.find(".talent-actions .fa-cog").on("click", popoutModiferWindow.bind(this));
       html.find(".talent-modifiers .fa-cog").on("click", this._onClickUpgradeEdit.bind(this));
       try {
         const dragDrop = new foundry.applications.ux.DragDrop({

@@ -179,18 +179,27 @@ split (deferred via ADR-013) folds in here once AE application is clean.
   tested (`attribute-to-ae.js`, 6 tests); migration file written + lint-clean
   but **NOT registered** in index.js (held pending operator real-world
   validation, ADR-002). *(orchestration/auto-run pending)*
-- [ ] 7.5 — "Add/edit modifier" UI creates AEs directly (replace
-  `onClickAttributeControl` + the attributes editor).
-- [ ] 7.6 — Migrate the ~10 `ModifierHelpers` callers onto AE iteration / the
-  taxonomy module, one cohesive group per commit.
-- [ ] 7.7 — Remove the `applyActiveEffects` override (force-pool now a change
-  mode from 7.2).
-- [ ] 7.8 — Remove `attributes` (and the Phase-7-coupled `itemmodifier`/
+- [x] 7.5 — "Add/edit modifier" UI creates AEs directly (replace
+  `onClickAttributeControl` + the attributes editor). *(done: non-upgrade item
+  sheets source modifier rows from AEs and sync forms to AEs; forcepower/
+  signatureability/specialization retain their legacy embedded upgrade/talent
+  attributes path pending 7.10.)*
+- [x] 7.6 — Migrate the ~10 `ModifierHelpers` callers onto AE iteration / the
+  taxonomy module, one cohesive group per commit. *(done for taxonomy callers;
+  remaining value/pool callers were migrated during 7.9 partial progress.)*
+- [x] 7.7 — Remove the `applyActiveEffects` override (force-pool computation
+  moved to derived preparation).
+- [x] 7.8 — Remove `attributes` (and the Phase-7-coupled `itemmodifier`/
   `adjusteditemmodifer`) from item DataModel schemas; fold in the Phase 6 actor
   derived split (`*.adjusted` → `derived.*` via calculators, `_preUpdate`
   removal, `prepareDerivedData` mutation removals) now AE application is clean.
+  *(partial: actor DataModel attributes removed; item attributes and adjusted
+  pipeline retained pending migration registration and 7.10.)*
 - [ ] 7.9 — Delete `modifiers.js` and `popout-modifiers.js` (verify zero callers
-  via lint/grep first — anti-creep note).
+  via lint/grep first — anti-creep note). *(partial: production callers are off
+  `ModifierHelpers`; `helpers/modifiers.js` remains as a 1.907 migration
+  compatibility shim; `popout-modifiers.js` remains live until the legacy
+  upgrade/talent attributes UI is removed.)*
 - [ ] 7.10 — Update item/chat templates (`*.adjusted` → derived; remove the
   attributes-editor markup).
 Per-task blocks expand as each is executed (as in Phases 5–6). Each is one

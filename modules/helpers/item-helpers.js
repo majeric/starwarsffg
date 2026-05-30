@@ -1,4 +1,4 @@
-import ModifierHelpers from "./modifiers.js";
+import { applyActiveEffectOnUpdate } from "../active-effects/legacy-attribute-effects.js";
 import { getModKeyPath } from "../active-effects/modifier-map.js";
 import { syncFormToEffects } from "../active-effects/modifier-ae-helpers.js";
 
@@ -29,7 +29,7 @@ export default class ItemHelpers {
           if (!attributes.hasOwnProperty(k)) attributes[`-=${k}`] = null;
         }
       }
-      await ModifierHelpers.applyActiveEffectOnUpdate(this.object, formData);
+      await applyActiveEffectOnUpdate(this.object, formData);
       if (Object.keys(attributes).length > 0) {
         foundry.utils.setProperty(formData, `data.attributes`, attributes);
       }

@@ -6,11 +6,11 @@ import PopoutEditor from "../popout-editor.js";
 import DiceHelpers from "../helpers/dice-helpers.js";
 import ActorOptions from "./actor-ffg-options.js";
 import ImportHelpers from "../importer/import-helpers.js";
-import ModifierHelpers from "../helpers/modifiers.js";
 import ActorHelpers, {xpLogEarn, xpLogSpend} from "../helpers/actor-helpers.js";
 import ItemHelpers from "../helpers/item-helpers.js";
 import EmbeddedItemHelpers from "../helpers/embeddeditem-helpers.js";
 import { getModifierEffectsAsAttributes } from "../active-effects/modifier-ae-helpers.js";
+import { onClickAttributeControl } from "../active-effects/modifier-sheet-actions.js";
 import EffectHelpers from "../helpers/effects.js";
 import {
   change_role,
@@ -1337,7 +1337,7 @@ export class ActorSheetFFG extends foundry.appv1.sheets.ActorSheet {
     });
 
     // Add or Remove Attribute
-    html.find(".attributes").on("click", ".attribute-control", ModifierHelpers.onClickAttributeControl.bind(this));
+    html.find(".attributes").on("click", ".attribute-control", onClickAttributeControl.bind(this));
 
     // transfer items between owned actor objects
     const dragDrop = new foundry.applications.ux.DragDrop({

@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-07-ae-unification
-**Current task:** 7.6 — Migrate the ~10 ModifierHelpers callers
-**Last verified:** 2026-05-30T02:50:00Z (after 7.5 modifier UI→AE; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 183 unit tests — +10 modifier-ae-helpers)
-**Last commit on plan:** 5c27fea
+**Current task:** 7.9 — Delete modifiers.js + popout-modifiers.js
+**Last verified:** 2026-05-30T07:28:17Z (task 7.9 partial; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 187 unit tests — +4 legacy-modifier-values)
+**Last commit on plan:** 29c88bf
 
 ---
 
@@ -59,7 +59,7 @@ preconditions require `test-worlds/` fixtures with rich modifier scenarios that
 - [x] 7.6 — Migrate ModifierHelpers taxonomy callers: actor-ffg.js, item-editor.js, import-helpers.js, item-ffg.js, item-helpers.js now import explodeMod/getModKeyPath/getModTypeByModPath from modifier-map.js directly. Remaining callers use getCalculatedValueFromCurrentAndArray (item-ffg.js, 7.8), getDicePoolModifiers (dice-helpers.js, 7.8), or are migration code (1.907, must not touch).
 - [x] 7.7 — Removed applyActiveEffects override from actor-ffg.js; force-pool dice computation relocated to prepareDerivedData using the Phase 1 computeForcePool calculator. AEs now apply without mutation.
 - [x] 7.8 — (partial) Removed `attributes` from all 6 actor DataModel schemas (actors source modifiers from AEs since 7.5). Item `attributes` retained pending 7.4 migration registration. `itemmodifier`/`adjusteditemmodifer` removal and Phase 6 actor derived split deferred — coupled with the adjusted-value pipeline in item-ffg.js.
-- [ ] 7.9 — Delete modifiers.js + popout-modifiers.js *(blocked: item-ffg.js adjusted-value pipeline (28 refs), dice-helpers.js pool modifiers (4 refs), forcepower/sig/spec legacy path, 1.907 migration)*
+- [ ] 7.9 — Delete modifiers.js + popout-modifiers.js *(partial: production callers migrated; helpers/modifiers.js is now a 1.907 compatibility shim. Blocked by principle 13 shipped-migration import and live popout legacy upgrade/talent editor path until 7.10/templates.)*
 - [ ] 7.10 — Update item/chat templates
 
 Phase 7 detailed in `phases/phase-07-ae-unification.md` (ADR-014). Approach: AEs
@@ -70,6 +70,25 @@ by extracting the mod→AE-key taxonomy verbatim (7.1) and reusing it.
 
 ## Open issues
 
+- 2026-05-30 — Session start before Phase 7 task 7.9. `npm run verify`
+  exited non-zero at the known lint gate: typecheck/comments/unit
+  tests/build/smoke/migration replay passed, while lint reported warnings
+  only and remains Phase 12-owned known-red. The STATE header was also stale
+  after commit `29c88bf` completed tasks 7.5-7.8 in one commit; reconciled the
+  current task pointer to 7.9 and `Last commit on plan` to `29c88bf` before
+  code work.
+- 2026-05-30 — Phase 7 task 7.9 partial progress. All production
+  `ModifierHelpers` callers were migrated to focused modules:
+  modifier sheet actions, modifier popout launch, legacy attribute→AE sync, and
+  legacy item/dice modifier-value helpers. `modules/helpers/modifiers.js` was
+  reduced to a compatibility shim for the unmodified shipped `1.907` migration.
+  Full deletion remains blocked by PRINCIPLES.md rule 13 (do not modify
+  already-shipped migrations) and by the still-live `popout-modifiers.js`
+  upgrade/talent attributes editor path for forcepower/signatureability/
+  specialization, which belongs with the remaining 7.10 template/UI removal.
+  Verification: targeted new-file eslint passed; `npx tsc --noEmit` passed;
+  `npx vitest run` passed (187 passed, 2 skipped); `npm run verify` passed all
+  gates except the known lint warning gate.
 - 2026-05-28 — Phase 0 bootstrap mismatch documented and reconciled by human
   direction. Task 0.1 expected no root `package.json`, but this checkout already
   had a legacy `package.json` and tracked `package-lock.json`. The legacy manifest

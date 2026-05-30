@@ -1,4 +1,3 @@
-import ModifierHelpers from "./modifiers.js";
 import {migrateDataToSystem} from "./migration.js";
 
 export default class ActorHelpers {

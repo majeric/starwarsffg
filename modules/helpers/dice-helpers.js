@@ -1,7 +1,7 @@
 import PopoutEditor from "../popout-editor.js";
 import RollBuilderFFG from "../dice/roll-builder.js";
-import ModifierHelpers from "../helpers/modifiers.js";
 import ImportHelpers from "../importer/import-helpers.js";
+import { getDicePoolModifiers } from "../active-effects/legacy-modifier-values.js";
 
 export default class DiceHelpers {
   static async rollSkill(obj, event, type, flavorText, sound) {
@@ -275,21 +275,21 @@ export default class DiceHelpers {
 
   static async getModifiers(dicePool, item) {
     if (item.type === "weapon" || item.type === "shipweapon") {
-      dicePool = await ModifierHelpers.getDicePoolModifiers(dicePool, item, []);
+      dicePool = await getDicePoolModifiers(dicePool, item, []);
 
       if (item?.system?.itemattachment) {
         await ImportHelpers.asyncForEach(item.system.itemattachment, async (attachment) => {
           //get base mods and additional mods totals
-          dicePool = await ModifierHelpers.getDicePoolModifiers(dicePool, attachment, []);
+          dicePool = await getDicePoolModifiers(dicePool, attachment, []);
           const activeModifiers = attachment.system.itemmodifier.filter((i) => i.system?.active);
           await ImportHelpers.asyncForEach(activeModifiers, async (modifier) => {
-            dicePool = await ModifierHelpers.getDicePoolModifiers(dicePool, modifier, []);
+            dicePool = await getDicePoolModifiers(dicePool, modifier, []);
           });
         });
       }
       if (item?.system?.itemmodifier) {
         await ImportHelpers.asyncForEach(item.system.itemmodifier, async (modifier) => {
-          dicePool = await ModifierHelpers.getDicePoolModifiers(dicePool, modifier, []);
+          dicePool = await getDicePoolModifiers(dicePool, modifier, []);
         });
       }
     }
