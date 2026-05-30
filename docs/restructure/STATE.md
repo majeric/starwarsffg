@@ -17,8 +17,8 @@
 - [x] phase-05-datamodels
 - [x] phase-06-derived-split       (relaxed per ADR-013; AE-dependent derived folded into phase-07)
 - [x] phase-07-ae-unification      (7.9 modifiers.js kept as 1.907 compat shim; 7.3 test-world fixtures deferred)
-- [ ] phase-08-sheets              ← CURRENT
-- [ ] phase-09-importer
+- [x] phase-08-sheets              (26 per-type sheets; V2 reskins deleted; monoliths retained as base classes)
+- [ ] phase-09-importer            ← NEXT
 - [ ] phase-10-system-abstraction
 - [x] phase-11-migration-infra    (closed early; inline parseFloat checks in swffg-main.js ready body deferred — see Open issues)
 - [ ] phase-12-typescript
@@ -36,7 +36,7 @@ upgrade/talent modifier popout remain as deferred cleanup.
 - [x] 8.0 — Detail Phase 8 atomic tasks
 - [x] 8.1-8.7 — Per-type actor sheets: 6 sheets in modules/sheets/actor/ (homestead, vehicle, minion, rival, nemesis, character) + classType fix for tab icons
 - [x] 8.8-8.12 — Per-type item sheets: 20 sheets in modules/sheets/item/ + classType fix for item tab icons
-- [ ] 8.13 — Delete legacy sheet files (after confirming all per-type sheets render correctly)
+- [x] 8.13 — Deleted V2 reskin files (3 files, 66 lines); cleaned up registrations. Monolith base classes retained as "(legacy)" fallback and base for per-type sheets.
 
 ---
 
