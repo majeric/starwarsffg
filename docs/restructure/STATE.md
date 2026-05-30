@@ -33,7 +33,10 @@ schemas; migration registered; `modifiers.js` reduced to a 24-line 1.907 compat
 shim. The item `*.adjusted` computation pipeline (item-ffg.js) and the legacy
 upgrade/talent modifier popout remain as deferred cleanup.
 
-- [ ] 8.0 — Detail Phase 8 atomic tasks
+- [x] 8.0 — Detail Phase 8 atomic tasks
+- [x] 8.1-8.7 — Per-type actor sheets: 6 sheets in modules/sheets/actor/ (homestead, vehicle, minion, rival, nemesis, character) + classType fix for tab icons
+- [x] 8.8-8.12 — Per-type item sheets: 20 sheets in modules/sheets/item/ + classType fix for item tab icons
+- [ ] 8.13 — Delete legacy sheet files (after confirming all per-type sheets render correctly)
 
 ---
 
