@@ -271,7 +271,7 @@ export default class ItemHelpers {
       // sync AEs to the rank value - that is, if we have a mod which adds 1 to max wounds with 4 ranks, the AE should have a value of 4, not 1
       const existingEffects = item.getEmbeddedCollection("ActiveEffect");
       for (const modifier of item.system.itemmodifier) {
-        for (const attr of Object.keys(modifier.system.attributes)) {
+        for (const attr of Object.keys(modifier.system?.attributes ?? {})) {
           const matchingEffect = existingEffects.find(effect => effect.name === attr);
           if (matchingEffect) {
             // the mod should be applied once per rank

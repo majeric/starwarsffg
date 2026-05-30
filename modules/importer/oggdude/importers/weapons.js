@@ -52,10 +52,10 @@ export default class Weapons {
                 isrestricted: item.Restricted === "true" ? true : false,
               },
               damage: {
-                value: parseInt(!item?.Damage ? item.DamageAdd : item.Damage, 10),
+                value: parseInt(!item?.Damage ? item.DamageAdd : item.Damage, 10) || 0,
               },
               crit: {
-                value: item.Crit ? parseInt(item.Crit, 10) : 0,
+                value: parseInt(item.Crit, 10) || 0,
               },
               skill: {
                 value: CONFIG.temporary.skills[item.SkillKey],
