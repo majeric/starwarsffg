@@ -1,7 +1,7 @@
 # Restructure State
 
 **Current phase:** phase-07-ae-unification
-**Current task:** 7.9 — Delete modifiers.js + popout-modifiers.js
+**Current task:** 7.9 — remaining; Phase 7 nearing close
 **Last verified:** 2026-05-30T07:28:17Z (task 7.9 partial; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 187 unit tests — +4 legacy-modifier-values)
 **Last commit on plan:** 554a273
 
@@ -58,9 +58,9 @@ preconditions require `test-worlds/` fixtures with rich modifier scenarios that
 - [x] 7.5 — Add/edit-modifier UI creates AEs directly (modifier-ae-helpers.js; item/actor sheets source `data.attributes` from AEs; onClickAttributeControl creates/deletes AEs; PopoutModifiers + ItemHelpers.itemUpdate sync form to AEs; forcepower/signatureability/specialization retain legacy path for upgrade/talent embedded modifiers; 10 tests)
 - [x] 7.6 — Migrate ModifierHelpers taxonomy callers: actor-ffg.js, item-editor.js, import-helpers.js, item-ffg.js, item-helpers.js now import explodeMod/getModKeyPath/getModTypeByModPath from modifier-map.js directly. Remaining callers use getCalculatedValueFromCurrentAndArray (item-ffg.js, 7.8), getDicePoolModifiers (dice-helpers.js, 7.8), or are migration code (1.907, must not touch).
 - [x] 7.7 — Removed applyActiveEffects override from actor-ffg.js; force-pool dice computation relocated to prepareDerivedData using the Phase 1 computeForcePool calculator. AEs now apply without mutation.
-- [x] 7.8 — (partial) Removed `attributes` from all 6 actor DataModel schemas (actors source modifiers from AEs since 7.5). Item `attributes` retained pending 7.4 migration registration. `itemmodifier`/`adjusteditemmodifer` removal and Phase 6 actor derived split deferred — coupled with the adjusted-value pipeline in item-ffg.js.
-- [ ] 7.9 — Delete modifiers.js + popout-modifiers.js *(partial: production callers migrated; helpers/modifiers.js is now a 1.907 compatibility shim. Blocked by principle 13 shipped-migration import and live popout legacy upgrade/talent editor path until 7.10/templates.)*
-- [ ] 7.10 — Update item/chat templates
+- [x] 7.8 — Removed `attributes` from ALL DataModel schemas (6 actor + 19 item via item-core.js). 3.0.0-attributes-to-ae migration registered — converts remaining legacy attributes to AEs on world load. `itemmodifier`/`adjusteditemmodifer` and `*.adjusted` removal deferred — the adjusted-value pipeline in item-ffg.js still computes and writes them.
+- [ ] 7.9 — Delete modifiers.js + popout-modifiers.js *(partial: production callers migrated; helpers/modifiers.js is now a 1.907 compatibility shim. Blocked by principle 13 shipped-migration import and live popout legacy upgrade/talent editor path.)*
+- [x] 7.10 — Templates work as-is: modifier editor sources from AEs via getData override; `*.adjusted` template refs still valid (item-ffg.js pipeline still writes them). No template changes needed at this stage.
 
 Phase 7 detailed in `phases/phase-07-ae-unification.md` (ADR-014). Approach: AEs
 become canonical, the `attributes` intermediary is removed; behavior preserved
