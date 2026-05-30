@@ -31,8 +31,11 @@
 Phase 8 closed. 26 per-type sheets registered; V2 reskins deleted; monoliths
 retained as base classes. Phase 9 in progress — extracting import-helpers.js.
 
-- [x] 9.1 — Extracted AE utilities (createInherentEffect, applyTalentActiveEffects) to import-ae-utils.js; compendium utilities to compendium-utils.js. ImportHelpers delegates; callers unchanged. import-helpers.js: 3322→3195 lines.
-- [ ] 9.x — Remaining: modifier processing (processDieMod/processModsData/etc.), adversary extraction, character import, qualities processing (503 lines). Deeply coupled with internal helpers and game settings.
+- [x] 9.1 — Extracted AE utilities (createInherentEffect, applyTalentActiveEffects, applyImportActiveEffects) to import-ae-utils.js; compendium utilities to compendium-utils.js. ImportHelpers delegates; callers unchanged.
+- [x] 9.2 — Extracted OggDude parsing utilities (convertOGCharacteristic, getAttributeObject, getSources, getSourcesAsArray, prepareBaseObject) to oggdude/oggdude-utils.js. 9 tests.
+- [x] 9.3 — Extracted actor templates (minionTemplate, characterTemplate — 460 lines of data literals) to import-templates.js, built programmatically from a skill table.
+- [x] 9.4 — Extracted import-specific AE sync (applyActiveEffectOnUpdate — 185 lines) to import-ae-utils.js, decomposed into focused helpers.
+- [ ] 9.x — Remaining in import-helpers.js (2458 lines): adversary extractors (~530 lines), characterImport (~603 lines), modifier processing (~260 lines), compendium I/O, image handling. The adversary + character methods are deeply coupled with runtime globals.
 
 ---
 
