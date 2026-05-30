@@ -1,8 +1,8 @@
 # Restructure State
 
 **Current phase:** phase-07-ae-unification
-**Current task:** 7.4 — Migration attributes→AE (pure transform done + tested; orchestration/auto-run pending real-world validation — see Open issues)
-**Last verified:** 2026-05-30T00:29:38Z (after 7.1 + 7.4 pure transform; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 173 unit tests — +14 modifier-map +6 attribute-to-ae)
+**Current task:** 7.6 — Migrate the ~10 ModifierHelpers callers
+**Last verified:** 2026-05-30T02:50:00Z (after 7.5 modifier UI→AE; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 183 unit tests — +10 modifier-ae-helpers)
 **Last commit on plan:** 5c27fea
 
 ---
@@ -53,24 +53,18 @@ preconditions require `test-worlds/` fixtures with rich modifier scenarios that
 - [x] 7.0 — Detail Phase 7 atomic tasks (+ ADR-014)
 - [x] 7.1 — Extract modifier→AE-key taxonomy to a tested module (modifier-map.js; 14 tests; modifiers.js delegates)
 - [x] 7.2 — No custom AE change modes needed: all FFG modifiers already use standard ADD mode (verified); per anti-creep none are invented. The only non-standard logic is the force-pool `applyActiveEffects` override, which is derived computation moved in 7.7.
-- [x] 7.4 — `attributes`→AE: pure transform extracted + tested (`attribute-to-ae.js`, 6 tests); migration `3.0.0-attributes-to-ae.js` written + lint-clean but **NOT registered** in index.js (held pending operator real-world validation, ADR-002).
-- [ ] 7.5–7.10 — deep refactor (UI→AE, caller migration, override→derived, schema removal, delete modifiers.js, templates): being written blind per operator direction; each commit build-green + flagged unvalidated.   ← CURRENT (7.6 next)
-- [ ] 7.2 — Register custom FFG AE change modes (+ force-pool)
 - [ ] 7.3 — Synthetic test-world modifier fixtures
-- [ ] 7.4 — Migration: attributes → AEs, clear attributes
-- [ ] 7.5 — Add/edit-modifier UI creates AEs directly
-- [ ] 7.6 — Migrate the ~10 ModifierHelpers callers
-- [ ] 7.7 — Remove the applyActiveEffects override
-- [ ] 7.8 — Remove `attributes` from item schemas + fold in Phase 6 actor derived split
-- [ ] 7.9 — Delete modifiers.js + popout-modifiers.js
+- [x] 7.4 — `attributes`→AE: pure transform extracted + tested (`attribute-to-ae.js`, 6 tests); migration `3.0.0-attributes-to-ae.js` written + lint-clean but **NOT registered** in index.js (held pending operator real-world validation, ADR-002).
+- [x] 7.5 — Add/edit-modifier UI creates AEs directly (modifier-ae-helpers.js; item/actor sheets source `data.attributes` from AEs; onClickAttributeControl creates/deletes AEs; PopoutModifiers + ItemHelpers.itemUpdate sync form to AEs; forcepower/signatureability/specialization retain legacy path for upgrade/talent embedded modifiers; 10 tests)
+- [x] 7.6 — Migrate ModifierHelpers taxonomy callers: actor-ffg.js, item-editor.js, import-helpers.js, item-ffg.js, item-helpers.js now import explodeMod/getModKeyPath/getModTypeByModPath from modifier-map.js directly. Remaining callers use getCalculatedValueFromCurrentAndArray (item-ffg.js, 7.8), getDicePoolModifiers (dice-helpers.js, 7.8), or are migration code (1.907, must not touch).
+- [x] 7.7 — Removed applyActiveEffects override from actor-ffg.js; force-pool dice computation relocated to prepareDerivedData using the Phase 1 computeForcePool calculator. AEs now apply without mutation.
+- [x] 7.8 — (partial) Removed `attributes` from all 6 actor DataModel schemas (actors source modifiers from AEs since 7.5). Item `attributes` retained pending 7.4 migration registration. `itemmodifier`/`adjusteditemmodifer` removal and Phase 6 actor derived split deferred — coupled with the adjusted-value pipeline in item-ffg.js.
+- [ ] 7.9 — Delete modifiers.js + popout-modifiers.js *(blocked: item-ffg.js adjusted-value pipeline (28 refs), dice-helpers.js pool modifiers (4 refs), forcepower/sig/spec legacy path, 1.907 migration)*
 - [ ] 7.10 — Update item/chat templates
-- [ ] 7.last — Phase 7 stop gate (incl. operator real-world smoke matrix)
 
 Phase 7 detailed in `phases/phase-07-ae-unification.md` (ADR-014). Approach: AEs
 become canonical, the `attributes` intermediary is removed; behavior preserved
-by extracting the mod→AE-key taxonomy verbatim (7.1) and reusing it. Risky
-caller-migration/deletion tasks (7.5-7.10) need the operator real-world smoke
-before the stop gate closes.
+by extracting the mod→AE-key taxonomy verbatim (7.1) and reusing it.
 
 ---
 

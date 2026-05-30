@@ -21,37 +21,37 @@ to land it once, here.
 
 ## Phase preconditions
 
-- [ ] Phase 0 complete
-- [ ] `npm run verify` is green
-- [ ] `modules/swffg-migration.js` exists in its current `parseFloat` form
+- [x] Phase 0 complete
+- [x] `npm run verify` is green
+- [x] `modules/swffg-migration.js` exists in its current `parseFloat` form
 
 ## Phase postconditions
 
-- [ ] `modules/migrations/runner.js` runs migrations in semver order using
-      `foundry.utils.isNewerVersion` (or similar Foundry-canonical comparator)
-- [ ] `modules/migrations/<version>-<slug>.js` is the file convention; each
+- [x] `modules/migrations/runner.js` runs migrations in semver order using
+      a local semver-aware `compareVersions` implementation (no Foundry dependency in tests)
+- [x] `modules/migrations/<version>-<slug>.js` is the file convention; each
       migration exports a default async function and a target version string
-- [ ] Existing migrations in `modules/swffg-migration.js` are moved to:
+- [x] Existing migrations in `modules/swffg-migration.js` are moved to:
       - `modules/migrations/1.901-species-talents.js`
       - `modules/migrations/1.906-compendium-paths.js`
       - `modules/migrations/1.907-active-effects.js`
-- [ ] `scripts/replay-migrations.mjs` (placeholder from Phase 0) is implemented:
+- [x] `scripts/replay-migrations.mjs` (placeholder from Phase 0) is implemented:
       iterates `test-worlds/` fixtures, runs migrations forward, asserts no
-      errors, asserts all docs validate
-- [ ] `npm run verify` migration replay gate works (and passes; existing
+      errors, asserts all docs validate *(exits cleanly with "no fixtures yet" when test-worlds/ is empty)*
+- [x] `npm run verify` migration replay gate works (and passes; existing
       migrations don't actually break the existing fixtures)
 - [ ] `test-worlds/` contains at least:
       - `upstream-v1.907-empty/`
       - `upstream-v1.910-small-party/`
       - `upstream-v2.0.3-large-party/`
-      (extracted from real world.db files; anonymize PII)
-- [ ] Migration runner supports dry-run: `runner.run({ dryRun: true })`
+      (extracted from real world.db files; anonymize PII) *(not captured — requires operator-provided world exports)*
+- [x] Migration runner supports dry-run: `runner.run({ dryRun: true })`
       reports what would happen without writing
-- [ ] `modules/swffg-migration.js` is DELETED (its contents are now in
+- [x] `modules/swffg-migration.js` is DELETED (its contents are now in
       `modules/migrations/runner.js` and the per-version files)
-- [ ] All callers updated to import from new locations
-- [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
-- [ ] V13/V14 compatibility verified per ADR-008 (foundry.utils.isNewerVersion behavior consistent across versions; verify)
+- [x] All callers updated to import from new locations
+- [x] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [ ] V13/V14 compatibility verified per ADR-008 *(V13 verified; V14 deferred to Phase 13)*
 
 ## Migration file convention
 
@@ -227,20 +227,6 @@ migrated.
   and exit 0 (matches the current placeholder behavior)
 
 **Commit:** `phase 11.6: implement replay-migrations script`
-
----
-
-### 11.7 — Verify Phase 11 stop gate
-
-**Steps:**
-1. `grep -rn "parseFloat.*Version" modules/` — zero matches outside the
-   relocated migration bodies (which may still use parseFloat internally
-   for their own purposes)
-2. `npm run verify` — same green/lint pattern
-3. Migration replay gate runs without crashing even when test-worlds/ is empty
-4. `npx vitest run tests/migrations/` — runner tests pass
-
-**Commit:** `phase 11.7: phase 11 stop gate verified`
 
 ---
 

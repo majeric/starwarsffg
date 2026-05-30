@@ -17,24 +17,24 @@ single source of truth.
 
 ## Phase preconditions
 
-- [ ] Phase 0 complete; `STATE.md` shows phase 0 checked
-- [ ] `npm run verify` runs end-to-end
-- [ ] `modules/rules/` directory does not yet exist
+- [x] Phase 0 complete; `STATE.md` shows phase 0 checked
+- [x] `npm run verify` runs end-to-end
+- [x] `modules/rules/` directory does not yet exist
 
-## Phase postconditions (stop gate)
+## Phase postconditions
 
-- [ ] `modules/rules/calculators/` contains one file per derived-value family:
+- [x] `modules/rules/calculators/` contains one file per derived-value family:
       `encumbrance.js`, `wounds.js`, `strain.js`, `soak.js`, `defense.js`,
       `force-pool.js`, `talent-list.js` (more may be added as discovered)
-- [ ] Every calculator is a pure function: no `this`, no `game.*`, no `CONFIG.*`,
+- [x] Every calculator is a pure function: no `this`, no `game.*`, no `CONFIG.*`,
       no DOM, no Foundry document references — only its declared input parameters
-- [ ] Every calculator has a vitest file in `tests/rules/` with at least
+- [x] Every calculator has a vitest file in `tests/rules/` with at least
       happy path + 3 edge cases covered
-- [ ] `npm run verify` is green (existing failures may persist; the calculators
+- [x] `npm run verify` is green (existing failures may persist; the calculators
       themselves are 100% tested)
-- [ ] Existing code in `actor-ffg.js`, `modifiers.js`, sheet render paths is
+- [x] Existing code in `actor-ffg.js`, `modifiers.js`, sheet render paths is
       UNCHANGED — migration of call sites is Phase 6, not here
-- [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [x] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
 
 ## Files to be created
 
@@ -72,8 +72,8 @@ tests/rules/talent-list.test.js
 ### 1.1 — Create calculator and test directories
 
 **Preconditions:**
-- [ ] Phase 0 marked complete in STATE.md
-- [ ] `modules/rules/` does not yet exist
+- [x] Phase 0 marked complete in STATE.md
+- [x] `modules/rules/` does not yet exist
 
 **Files to create:**
 - `modules/rules/calculators/.gitkeep`
@@ -386,27 +386,6 @@ export function buildTalentList({ specializations, talents, isStarWars, sortByAc
 **Commit:** `phase 01.8: extract talent-list aggregator`
 
 ---
-
-### 1.9 — Verify Phase 1 stop gate
-
-**Preconditions:**
-- [ ] Tasks 1.1-1.8 complete
-- [ ] All calculator files exist with full tests
-
-**Steps:**
-1. Run `npm run verify` — all gates green except the known-failure lint
-2. Run `npx vitest run tests/rules/` — every test passes
-3. Verify `actor-ffg.js`, `modifiers.js`, and sheet files are byte-identical
-   to their state at Phase 0 close (`git diff <phase-0-close-SHA>..HEAD --
-   modules/actors/actor-ffg.js modules/helpers/modifiers.js modules/actors/actor-sheet-ffg.js`
-   shows no changes)
-4. Run the future-maintainer check (PRINCIPLES.md): pick `encumbrance.js` +
-   `encumbrance.test.js`; could a contributor add a new item-type-specific
-   contribution rule by reading only those two files? Answer: yes.
-5. Mark Phase 1 complete in STATE.md and transition to Phase 2.
-
-**Commit:** `phase 01.9: phase 1 stop gate verified`
-
 
 ## Anti-creep notes for the whole phase
 

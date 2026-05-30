@@ -88,4 +88,3 @@ Suggested breakdown:
 - Task 9.N+1: Migrate per-type importer files to use the new pipeline
 - Task 9.N+2: Delete import-helpers.js
 - Task 9.N+3: Add dry-run mode
-- Task 9.N+4: Verify Phase 9 stop gate

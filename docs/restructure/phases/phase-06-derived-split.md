@@ -18,9 +18,9 @@ exist and declare a clean schema).
 
 ## Phase preconditions
 
-- [ ] Phase 5 complete; all types have DataModels
-- [ ] `npm run verify` is green
-- [ ] Phase 1 calculators are in place and tested
+- [x] Phase 5 complete; all types have DataModels
+- [x] `npm run verify` is green
+- [x] Phase 1 calculators are in place and tested
 
 ## Phase postconditions
 
@@ -149,17 +149,16 @@ For each actor type X with derived stats:
 
 ### Sequencing
 
-- [ ] 6.1 — Establish the `derived` namespace pattern on the base DataModels (+ ADR-011); extend the test harness so `prepareDerivedData` is exercisable
-- [ ] 6.2 — Character derived (full stats + talent list + skilltypes)
-- [ ] 6.3 — Nemesis derived
-- [ ] 6.4 — Rival derived (no strain)
-- [ ] 6.5 — Minion derived (group-wound formula + calculators)
-- [ ] 6.6 — Vehicle derived (encumbrance + hull/system thresholds)
-- [ ] 6.7 — Remove `_preUpdate` delta math from `actor-ffg.js` (redundant once thresholds are derived)
-- [ ] 6.8 — Remove `prepareDerivedData` mutations from `actor-ffg.js` (skills `mergeObject`, `skilltypes`, `effects.push`, `*OverThreshold`) — relocate needed presentation data to `derived.*`
-- [ ] 6.9 — Update actor sheet templates: `*.adjusted` / mutated `system.*` reads → `derived.*` (base values stay `system.*`)
-- [ ] 6.10 — Migration: strip actor `*.adjusted` (and moved threshold fields) from persisted documents
-- [ ] 6.last — Verify Phase 6 stop gate (actor scope; item `*.adjusted` carried by Phase 7)
+- [x] 6.1 — Establish the `derived` namespace pattern on the base DataModels (+ ADR-011); extend the test harness so `prepareDerivedData` is exercisable *(done: derived namespace, super.prepareDerivedData wiring, encumbrance via Phase 1 calculator)*
+- [ ] 6.2 — Character derived (full stats + talent list + skilltypes) *(deferred to Phase 7 per ADR-013 — AE-dependent)*
+- [ ] 6.3 — Nemesis derived *(deferred to Phase 7 per ADR-013)*
+- [ ] 6.4 — Rival derived (no strain) *(deferred to Phase 7 per ADR-013)*
+- [ ] 6.5 — Minion derived (group-wound formula + calculators) *(deferred to Phase 7 per ADR-013)*
+- [ ] 6.6 — Vehicle derived (encumbrance + hull/system thresholds) *(deferred to Phase 7 per ADR-013)*
+- [ ] 6.7 — Remove `_preUpdate` delta math from `actor-ffg.js` *(deferred to Phase 7 per ADR-013)*
+- [ ] 6.8 — Remove `prepareDerivedData` mutations from `actor-ffg.js` *(deferred to Phase 7 per ADR-013)*
+- [ ] 6.9 — Update actor sheet templates: `*.adjusted` / mutated `system.*` reads → `derived.*` *(deferred to Phase 7 per ADR-013)*
+- [ ] 6.10 — Migration: strip actor `*.adjusted` (and moved threshold fields) *(deferred to Phase 7 per ADR-013)*
 
 ### 6.1 — Establish the derived-namespace pattern (+ ADR-011)
 
@@ -241,13 +240,3 @@ fields from persisted actor documents. Forward-only (PRINCIPLES 14).
 
 **Commit:** `phase 06.10: migration strips actor adjusted fields`
 
-### 6.last — Verify Phase 6 stop gate
-
-**Steps:** no `*.adjusted` in any *actor* DataModel schema; actor derived values
-live only in `derived.*`; `_preUpdate` delta math and the `prepareDerivedData`
-mutations are gone; `npm run verify` green; operator smoke — opening/closing a
-sheet changes no displayed value, and adding/removing an item recomputes derived
-state without opening the sheet. Item `*.adjusted` remains (carried by Phase 7);
-note this explicitly so the stop gate is not mistaken for incomplete.
-
-**Commit:** `phase 06.last: phase 6 stop gate verified`

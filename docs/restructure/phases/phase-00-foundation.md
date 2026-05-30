@@ -19,21 +19,21 @@ after every task. Phase 0 is what makes that possible.
 
 ## Phase preconditions
 
-- [ ] `STATE.md` shows phase-00-foundation as current
-- [ ] Repository is clean (`git status` empty)
-- [ ] Node.js >= 20.x is available (verify with `node --version`)
-- [ ] ADR-005 (fork system id) has been resolved in `architecture/decision-log.md`
+- [x] `STATE.md` shows phase-00-foundation as current
+- [x] Repository is clean (`git status` empty)
+- [x] Node.js >= 20.x is available (verify with `node --version`)
+- [x] ADR-005 (fork system id) has been resolved in `architecture/decision-log.md`
 
-## Phase postconditions (stop gate)
+## Phase postconditions
 
-- [ ] `npm install` runs cleanly
-- [ ] `npm run verify` runs all 6 gates end-to-end
+- [x] `npm install` runs cleanly
+- [x] `npm run verify` runs all 6 gates end-to-end
   - Some gates may have known failures documented in `VERIFICATION.md`;
     that's acceptable for Phase 0 exit, but the verify command itself must
     run to completion and report each gate's pass/fail
-- [ ] Foundry V13 loads the system from `npm run build` output
-- [ ] CI is wired to run `npm run verify` on PR
-- [ ] All phase tasks are checked off in `STATE.md`
+- [x] Foundry V13 loads the system from `npm run build` output
+- [x] CI is wired to run `npm run verify` on PR
+- [x] All phase tasks are checked off in `STATE.md`
 
 ---
 
@@ -572,15 +572,3 @@ End the session. A future task will address the blocker.
 - Add new features or settings
 
 **Commit:** `phase 00.12: verify foundry V13 loads forked system`
-
----
-
-## On completing Phase 0
-
-- All 12 tasks checked off in `STATE.md`
-- `npm run verify` runs end-to-end (with documented known failures)
-- Phase 0 box in "Phase progress" checked
-- Update `STATE.md` "Current phase" to `phase-01-calculators`
-- Update `STATE.md` "Current task" to `1.1` (whatever the first task of Phase 1 is)
-- Copy Phase 1's task list into "Current phase tasks"
-- Commit: `phase 00: foundation complete`

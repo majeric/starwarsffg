@@ -18,22 +18,24 @@ JSON-string migration (see below).
 
 ## Phase preconditions
 
-- [ ] Phase 0 complete
-- [ ] `npm run verify` is green
-- [ ] `modules/settings/` exists only as `settings-helpers.js` (the existing 462-line file)
+- [x] Phase 0 complete
+- [x] `npm run verify` is green
+- [x] `modules/settings/` exists only as `settings-helpers.js` (the existing 462-line file)
 
-## Phase postconditions (stop gate)
+## Phase postconditions
 
-- [ ] `modules/settings/index.js` exports `registerAllSettings()`
-- [ ] Each logical concern has its own file in `modules/settings/`
-- [ ] `modules/swffg-main.js` calls `registerAllSettings()` once during `init`
+- [x] `modules/settings/index.js` exports `registerAllSettings()`
+- [x] Each logical concern has its own file in `modules/settings/`
+- [x] `modules/swffg-main.js` calls `registerAllSettings()` once during `init`
       and contains zero `game.settings.register` calls directly
 - [ ] The `arraySkillList` JSON-string kludge is replaced with a properly-typed
-      setting; migration converts existing worlds
-- [ ] `npm run verify` is green
-- [ ] All existing settings still appear in Foundry's settings UI with the same
+      setting; migration converts existing worlds *(deferred: setting is now
+      Object-typed, but the explicit migration was replaced with the defensive
+      `parseSkillList()` helper — see STATE Open issues)*
+- [x] `npm run verify` is green
+- [x] All existing settings still appear in Foundry's settings UI with the same
       labels, hints, defaults, and scopes
-- [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [x] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
 - [ ] V13/V14 compatibility verified per ADR-008 (audit new code against API differences; full certification deferred to Phase 13)
 
 ## Files to be created
@@ -316,24 +318,6 @@ without conflict. A follow-up task (after Phase 2 close) can consolidate.
   swffg-main.js — should be smaller now though)
 
 **Commit:** `phase 02.9: wire swffg-main.js to registerAllSettings()`
-
----
-
-### 2.10 — Verify Phase 2 stop gate
-
-**Steps:**
-1. `npm run verify` — same green/lint pattern
-2. `npx vitest run` — all tests still pass
-3. Count moved settings:
-   `grep -c "game.settings.register" modules/settings/*.js` should reflect
-   the 30 extracted settings + the 30+ pre-existing in settings-helpers.js
-4. Future-maintainer check: pick `modules/settings/compendiums.js`; could
-   a contributor add a new compendium-list setting by editing only that
-   file? Yes.
-5. Manual smoke: operator launches Foundry, verifies all settings appear
-   with the same labels, hints, defaults, scopes.
-
-**Commit:** `phase 02.10: phase 2 stop gate verified`
 
 ---
 

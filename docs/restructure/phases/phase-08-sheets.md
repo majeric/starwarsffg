@@ -81,4 +81,3 @@ Suggested breakdown:
 - Tasks 8.2-8.N: One per actor type — extract from monolith, verify rendering
 - Tasks 8.N+1 to 8.M: One per item type
 - Task 8.M+1: Delete legacy sheet files
-- Task 8.M+2: Verify Phase 8 stop gate

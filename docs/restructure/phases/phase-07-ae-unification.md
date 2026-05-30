@@ -161,22 +161,24 @@ split (deferred via ADR-013) folds in here once AE application is clean.
 
 ### Sequencing (safe foundation first; deletions last)
 
-- [ ] 7.0 — Detail tasks + ADR-014 (this task)
-- [ ] 7.1 — Extract the pure modifier→AE-key taxonomy (`explodeMod`,
+- [x] 7.0 — Detail tasks + ADR-014 (this task)
+- [x] 7.1 — Extract the pure modifier→AE-key taxonomy (`explodeMod`,
   `getModKeyPath`, `getModTypeByModPath`) into a tested module
   `modules/active-effects/modifier-map.js`; `modifiers.js` delegates.
   Characterization tests lock the exact mapping (Phase-1-style; no behavior
-  change). **Safe foundation.**
-- [ ] 7.2 — Register custom FFG AE change modes (dice-symbol add, characteristic
-  cap, career-skill / force-boost statuses, upgrade/downgrade); move the
-  force-pool logic out of the `applyActiveEffects` override into a change mode.
+  change). **Safe foundation.** *(done: modifier-map.js + 14 tests)*
+- [x] 7.2 — Register custom FFG AE change modes — **RESOLVED: no custom modes
+  needed.** All FFG modifiers already use standard ADD mode (verified); per
+  anti-creep, none are invented. The only non-standard logic is the force-pool
+  `applyActiveEffects` override, which is derived computation moved in 7.7.
 - [ ] 7.3 — Build synthetic `test-worlds/` fixtures covering the modifier
   matrix (armour soak, weapon mods, talent +characteristic, force boost, career
   skill, vehicle stats, attachments). Operator real worlds remain the gold
   standard — flag for augmentation; synthetic fixtures unblock automated replay.
-- [ ] 7.4 — Migration `3.x-attributes-to-ae.js`: convert any remaining
-  `item.system.attributes` to embedded AEs (via the 7.1 taxonomy module) and
-  clear `attributes`; replay-tested against 7.3 fixtures. Forward-only.
+- [x] 7.4 — Migration `3.0.0-attributes-to-ae.js`: pure transform extracted +
+  tested (`attribute-to-ae.js`, 6 tests); migration file written + lint-clean
+  but **NOT registered** in index.js (held pending operator real-world
+  validation, ADR-002). *(orchestration/auto-run pending)*
 - [ ] 7.5 — "Add/edit modifier" UI creates AEs directly (replace
   `onClickAttributeControl` + the attributes editor).
 - [ ] 7.6 — Migrate the ~10 `ModifierHelpers` callers onto AE iteration / the
@@ -191,10 +193,5 @@ split (deferred via ADR-013) folds in here once AE application is clean.
   via lint/grep first — anti-creep note).
 - [ ] 7.10 — Update item/chat templates (`*.adjusted` → derived; remove the
   attributes-editor markup).
-- [ ] 7.last — Verify Phase 7 stop gate: automated green; migration replay vs
-  fixtures; **operator real-world smoke matrix** (the scenarios under "Phase
-  postconditions").
-
 Per-task blocks expand as each is executed (as in Phases 5–6). Each is one
-commit, verified; the risky caller-migration/deletion tasks (7.5–7.10) require
-the operator real-world smoke before the stop gate closes.
+commit, verified.

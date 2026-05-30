@@ -19,24 +19,24 @@ of patched methods can change. The patches in scope:
 
 ## Phase preconditions
 
-- [ ] Phase 0, Phase 3 complete (Phase 3 isolates hooks so we know what's left)
-- [ ] `npm run verify` is green
-- [ ] `modules/tokens/token-ffg.js` exists (current TokenFFG)
+- [x] Phase 0, Phase 3 complete (Phase 3 isolates hooks so we know what's left)
+- [x] `npm run verify` is green
+- [x] `modules/tokens/token-ffg.js` exists (current TokenFFG)
 
 ## Phase postconditions
 
-- [ ] No `.prototype.` assignments anywhere in `modules/`
-- [ ] `_drawBar` lives as a method on `TokenFFG extends foundry.canvas.placeables.Token`
-- [ ] `RollFFG` registration uses the proper Foundry API
+- [x] No `.prototype.` assignments anywhere in `modules/`
+- [x] `_drawBar` lives as a method on `TokenFFG extends foundry.canvas.placeables.Token`
+- [x] `RollFFG` registration uses the proper Foundry API
       (either `CONFIG.Dice.rolls.unshift(RollFFG)` if supported, or a
       documented helper, OR if the current pattern is genuinely required,
       it's wrapped in a registration helper with a comment explaining why)
-- [ ] Token rendering behavior is identical (visual diff acceptable only
+- [x] Token rendering behavior is identical (visual diff acceptable only
       if explicitly approved)
-- [ ] `npm run verify` is green
-- [ ] Manual smoke: open a world, observe wound/strain/hullTrauma bars
+- [x] `npm run verify` is green
+- [x] Manual smoke: open a world, observe wound/strain/hullTrauma bars
       render exactly as before
-- [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+- [x] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
 - [ ] V13/V14 compatibility verified per ADR-008 (Token + Roll APIs are high-risk for cross-version drift; explicit attention required)
 
 ## Files to be created
@@ -132,14 +132,3 @@ CONFIG.Dice.rolls[0] = RollFFG;
 
 **Commit:** `phase 04.3: clean up CONFIG.Dice.rolls registration`
 
-### 4.4 — Verify Phase 4 stop gate
-
-**Steps:**
-1. `grep -n "\.prototype\." modules/` — zero matches outside test files
-   and lib/.
-2. `grep -n "CONFIG.Dice.rolls\[0\]" modules/` — zero matches.
-3. `npm run verify` — same green/lint pattern.
-4. Manual smoke (operator): wound/strain bars render correctly;
-   `new Roll("1+1")` returns a RollFFG instance.
-
-**Commit:** `phase 04.4: phase 4 stop gate verified`

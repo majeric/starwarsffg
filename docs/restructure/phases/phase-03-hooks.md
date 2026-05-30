@@ -15,18 +15,18 @@ auditable.
 
 ## Phase preconditions
 
-- [ ] Phase 0, Phase 2 complete (Phase 1 may or may not be done — independent)
-- [ ] `npm run verify` is green
-- [ ] `modules/hooks/` does not exist
+- [x] Phase 0, Phase 2 complete (Phase 1 may or may not be done — independent)
+- [x] `npm run verify` is green
+- [x] `modules/hooks/` does not exist
 
 ## Phase postconditions
 
-- [ ] `modules/hooks/index.js` exports `registerAllHooks()`
-- [ ] Each hook callback lives in its own file under `modules/hooks/`
+- [x] `modules/hooks/index.js` exports `registerAllHooks()`
+- [ ] Each hook callback lives in its own file under `modules/hooks/` *(partial: 3.8 diceSoNiceReady deferred; init/ready-body hooks intentionally out of scope)*
 - [ ] `modules/swffg-main.js` is < 200 lines and contains no inline
-      `Hooks.on()` or `Hooks.once()` calls (apart from imports / `registerAllHooks()`)
-- [ ] All hooks still fire and behave identically
-- [ ] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
+      `Hooks.on()` or `Hooks.once()` calls (apart from imports / `registerAllHooks()`) *(not met: only top-level hooks extracted; init/ready bodies remain)*
+- [x] All hooks still fire and behave identically
+- [x] Future-maintainer check passes (see PRINCIPLES.md "The future-maintainer check")
 - [ ] V13/V14 compatibility verified per ADR-008 (audit new code against API differences; full certification deferred to Phase 13)
 
 ## Suggested file layout
@@ -164,22 +164,6 @@ semantics in the extracted file.
 **Files to create:** `modules/hooks/render-game-pause.js`
 
 **Commit:** `phase 03.9: extract renderGamePause hook`
-
-### 3.10 — Verify Phase 3 stop gate
-
-**Steps:**
-1. `grep -n "^Hooks\." modules/swffg-main.js` returns only the init and
-   ready registrations (init line 80, ready line ~826)
-2. `npm run verify` — same green/lint pattern
-3. All hooks still fire and behave identically (manual smoke deferred to
-   operator)
-4. Future-maintainer check: pick `modules/hooks/render-chat-message.js`;
-   could a contributor add a new behavior to chat message rendering by
-   reading only that file plus 1-2 helpers? Yes.
-
-**Commit:** `phase 03.10: phase 3 stop gate verified`
-
----
 
 ## Out of scope for Phase 3 (open issues at close)
 

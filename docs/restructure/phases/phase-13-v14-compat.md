@@ -28,7 +28,7 @@ It cannot run earlier because:
 - [ ] `test-worlds/` includes at least one fixture captured on V14
 - [ ] V14 type definitions exist (vendor from community types package)
 
-## Phase postconditions (stop gate)
+## Phase postconditions
 
 - [ ] `system.json` `compatibility` is `{ minimum: 13, verified: 14, maximum: 14 }`
 - [ ] `npm run verify` passes against both V13 and V14 (matrix smoke load)
@@ -76,7 +76,6 @@ Suggested breakdown:
 - Task 13.5: Implement matrix CI build (V13 + V14)
 - Task 13.6: Run all earlier phases' manual smoke matrices against V14
 - Task 13.7: Capture a V14 world fixture for `test-worlds/`
-- Task 13.8: Verify Phase 13 stop gate
 
 The first session in Phase 13 produces the detailed audit (13.1) before
 starting other tasks. The audit drives the per-API decisions in 13.2.
