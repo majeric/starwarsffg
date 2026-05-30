@@ -22,7 +22,7 @@ export const slug = "active-effects";
 export const description = "Convert legacy item attributes to Active Effects and parse XP log";
 
 /* eslint-disable max-lines-per-function, complexity, max-depth -- relocated verbatim from swffg-migration.js; decomposition is a future task. */
-export default async function migrate(world) {
+export default async function migrate(world: any): Promise<void> {
   try {
     for (const actor of world.actors) {
       const xpLog = actor.getFlag("starwarsffg", "xpLog") || [];
@@ -67,7 +67,7 @@ export default async function migrate(world) {
     }
 
     for (const actor of world.actors) {
-      const inputStats = { system: {} };
+      const inputStats: any = { system: {} };
 
       if (["character", "nemesis", "rival"].includes(actor.type)) {
         inputStats.system.characteristics = {};
@@ -173,20 +173,25 @@ export default async function migrate(world) {
   }
 }
 
-async function convertSpecializationToAEs(item) {
+async function convertSpecializationToAEs(item: any): Promise<void> {
   await convertNestedAttributesToAEs(item, "talents", 20, "talent");
 }
 
-async function convertForcePowerToAEs(item) {
+async function convertForcePowerToAEs(item: any): Promise<void> {
   await convertNestedAttributesToAEs(item, "upgrades", 16, "upgrade");
 }
 
-async function convertSignatureAbilityToAEs(item) {
+async function convertSignatureAbilityToAEs(item: any): Promise<void> {
   await convertNestedAttributesToAEs(item, "upgrades", 8, "upgrade");
 }
 
-async function convertNestedAttributesToAEs(item, collectionKey, count, entryPrefix) {
-  const toCreate = [];
+async function convertNestedAttributesToAEs(
+  item: any,
+  collectionKey: string,
+  count: number,
+  entryPrefix: string,
+): Promise<void> {
+  const toCreate: any[] = [];
   for (let i = 0; i < count; i++) {
     const entry = item.system[collectionKey][`${entryPrefix}${i}`];
     const attributes = entry?.attributes;
@@ -197,7 +202,7 @@ async function convertNestedAttributesToAEs(item, collectionKey, count, entryPre
       entry.attributes[nk] = attributes[attribute];
       entry.attributes[`-=${attribute}`] = null;
       delete entry.attributes[attribute];
-      await new Promise((r) => setTimeout(r, 1));
+      await new Promise((resolve) => setTimeout(resolve, 1));
       const changes = buildAEChangesFromMod(entry.attributes[nk]);
       toCreate.push({
         name: nk,
@@ -212,7 +217,7 @@ async function convertNestedAttributesToAEs(item, collectionKey, count, entryPre
   }
 }
 
-function buildAEChangesFromMod(attr) {
+function buildAEChangesFromMod(attr: any): any[] {
   const explodedMods = ModifierHelpers.explodeMod(attr.modtype, attr.mod);
   return explodedMods.map((curMod) => ({
     key: ModifierHelpers.getModKeyPath(curMod.modType, curMod.mod),

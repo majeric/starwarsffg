@@ -10,6 +10,7 @@ declare global {
 
   interface CONFIG {
     FFG: Record<string, any>;
+    logger: Pick<Console, "debug" | "error" | "info" | "log" | "warn">;
   }
 
   interface Canvas {

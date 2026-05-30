@@ -15,13 +15,13 @@ const COMPENDIUM_SETTINGS = [
   "talentCompendiums",
 ];
 
-export default async function migrate(world) {
+export default async function migrate(world: any): Promise<void> {
   for (const settingKey of COMPENDIUM_SETTINGS) {
     rewriteSettingPaths(world.settings, settingKey);
   }
 }
 
-function rewriteSettingPaths(settings, key) {
+function rewriteSettingPaths(settings: any, key: string): void {
   const original = settings.get("starwarsffg", key);
   if (!original) return;
   const rewritten = original

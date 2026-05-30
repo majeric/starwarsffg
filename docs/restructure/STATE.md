@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-12-typescript
-**Current task:** 12.7 — Convert modules/migrations/
-**Last verified:** 2026-05-30T19:15:53Z (task 12.6; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors, 965 warnings; 204 unit tests, 2 skipped)
-**Last commit on plan:** 5430330
+**Current task:** 12.8 — Convert modules/active-effects/
+**Last verified:** 2026-05-30T19:19:45Z (task 12.7; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors, 965 warnings; 204 unit tests, 2 skipped)
+**Last commit on plan:** ad28ce2
 
 ---
 
@@ -35,7 +35,7 @@
 - [x] 12.4 — Convert `modules/data/` (45 files, 1218 lines)
 - [x] 12.5 — Convert `modules/settings/` (11 files, 1086 lines)
 - [x] 12.6 — Convert `modules/hooks/` (8 files, 210 lines)
-- [ ] 12.7 — Convert `modules/migrations/` (6 files, 456 lines)
+- [x] 12.7 — Convert `modules/migrations/` (6 files, 456 lines)
 - [ ] 12.8 — Convert `modules/active-effects/` (8 files, 649 lines)
 - [ ] 12.9 — Convert `modules/tokens/` (1 file, 141 lines)
 - [ ] 12.10 — Convert `modules/dice/` (11 files, 1580 lines)

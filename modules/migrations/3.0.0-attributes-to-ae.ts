@@ -22,7 +22,7 @@ export const version = "3.0.0";
 export const slug = "attributes-to-ae";
 export const description = "Convert remaining legacy item attributes to Active Effects and clear them (Phase 7)";
 
-export default async function migrate(world) {
+export default async function migrate(world: any): Promise<{ changed: number }> {
   let changed = 0;
   for (const item of allItems(world)) {
     changed += await migrateItem(item);
@@ -30,14 +30,14 @@ export default async function migrate(world) {
   return { changed };
 }
 
-function* allItems(world) {
+function* allItems(world: any): Generator<any> {
   for (const item of world.items) yield item;
   for (const actor of world.actors) {
     for (const item of actor.items) yield item;
   }
 }
 
-async function migrateItem(item) {
+async function migrateItem(item: any): Promise<number> {
   const attributes = item.system?.attributes ?? {};
   const userKeys = Object.keys(attributes).filter(isUserAttributeKey);
   if (userKeys.length === 0) return 0;
@@ -56,14 +56,14 @@ async function migrateItem(item) {
 }
 
 /** Equippable item that is not currently equipped — its migrated AEs start disabled. */
-function isUnequipped(item) {
+function isUnequipped(item: any): boolean {
   const equippable = item.system?.equippable;
   return equippable?.value === true && equippable?.equipped !== true;
 }
 
 /** Build a Foundry `-=key` deletion payload that removes each attribute key. */
-function deletionKeys(keys) {
-  const clear = {};
+function deletionKeys(keys: string[]): Record<string, null> {
+  const clear: Record<string, null> = {};
   for (const key of keys) clear[`-=${key}`] = null;
   return clear;
 }
