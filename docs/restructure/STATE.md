@@ -3,7 +3,7 @@
 **Current phase:** phase-07-ae-unification
 **Current task:** 7.9 — Delete modifiers.js + popout-modifiers.js
 **Last verified:** 2026-05-30T07:28:17Z (task 7.9 partial; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 187 unit tests — +4 legacy-modifier-values)
-**Last commit on plan:** 29c88bf
+**Last commit on plan:** 554a273
 
 ---
 
