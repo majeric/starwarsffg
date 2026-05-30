@@ -10,6 +10,11 @@
  * without an ADR; the characterization tests in tests/active-effects/ lock it.
  */
 
+export interface ModifierSelection {
+  modType: string;
+  mod: string;
+}
+
 /**
  * Expand a mod into the list of mods it implies (e.g. Brawn also drives
  * Encumbrance threshold and Soak; Defence drives both melee and ranged).
@@ -18,7 +23,7 @@
  * @param {string} mod
  * @returns {Array<{modType:string, mod:string}>}
  */
-export function explodeMod(modType, mod) {
+export function explodeMod(modType: string, mod: string): ModifierSelection[] {
   const modLower = mod.toLocaleLowerCase();
   if (["defence-melee", "defense-melee"].includes(modLower)) {
     return [{ modType: "Stat", mod: "Defence.Melee" }];
@@ -57,8 +62,8 @@ export function explodeMod(modType, mod) {
  * @param {string} mod
  * @returns {string|undefined}
  */
-/* eslint-disable-next-line complexity, max-lines-per-function -- verbatim taxonomy from modifiers.js; a table-driven refactor is a separate task */
-export function getModKeyPath(modType, mod) {
+/* Verbatim taxonomy from modifiers.js; a table-driven refactor is a separate task. */
+export function getModKeyPath(modType: string, mod: string): string | undefined {
   if (["Wounds", "Strain", "EncumbranceMax", "Speed", "Hulltrauma", "Systemstrain"].includes(mod)) {
     modType = "Threshold";
   }
@@ -146,8 +151,8 @@ export function getModKeyPath(modType, mod) {
  * @param {string} skillPath
  * @returns {string|undefined}
  */
-/* eslint-disable-next-line complexity -- verbatim taxonomy from modifiers.js; a lookup-map refactor is a separate task */
-export function getModTypeByModPath(skillPath) {
+/* Verbatim taxonomy from modifiers.js; a lookup-map refactor is a separate task. */
+export function getModTypeByModPath(skillPath: string): string | undefined {
   if (skillPath.endsWith("force")) {
     return "Force Boost";
   } else if (skillPath.endsWith("advantage")) {

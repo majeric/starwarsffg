@@ -1,10 +1,10 @@
 import { explodeMod, getModKeyPath } from "./modifier-map.js";
 
-function hasKey(obj, key) {
+function hasKey(obj: any, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(obj ?? {}, key);
 }
 
-function cleanDeletedAttributeKeys(formData) {
+function cleanDeletedAttributeKeys(formData: any): void {
   const attributes = formData.data.attributes;
   if (!attributes) return;
 
@@ -13,12 +13,12 @@ function cleanDeletedAttributeKeys(formData) {
   }
 }
 
-function submittedAttributes(formData) {
-  return foundry.utils.expandObject(formData)?.data?.attributes || {};
+function submittedAttributes(formData: any): Record<string, any> {
+  return (foundry.utils.expandObject(formData) as any)?.data?.attributes || {};
 }
 
-function changesForAttribute(attr) {
-  const changes = [];
+function changesForAttribute(attr: any): any[] {
+  const changes: any[] = [];
   for (const curMod of explodeMod(attr.modtype, attr.mod)) {
     changes.push({
       key: getModKeyPath(curMod.modType, curMod.mod),
@@ -29,7 +29,7 @@ function changesForAttribute(attr) {
   return changes;
 }
 
-function applyAttributeToEffect(effect, attr) {
+function applyAttributeToEffect(effect: any, attr: any): void {
   for (const curMod of explodeMod(attr.modtype, attr.mod)) {
     const modPath = getModKeyPath(curMod.modType, curMod.mod);
     const index = effect.changes.findIndex((change) => change.key === modPath);
@@ -37,7 +37,7 @@ function applyAttributeToEffect(effect, attr) {
   }
 }
 
-async function updateInherentAttributes(formData, inherentEffect) {
+async function updateInherentAttributes(formData: any, inherentEffect: any): Promise<void> {
   if (!inherentEffect || !hasKey(formData.data, "attributes")) return;
 
   for (const key of Object.keys(formData.data.attributes)) {
@@ -48,7 +48,7 @@ async function updateInherentAttributes(formData, inherentEffect) {
   await inherentEffect.update({ changes: inherentEffect.changes });
 }
 
-function inherentStatUpdates(item, formData) {
+function inherentStatUpdates(item: any, formData: any): any[] {
   if (["gear", "weapon", "armour"].includes(item.type)) {
     const updates = [{ modtype: "Stat", mod: "Encumbrance", value: formData.data.encumbrance.value }];
     if (item.type === "armour") {
@@ -65,7 +65,7 @@ function inherentStatUpdates(item, formData) {
   return [];
 }
 
-function applyInherentStatUpdate(effect, update) {
+function applyInherentStatUpdate(effect: any, update: any): void {
   for (const curMod of explodeMod(update.modtype, update.mod)) {
     const modPath = getModKeyPath(curMod.modType, curMod.mod);
     const index = effect.changes.findIndex((change) => change.key === modPath);
@@ -73,7 +73,7 @@ function applyInherentStatUpdate(effect, update) {
   }
 }
 
-async function updateInherentStats(item, formData, inherentEffect) {
+async function updateInherentStats(item: any, formData: any, inherentEffect: any): Promise<void> {
   if (!inherentEffect) return;
   const updates = inherentStatUpdates(item, formData);
   if (!updates.length) return;
@@ -85,7 +85,7 @@ async function updateInherentStats(item, formData, inherentEffect) {
   await inherentEffect.update({ changes: inherentEffect.changes });
 }
 
-function stageDeletedAttributeEffects(item, existingEffects, attributes, toDelete) {
+function stageDeletedAttributeEffects(item: any, existingEffects: any, attributes: Record<string, any>, toDelete: string[]): void {
   for (const key of Object.keys(item.system?.attributes ?? {})) {
     const match = existingEffects.find((effect) => effect.name === key);
     if (!hasKey(attributes, key)) {
@@ -95,7 +95,7 @@ function stageDeletedAttributeEffects(item, existingEffects, attributes, toDelet
   }
 }
 
-async function syncSubmittedAttributeEffects(existingEffects, formData, toCreate) {
+async function syncSubmittedAttributeEffects(existingEffects: any, formData: any, toCreate: any[]): Promise<void> {
   if (!formData.data?.attributes) return;
 
   for (const key of Object.keys(formData.data.attributes)) {
@@ -110,7 +110,7 @@ async function syncSubmittedAttributeEffects(existingEffects, formData, toCreate
   }
 }
 
-function speciesThresholdValues(item, formData, changes) {
+function speciesThresholdValues(item: any, formData: any, changes: any[]): Record<string, number> {
   const newBrawn = changes.find((ae) => ae.key === "system.characteristics.Brawn.value").value;
   const newWillpower = changes.find((ae) => ae.key === "system.characteristics.Willpower.value").value;
   const wounds = submittedAttributeValue(formData, item, "Wounds");
@@ -123,13 +123,13 @@ function speciesThresholdValues(item, formData, changes) {
   };
 }
 
-function submittedAttributeValue(formData, item, key) {
+function submittedAttributeValue(formData: any, item: any, key: string): any {
   const submitted = formData.data.attributes?.[key]?.value;
   if (submitted) return submitted;
   return item.system.attributes[key].value;
 }
 
-function updateSpeciesThresholdChange(change, values) {
+function updateSpeciesThresholdChange(change: any, values: Record<string, number>): void {
   const thresholdValues = {
     "system.stats.wounds.max": values.wounds,
     "system.stats.strain.max": values.strain,
@@ -139,7 +139,7 @@ function updateSpeciesThresholdChange(change, values) {
   if (hasKey(thresholdValues, change.key)) change.value = thresholdValues[change.key];
 }
 
-async function updateSpeciesThresholdEffects(item, formData, existingEffects) {
+async function updateSpeciesThresholdEffects(item: any, formData: any, existingEffects: any): Promise<void> {
   const itemEffect = existingEffects.find((effect) => effect.name === "(inherent)");
   if (!itemEffect || item.type !== "species") return;
 
@@ -153,7 +153,7 @@ async function updateSpeciesThresholdEffects(item, formData, existingEffects) {
   await itemEffect.update({ changes: newChanges });
 }
 
-export async function applyActiveEffectOnUpdate(item, formData) {
+export async function applyActiveEffectOnUpdate(item: any, formData: any): Promise<void> {
   CONFIG.logger.debug("Updating active effects on item update");
   if (!hasKey(formData, "data")) {
     CONFIG.logger.debug("Bailing on update as there was no form data");
@@ -166,8 +166,8 @@ export async function applyActiveEffectOnUpdate(item, formData) {
   const attributes = submittedAttributes(updateData);
   const existingEffects = item.getEmbeddedCollection("ActiveEffect");
   const inherentEffect = existingEffects.find((effect) => effect.name === "(inherent)");
-  const toDelete = [];
-  const toCreate = [];
+  const toDelete: string[] = [];
+  const toCreate: any[] = [];
 
   await updateInherentAttributes(updateData, inherentEffect);
   await updateInherentStats(item, updateData, inherentEffect);

@@ -8,6 +8,24 @@ import { explodeMod, getModKeyPath } from "./modifier-map.js";
  * `buildAEChangesFromMod` (explodeMod + getModKeyPath, ADD mode).
  */
 
+export interface LegacyAttribute {
+  modtype: string;
+  mod: string;
+  value: any;
+}
+
+export interface ActiveEffectChangeData {
+  key: string | undefined;
+  mode: any;
+  value: any;
+}
+
+export interface AttributeEffectData {
+  name: string;
+  changes: ActiveEffectChangeData[];
+  flags: { starwarsffg: { ffgModType: string; ffgMod: string } };
+}
+
 /**
  * User-authored modifier entries use `attr<timestamp>` keys; inherent/structural
  * entries (e.g. a species "brawn") do not. Only user entries migrate to
@@ -16,7 +34,7 @@ import { explodeMod, getModKeyPath } from "./modifier-map.js";
  * @param {string} key
  * @returns {boolean}
  */
-export function isUserAttributeKey(key) {
+export function isUserAttributeKey(key: string): boolean {
   return typeof key === "string" && key.startsWith("attr");
 }
 
@@ -27,7 +45,7 @@ export function isUserAttributeKey(key) {
  * @param {{ modtype:string, mod:string, value:* }} attr
  * @returns {Array<{ key:string, mode:number, value:* }>}
  */
-export function attributeToChanges(attr) {
+export function attributeToChanges(attr: LegacyAttribute): ActiveEffectChangeData[] {
   const exploded = explodeMod(attr.modtype, attr.mod);
   return exploded.map((curMod) => ({
     key: getModKeyPath(curMod.modType, curMod.mod),
@@ -44,8 +62,8 @@ export function attributeToChanges(attr) {
  * @param {Record<string, { modtype:string, mod:string, value:* }>} attributes
  * @returns {Array<{ name:string, changes:Array<object> }>}
  */
-export function attributesToEffectData(attributes = {}) {
-  const effects = [];
+export function attributesToEffectData(attributes: Record<string, LegacyAttribute> = {}): AttributeEffectData[] {
+  const effects: AttributeEffectData[] = [];
   for (const [key, attr] of Object.entries(attributes)) {
     if (!isUserAttributeKey(key)) continue;
     const changes = attributeToChanges(attr).filter((c) => c.key !== undefined);

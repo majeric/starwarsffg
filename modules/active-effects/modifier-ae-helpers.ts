@@ -24,7 +24,14 @@ const STAT_KEYS = {
   "system.stats.silhouette.value": { modtype: "Vehicle Stat", mod: "Silhouette" },
 };
 
-function reverseModKeyPath(key) {
+interface ModifierData {
+  key?: string;
+  modtype: string;
+  mod: string;
+  value: any;
+}
+
+function reverseModKeyPath(key: string): { modtype: string; mod: string } | undefined {
   const charMatch = key.match(/^system\.characteristics\.(\w+)\.value$/);
   if (charMatch) return { modtype: "Characteristic", mod: charMatch[1] };
 
@@ -39,36 +46,36 @@ function reverseModKeyPath(key) {
   return undefined;
 }
 
-export function isModifierEffect(effect) {
+export function isModifierEffect(effect: any): boolean {
   if (effect.name === "(inherent)") return false;
   if (effect.flags?.starwarsffg?.ffgModType) return true;
   if (effect.name?.startsWith("attr") || effect.name?.startsWith("Migrated:")) return true;
   return false;
 }
 
-function modFromFlags(effect) {
+function modFromFlags(effect: any): { modtype: string; mod: string } | undefined {
   const flags = effect.flags?.starwarsffg;
   if (!flags?.ffgModType) return undefined;
   return { modtype: flags.ffgModType, mod: flags.ffgMod };
 }
 
-function modFromChanges(effect) {
+function modFromChanges(effect: any): { modtype: string; mod: string } | undefined {
   const change = effect.changes?.[0];
   if (!change) return undefined;
   return reverseModKeyPath(change.key);
 }
 
-function effectToModifier(effect) {
+function effectToModifier(effect: any): ModifierData | undefined {
   const info = modFromFlags(effect) || modFromChanges(effect);
   if (!info) return undefined;
   const value = effect.changes?.[0]?.value ?? 0;
   return { key: effect.id, modtype: info.modtype, mod: info.mod, value };
 }
 
-export function getModifierEffectsAsAttributes(doc) {
+export function getModifierEffectsAsAttributes(doc: any): Record<string, ModifierData> {
   const effects = doc.getEmbeddedCollection?.("ActiveEffect");
   if (!effects) return {};
-  const result = {};
+  const result: Record<string, ModifierData> = {};
   for (const effect of effects) {
     if (!isModifierEffect(effect)) continue;
     const mod = effectToModifier(effect);
@@ -77,7 +84,7 @@ export function getModifierEffectsAsAttributes(doc) {
   return result;
 }
 
-function buildAEData(modtype, mod, value) {
+function buildAEData(modtype: string, mod: string, value: any): any {
   const exploded = explodeMod(modtype, mod);
   const changes = exploded
     .map((m) => ({
@@ -95,30 +102,36 @@ function buildAEData(modtype, mod, value) {
   };
 }
 
-export async function createModifierEffect(doc, modtype, mod, value) {
+export async function createModifierEffect(doc: any, modtype: string, mod: string, value: any): Promise<any> {
   const data = buildAEData(modtype, mod, value);
   return doc.createEmbeddedDocuments("ActiveEffect", [data]);
 }
 
-export async function updateModifierEffect(doc, effectId, modtype, mod, value) {
+export async function updateModifierEffect(
+  doc: any,
+  effectId: string,
+  modtype: string,
+  mod: string,
+  value: any,
+): Promise<any> {
   const data = buildAEData(modtype, mod, value);
   data._id = effectId;
   return doc.updateEmbeddedDocuments("ActiveEffect", [data]);
 }
 
-export async function deleteModifierEffect(doc, effectId) {
+export async function deleteModifierEffect(doc: any, effectId: string): Promise<any> {
   return doc.deleteEmbeddedDocuments("ActiveEffect", [effectId]);
 }
 
-export async function syncFormToEffects(doc, formModifiers) {
+export async function syncFormToEffects(doc: any, formModifiers: Record<string, ModifierData>): Promise<void> {
   const existing = doc.getEmbeddedCollection("ActiveEffect");
-  const existingMods = {};
+  const existingMods: Record<string, any> = {};
   for (const e of existing) {
     if (isModifierEffect(e)) existingMods[e.id] = e;
   }
 
-  const toUpdate = [];
-  const seen = new Set();
+  const toUpdate: any[] = [];
+  const seen = new Set<string>();
 
   for (const [key, mod] of Object.entries(formModifiers)) {
     if (key.startsWith("-=")) continue;

@@ -1,8 +1,6 @@
-﻿
-function disablePushOnItem(options){
+function disablePushOnItem(options: any): void {
   // don't show push/animation if that's an effect from item
-  if(options.parent.parentCollection === "items")
-  {
+  if (options.parent.parentCollection === "items") {
     options.animate = false;
   }
 }
@@ -13,19 +11,19 @@ function disablePushOnItem(options){
  */
 export class ActiveEffectFFG extends ActiveEffect {
   /** @override */
-  async _onCreate(changed, options, userId) {
+  async _onCreate(changed: any, options: any, userId: string): Promise<void> {
     disablePushOnItem(options);
     await super._onCreate(changed, options, userId);
   }
 
   /** @override */
-  async _onUpdate(changed, options, userId) {
+  async _onUpdate(changed: any, options: any, userId: string): Promise<void> {
     disablePushOnItem(options);
     await super._onUpdate(changed, options, userId);
   }
 
   /** @override */
-  async _onDelete(options, userId) {
+  async _onDelete(options: any, userId: string): Promise<void> {
     disablePushOnItem(options);
     await super._onDelete(options, userId);
   }
