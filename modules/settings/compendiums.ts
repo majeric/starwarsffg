@@ -27,7 +27,7 @@ const COMPENDIUM_SETTINGS = [
   },
 ];
 
-export function registerCompendiumSettings() {
+export function registerCompendiumSettings(): void {
   for (const entry of COMPENDIUM_SETTINGS) {
     game.settings.register("starwarsffg", entry.key, {
       name: game.i18n.localize(`SWFFG.Settings.Purchase.${entry.label}.Name`),

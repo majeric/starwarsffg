@@ -1,23 +1,31 @@
+type SettingViewData = Record<string, any>;
+
+function getSettingValue(namespace: string, key: string): any {
+  // FIXME(types): Settings form rows carry runtime namespace/key strings.
+  return game.settings.get(namespace as any, key as any);
+}
+
 class ffgSettings extends FormApplication {
-  activateListeners(html) {
+  activateListeners(html: any): void {
     super.activateListeners(html);
     html.find("button.filepicker").click(this._onFilePicker.bind(this));
   }
 
-  getData(acceptableSettings) {
+  getData(acceptableSettings: any = []): any {
     const canConfigure = game.user.can("SETTINGS_MODIFY");
-    let includeSettings = [];
-    for (const setting of game.settings.settings) {
-      if (acceptableSettings.includes(setting[0])) {
-        const s = foundry.utils.duplicate(setting[1]);
+    const includeSettings: SettingViewData[] = [];
+    const acceptableSettingNames = acceptableSettings as string[];
+    for (const [settingKey, settingConfig] of game.settings.settings) {
+      if (acceptableSettingNames.includes(settingKey)) {
+        const s = foundry.utils.duplicate(settingConfig) as SettingViewData;
         s.name = game.i18n.localize(s.name);
         s.hint = game.i18n.localize(s.hint);
-        s.value = game.settings.get(s.namespace, s.key);
-        s.type = setting.type instanceof Function ? setting.type.name : "String";
-        s.isCheckbox = setting[1].type === Boolean;
+        s.value = getSettingValue(s.namespace, s.key);
+        s.type = settingConfig.type instanceof Function ? settingConfig.type.name : "String";
+        s.isCheckbox = settingConfig.type === Boolean;
         s.isSelect = s.choices !== undefined;
-        s.isRange = setting[1].type === Number && s.range;
-        s.isFilePicker = setting.valueType === "FilePicker";
+        s.isRange = settingConfig.type === Number && s.range;
+        s.isFilePicker = (settingConfig as SettingViewData).valueType === "FilePicker";
         includeSettings.push(s);
       }
     }
@@ -35,35 +43,38 @@ class ffgSettings extends FormApplication {
     };
   }
 
-  _onFilePicker(event) {
+  _onFilePicker(event: Event): Promise<unknown> {
     event.preventDefault();
 
     const fp = new foundry.applications.apps.FilePicker({
       type: "image",
-      callback: (path) => {
+      callback: (path: string) => {
         $(event.currentTarget).prev().val(path);
         //this._onSubmit(event);
       },
       top: this.position.top + 40,
       left: this.position.left + 10,
-    });
+      // FIXME(types): Foundry V13 still accepts top/left here, but
+      // fvtt-types only exposes the newer position option shape.
+    } as any);
     return fp.browse();
   }
 
     /** @override */
-  async _updateObject(event, formData) {
-    for (let [k, v] of Object.entries(foundry.utils.flattenObject(formData))) {
-      let s = game.settings.settings.get(k);
-      let current = game.settings.get(s.namespace, s.key);
+  async _updateObject(event: Event, formData: Record<string, any>): Promise<void> {
+    void event;
+    for (const [k, v] of Object.entries(foundry.utils.flattenObject(formData))) {
+      const s = game.settings.settings.get(k as any) as SettingViewData;
+      const current = getSettingValue(s.namespace, s.key);
       if (v !== current) {
-        await game.settings.set(s.namespace, s.key, v);
+        await game.settings.set(s.namespace as any, s.key as any, v);
       }
     }
   }
 }
 
 export class rulesetSettings extends ffgSettings {
-  static get defaultOptions() {
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: "ruleset-settings",
       classes: ["starwarsffg", "ruleset-settings"],
@@ -72,7 +83,7 @@ export class rulesetSettings extends ffgSettings {
     });
   }
 
-  getData(options) {
+  getData(): any {
     const includeSettingsNames = [
         "starwarsffg.dicetheme",
         "starwarsffg.vehicleRangeBand",
@@ -84,7 +95,7 @@ export class rulesetSettings extends ffgSettings {
 }
 
 export class uiSettings extends ffgSettings {
-  static get defaultOptions() {
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: "ui-settings",
       classes: ["starwarsffg", "ui-settings"],
@@ -93,7 +104,7 @@ export class uiSettings extends ffgSettings {
     });
   }
 
-  getData(options) {
+  getData(): any {
     const includeSettingsNames = [
       "starwarsffg.ui-uitheme",
       "starwarsffg.ui-pausedImage",
@@ -111,7 +122,7 @@ export class uiSettings extends ffgSettings {
 }
 
 export class combatSettings extends ffgSettings {
-  static get defaultOptions() {
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: "combat-settings",
       classes: ["starwarsffg", "combat-settings"],
@@ -120,7 +131,7 @@ export class combatSettings extends ffgSettings {
     });
   }
 
-  getData(options) {
+  getData(): any {
     const includeSettingsNames = [
       "starwarsffg.useGenericSlots",
       "starwarsffg.initiativeRule",
@@ -133,7 +144,7 @@ export class combatSettings extends ffgSettings {
 }
 
 export class actorSettings extends ffgSettings {
-  static get defaultOptions() {
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: "actor-settings",
       classes: ["starwarsffg", "actor-settings"],
@@ -142,7 +153,7 @@ export class actorSettings extends ffgSettings {
     });
   }
 
-  getData(options) {
+  getData(): any {
     const includeSettingsNames = [
       "starwarsffg.enableSoakCalc",
       "starwarsffg.talentSorting",
@@ -161,7 +172,7 @@ export class actorSettings extends ffgSettings {
 }
 
 export class xpSpendingSettings extends ffgSettings {
-  static get defaultOptions() {
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: "xpSpending",
       classes: ["starwarsffg", "xpSpending"],
@@ -170,7 +181,7 @@ export class xpSpendingSettings extends ffgSettings {
     });
   }
 
-  getData(options) {
+  getData(): any {
     const includeSettingsNames = [
       "starwarsffg.specializationCompendiums",
       "starwarsffg.signatureAbilityCompendiums",
@@ -195,7 +206,7 @@ export class xpSpendingSettings extends ffgSettings {
 }
 
 export class localizationSettings extends ffgSettings {
-  static get defaultOptions() {
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: "localization",
       classes: ["starwarsffg", "localization"],
@@ -204,7 +215,7 @@ export class localizationSettings extends ffgSettings {
     });
   }
 
-  getData(options) {
+  getData(): any {
     const includeSettingsNames = [
       "starwarsffg.skillSorting",
       "starwarsffg.destiny-pool-light",
@@ -215,7 +226,7 @@ export class localizationSettings extends ffgSettings {
 }
 
 export class groupManagerSettings extends ffgSettings {
-  static get defaultOptions() {
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: "group-manager",
       classes: ["starwarsffg", "group-manager"],
@@ -224,7 +235,7 @@ export class groupManagerSettings extends ffgSettings {
     });
   }
 
-  getData(options) {
+  getData(): any {
     const includeSettingsNames = [
       "starwarsffg.pcListMode",
       "starwarsffg.privateTriggers",

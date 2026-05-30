@@ -10,7 +10,7 @@ import {
 
 export default class SettingsHelpers {
   // Initialize System Settings after the Init Hook
-  static initLevelSettings() {
+  static initLevelSettings(): void {
     // System Migration Version
     game.settings.register("starwarsffg", "systemMigrationVersion", {
       name: "Current Version",
@@ -176,7 +176,7 @@ export default class SettingsHelpers {
         active: game.i18n.localize("SWFFG.SettingsPCListModeActive"),
         owned: game.i18n.localize("SWFFG.SettingsPCListModeOwned"),
       },
-      onChange: (rule) => {
+      onChange: () => {
         const groupmanager = canvas?.groupmanager?.window;
         if (groupmanager) {
           groupmanager.render();
@@ -191,14 +191,15 @@ export default class SettingsHelpers {
       default: 0,
       config: false,
       type: Number,
-      onChange: (rule) => {
+      onChange: () => {
         const groupmanager = canvas?.groupmanager?.window;
         if (groupmanager) {
           groupmanager.render();
         }
-        let destinyLight = game.settings.get("starwarsffg", "dPoolLight");
-        document.getElementById("destinyLight").setAttribute("data-value", destinyLight);
-        document.getElementById("destinyLight").innerHTML = destinyLight + `<span>${game.i18n.localize(game.settings.get("starwarsffg", "destiny-pool-light"))}</span>`;
+        const destinyLight = game.settings.get("starwarsffg", "dPoolLight") as any;
+        const destinyLightLabel = game.settings.get("starwarsffg", "destiny-pool-light") as unknown as string;
+        document.getElementById("destinyLight").setAttribute("data-value", String(destinyLight));
+        document.getElementById("destinyLight").innerHTML = destinyLight + `<span>${game.i18n.localize(destinyLightLabel)}</span>`;
       },
     });
     game.settings.register("starwarsffg", "dPoolDark", {
@@ -207,19 +208,22 @@ export default class SettingsHelpers {
       default: 0,
       config: false,
       type: Number,
-      onChange: (rule) => {
+      onChange: () => {
         const groupmanager = canvas?.groupmanager?.window;
         if (groupmanager) {
           groupmanager.render();
         }
-        let destinyDark = game.settings.get("starwarsffg", "dPoolDark");
-        document.getElementById("destinyDark").setAttribute("data-value", destinyDark);
-        document.getElementById("destinyDark").innerHTML = destinyDark + `<span>${game.i18n.localize(game.settings.get("starwarsffg", "destiny-pool-dark"))}</span>`;
+        const destinyDark = game.settings.get("starwarsffg", "dPoolDark") as any;
+        const destinyDarkLabel = game.settings.get("starwarsffg", "destiny-pool-dark") as unknown as string;
+        document.getElementById("destinyDark").setAttribute("data-value", String(destinyDark));
+        document.getElementById("destinyDark").innerHTML = destinyDark + `<span>${game.i18n.localize(destinyDarkLabel)}</span>`;
       },
     });
 
     // Register settings for UI Themes
     game.settings.register("starwarsffg", "ui-uitheme", {
+      // FIXME(types): Foundry accepts this legacy metadata, but fvtt-types
+      // omits it from ClientSettings registration data.
       module: "starwarsffg",
       name: game.i18n.localize("SWFFG.SettingsUITheme"),
       hint: game.i18n.localize("SWFFG.SettingsUIThemeHint"),
@@ -232,7 +236,7 @@ export default class SettingsHelpers {
         default: "Default (retired; expect issues)",
         mandar: "Mandar",
       },
-    });
+    } as any);
 
     // Register setting for token healthy
     game.settings.register("starwarsffg", "ui-token-healthy", {
@@ -289,6 +293,8 @@ export default class SettingsHelpers {
     });
 
     game.settings.register("starwarsffg", "ui-pausedImage", {
+      // FIXME(types): Foundry accepts these legacy metadata fields, but
+      // fvtt-types omits them from ClientSettings registration data.
       module: "starwarsffg",
       name: game.i18n.localize("SWFFG.SettingsPausedImage"),
       hint: game.i18n.localize("SWFFG.SettingsPausedImageHint"),
@@ -298,7 +304,7 @@ export default class SettingsHelpers {
       type: String,
       valueType: "FilePicker",
       onChange: this.debouncedReload,
-    });
+    } as any);
 
     game.settings.register("starwarsffg", "destiny-pool-light", {
       name: game.i18n.localize("SWFFG.SettingsDestinyLight"),
@@ -338,7 +344,7 @@ export default class SettingsHelpers {
       default: true,
       type: Boolean,
       onChange: (rule) => {
-        if (game.settings.get("starwarsffg", "dicetheme") === "starwars") {
+        if ((game.settings.get("starwarsffg", "dicetheme") as unknown as string) === "starwars") {
           if (!rule) {
             game.settings.set("starwarsffg", "enableForceDie", true);
           }
@@ -380,7 +386,7 @@ export default class SettingsHelpers {
   }
 
   // Initialize System Settings after the Ready Hook
-  static readyLevelSetting() {
+  static readyLevelSetting(): void {
     // Allow Users to Roll Audio
     game.settings.register("starwarsffg", "allowUsersAddRollAudio", {
       name: game.i18n.localize("SWFFG.EnableRollAudio"),
@@ -392,7 +398,7 @@ export default class SettingsHelpers {
     });
 
     // generate a list of playlists
-    const playlists = {};
+    const playlists: Record<string, string> = {};
     playlists["None"] = "";
     game.playlists.contents.forEach((playlist, index) => {
       playlists[playlist.id] = `${index}-${playlist.name}`;
@@ -443,7 +449,7 @@ export default class SettingsHelpers {
       type: Boolean,
     });
 
-    let stimpackChoices = [
+    const stimpackChoices = [
       game.i18n.localize("SWFFG.MedicalItemNameUsePrompt"),
       game.i18n.localize("SWFFG.MedicalItemNameUseRest"),
       game.i18n.localize("SWFFG.MedicalItemNameUseReset"),
@@ -454,9 +460,9 @@ export default class SettingsHelpers {
       default: "0",
       config: false,
       type: String,
-      choices: stimpackChoices,
+      choices: stimpackChoices as any,
     });
   }
 
-  static debouncedReload = foundry.utils.debounce(() => window.location.reload(), 100);
+  static debouncedReload: () => void = foundry.utils.debounce(() => window.location.reload(), 100);
 }

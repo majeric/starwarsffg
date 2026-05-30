@@ -9,7 +9,7 @@ import SettingsHelpers from "./settings-helpers.js";
  * the debounce behavior and matches the pattern other settings already
  * use (e.g., the skill-list onChange callbacks).
  */
-export function registerDebugSettings() {
+export function registerDebugSettings(): void {
   game.settings.register("starwarsffg", "enableDebug", {
     name: game.i18n.localize("SWFFG.EnableDebug"),
     hint: game.i18n.localize("SWFFG.EnableDebugHint"),

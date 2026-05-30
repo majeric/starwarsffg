@@ -1,6 +1,13 @@
+type SettingViewData = Record<string, any>;
+
+function getSettingValue(namespace: string, key: string): any {
+  // FIXME(types): Form setting rows carry runtime namespace/key strings.
+  return game.settings.get(namespace as any, key as any);
+}
+
 export default class CrewSettings extends FormApplication {
   /** @override */
-  static get defaultOptions() {
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: "data-importer",
       classes: ["starwarsffg", "data-import"],
@@ -11,29 +18,28 @@ export default class CrewSettings extends FormApplication {
     });
   }
 
-  getData(options) {
+  getData(): any {
     const gs = game.settings;
     const canConfigure = game.user.can("SETTINGS_MODIFY");
 
-    const data = {
+    const data: Record<string, any> = {
       system: { title: game.system.title, menus: [], settings: [] },
     };
 
     // Classify all settings
-    for (let setting of gs.settings.values()) {
+    for (const setting of gs.settings.values()) {
       // Exclude settings the user cannot change
       if (!setting.key.includes("arrayCrewRoles") || (!canConfigure && setting.scope !== "client")) continue;
 
-      // Update setting data
-      const s = foundry.utils.duplicate(setting);
+      const s = foundry.utils.duplicate(setting) as SettingViewData;
       s.name = game.i18n.localize(s.name);
       s.hint = game.i18n.localize(s.hint);
-      s.value = game.settings.get(s.namespace, s.key);
+      s.value = getSettingValue(s.namespace, s.key);
       s.type = setting.type instanceof Function ? setting.type.name : "String";
       s.isCheckbox = setting.type === Boolean;
       s.isSelect = s.choices !== undefined;
       s.isRange = setting.type === Number && s.range;
-      s.isFilePicker = setting.valueType === "FilePicker";
+      s.isFilePicker = (setting as SettingViewData).valueType === "FilePicker";
 
       // Classify setting
       if (s.namespace === game.system.id && s.key.includes("arrayCrewRoles")) data.system.settings.push(s);
@@ -51,7 +57,7 @@ export default class CrewSettings extends FormApplication {
     };
   }
 
-  activateListeners(html) {
+  activateListeners(html: any): void {
     super.activateListeners(html);
     html.find('button[name="reset"]').click(this._onResetDefaults.bind(this));
   }
@@ -63,9 +69,9 @@ export default class CrewSettings extends FormApplication {
    * @param event {Event}   The initial button click event
    * @private
    */
-  _onResetDefaults(event) {
+  _onResetDefaults(event: Event): void {
     event.preventDefault();
-    const defaults = game.settings.settings.get("starwarsffg.arrayCrewRoles").default;
+    const defaults = (game.settings.settings.get("starwarsffg.arrayCrewRoles" as any) as SettingViewData).default;
     game.settings.set("starwarsffg", "arrayCrewRoles", defaults);
     this.close();
   }
@@ -74,9 +80,10 @@ export default class CrewSettings extends FormApplication {
   /* -------------------------------------------- */
 
   /** @override */
-  async _updateObject(event, formData) {
-    const existing_settings = game.settings.get("starwarsffg", "arrayCrewRoles");
-    let new_settings = [];
+  async _updateObject(event: Event, formData: Record<string, any>): Promise<void> {
+    void event;
+    const existing_settings = game.settings.get("starwarsffg", "arrayCrewRoles") as any;
+    const new_settings: SettingViewData[] = [];
     // convert the arrays into the format expected
     for (let i = 0; i < formData['role_name'].length; i++) {
       new_settings.push({

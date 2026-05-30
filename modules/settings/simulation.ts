@@ -9,7 +9,7 @@
  * behavior). Converting it to a typed Object setting is deferred to a
  * later task alongside the same change for `arraySkillList`.
  */
-export function registerSimulationSettings() {
+export function registerSimulationSettings(): void {
   game.settings.register("starwarsffg", "additionalStatuses", {
     name: game.i18n.localize("SWFFG.Settings.AdditionalStatuses.Name"),
     hint: game.i18n.localize("SWFFG.Settings.AdditionalStatuses.Hint"),

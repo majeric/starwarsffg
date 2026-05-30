@@ -12,7 +12,7 @@ import CrewSettings from "./crew-settings.js";
  * The function runs async because the original was async, even though the
  * body does no awaits. Preserving the signature avoids surprising callers.
  */
-export async function registerCrewMainSettings() {
+export async function registerCrewMainSettings(): Promise<void> {
   const defaultArrayCrewRoles = [
     {
       role_name: game.i18n.localize("SWFFG.Crew.Roles.Gunner.Name"),
@@ -32,13 +32,15 @@ export async function registerCrewMainSettings() {
   });
 
   game.settings.register("starwarsffg", "arrayCrewRoles", {
+    // FIXME(types): Foundry accepts this legacy metadata, but fvtt-types
+    // omits it from ClientSettings registration data.
     module: "starwarsffg",
     name: "arrayCrewRoles",
     scope: "world",
     default: defaultArrayCrewRoles,
     config: false,
     type: Object,
-  });
+  } as any);
 
   const initiativeCrewRole = {
     role_name: game.i18n.localize("SWFFG.Crew.Roles.Initiative.Name"),
@@ -48,11 +50,13 @@ export async function registerCrewMainSettings() {
   };
 
   game.settings.register("starwarsffg", "initiativeCrewRole", {
+    // FIXME(types): Foundry accepts this legacy metadata, but fvtt-types
+    // omits it from ClientSettings registration data.
     module: "starwarsffg",
     name: "initiativeCrewRole",
     scope: "world",
     default: initiativeCrewRole,
     config: false,
     type: Object,
-  });
+  } as any);
 }

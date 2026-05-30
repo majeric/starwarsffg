@@ -18,7 +18,7 @@ import { registerDebugSettings } from "./debug.js";
  *   can't import (e.g., functions defined in swffg-main.js scope that
  *   cannot reasonably move with the setting).
  */
-export function registerAllSettings(callbacks = {}) {
+export function registerAllSettings(callbacks: Record<string, unknown> = {}): void {
   void callbacks;
   registerCompendiumSettings();
   registerCombatSettings();

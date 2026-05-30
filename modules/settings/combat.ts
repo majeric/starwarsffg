@@ -13,12 +13,12 @@
  * classes). Only the registrations move.
  */
 
-const INITIATIVE_FORMULAS = {
+const INITIATIVE_FORMULAS: Record<string, string> = {
   v: "Vigilance",
   c: "Cool",
 };
 
-export function setFFGInitiative(initMethod) {
+export function setFFGInitiative(initMethod: string): void {
   const formula = INITIATIVE_FORMULAS[initMethod];
   CONFIG.Combat.initiative = { formula, decimals: 2 };
   if (canvas?.groupmanager?.window) {
@@ -26,7 +26,7 @@ export function setFFGInitiative(initMethod) {
   }
 }
 
-export function registerCombatSettings() {
+export function registerCombatSettings(): void {
   game.settings.register("starwarsffg", "configuredTurnMarker", {
     name: "configuredTurnMarker",
     hint: "configuredTurnMarker",
@@ -74,5 +74,5 @@ export function registerCombatSettings() {
     onChange: (rule) => setFFGInitiative(rule),
   });
 
-  setFFGInitiative(game.settings.get("starwarsffg", "initiativeRule"));
+  setFFGInitiative(game.settings.get("starwarsffg", "initiativeRule") as unknown as string);
 }

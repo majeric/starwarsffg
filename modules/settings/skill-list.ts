@@ -16,7 +16,7 @@ import { defaultSkillList } from "../config/ffg-skillslist.js";
  * swffg-main.js handles that case defensively. Replacing parseSkillList
  * with a typed accessor is deferred.
  */
-export function registerSkillListSettings() {
+export function registerSkillListSettings(): void {
   game.settings.registerMenu("starwarsffg", "addskilltheme", {
     name: game.i18n.localize("SWFFG.SettingsSkillListImporter"),
     label: game.i18n.localize("SWFFG.SettingsSkillListImporterLabel"),
@@ -50,7 +50,7 @@ export function registerSkillListSettings() {
  *
  * @param {Object<string,string>} choices
  */
-export function registerSkillThemeSetting(choices) {
+export function registerSkillThemeSetting(choices: Record<string, string>): void {
   game.settings.register("starwarsffg", "skilltheme", {
     name: game.i18n.localize("SWFFG.SettingsSkillTheme"),
     hint: game.i18n.localize("SWFFG.SettingsSkillThemeHint"),

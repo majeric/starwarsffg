@@ -18,7 +18,7 @@ const CHARACTER_SETTINGS = [
   { key: "maxSkill", locale: "SWFFG.Settings.maxSkill", default: 6, type: Number },
 ];
 
-export function registerCharacterSettings() {
+export function registerCharacterSettings(): void {
   for (const entry of CHARACTER_SETTINGS) {
     game.settings.register("starwarsffg", entry.key, {
       name: game.i18n.localize(`${entry.locale}.Name`),
