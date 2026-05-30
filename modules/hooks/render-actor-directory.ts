@@ -5,8 +5,8 @@ import { CharacterCreator } from "../helpers/character-creator.js";
  * by Phase 3.4. Adds an "Activate Character Wizard" button to the actor
  * directory's header actions when the actors directory renders.
  */
-export function registerRenderActorDirectoryHook() {
-  Hooks.on("renderActorDirectory", (app, html) => {
+export function registerRenderActorDirectoryHook(): void {
+  Hooks.on("renderActorDirectory", (app: { id: string }, html: HTMLElement) => {
     if (app.id !== "actors") return;
     const wizardId = "ffgCharacterWizard";
     if (document.querySelector(`#${wizardId}`)) return;

@@ -7,8 +7,8 @@ import SWAImporter from "../importer/swa-importer.js";
  * directory footer that launch the OggDude and Adversaries dataset
  * importers.
  */
-export function registerRenderCompendiumDirectoryHook() {
-  Hooks.on("renderCompendiumDirectory", (_app, html) => {
+export function registerRenderCompendiumDirectoryHook(): void {
+  Hooks.on("renderCompendiumDirectory", (_app: unknown, html: HTMLElement) => {
     if (!game.user.isGM) return;
 
     const div = document.createElement("div");

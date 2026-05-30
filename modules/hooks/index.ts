@@ -19,7 +19,7 @@ import { registerRenderGamePauseHook } from "./render-game-pause.js";
  * Each register* function is imported from its per-event file and called
  * here once. The whole chain runs once at module load.
  */
-export function registerAllHooks() {
+export function registerAllHooks(): void {
   registerSetupHook();
   registerRenderChatInputHook();
   registerRenderActorDirectoryHook();

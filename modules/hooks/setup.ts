@@ -11,7 +11,7 @@ import { register_system_tours } from "../helpers/tours.js";
  * (so journal pages and chat messages can render FFG dice glyphs) and
  * registers the system's interactive tour entries.
  */
-export function registerSetupHook() {
+export function registerSetupHook(): void {
   Hooks.on("setup", function () {
     register_roll_tag_enricher();
     register_oggdude_tag_enricher();

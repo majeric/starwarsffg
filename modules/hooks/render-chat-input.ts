@@ -6,8 +6,9 @@ import DiceHelpers from "../helpers/dice-helpers.js";
  * Phase 3.3. Adds the FFG chat dice-roller button next to the roll
  * privacy controls when the chat input renders.
  */
-export function registerRenderChatInputHook() {
-  Hooks.on("renderChatInput", (app) => {
+export function registerRenderChatInputHook(): void {
+  // FIXME(types): fvtt-types V13 does not declare this legacy render hook.
+  (Hooks.on as any)("renderChatInput", (app: { id: string }) => {
     if (app.id !== "chat") return;
     const rollButtonId = "ffgChatRoll";
     if (document.querySelector(`#${rollButtonId}`)) return;
