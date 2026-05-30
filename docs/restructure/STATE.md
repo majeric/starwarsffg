@@ -1,9 +1,9 @@
 # Restructure State
 
-**Current phase:** phase-07-ae-unification
-**Current task:** 7.9 — remaining; Phase 7 nearing close
-**Last verified:** 2026-05-30T07:28:17Z (task 7.9 partial; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 187 unit tests — +4 legacy-modifier-values)
-**Last commit on plan:** 554a273
+**Current phase:** phase-08-sheets
+**Current task:** 8.0 — Detail Phase 8 atomic tasks
+**Last verified:** 2026-05-30T09:50:00Z (phase 7 close; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 187 unit tests)
+**Last commit on plan:** 01beceb
 
 ---
 
@@ -16,8 +16,8 @@
 - [x] phase-04-prototype-cleanup
 - [x] phase-05-datamodels
 - [x] phase-06-derived-split       (relaxed per ADR-013; AE-dependent derived folded into phase-07)
-- [ ] phase-07-ae-unification      ← CURRENT
-- [ ] phase-08-sheets
+- [x] phase-07-ae-unification      (7.9 modifiers.js kept as 1.907 compat shim; 7.3 test-world fixtures deferred)
+- [ ] phase-08-sheets              ← CURRENT
 - [ ] phase-09-importer
 - [ ] phase-10-system-abstraction
 - [x] phase-11-migration-infra    (closed early; inline parseFloat checks in swffg-main.js ready body deferred — see Open issues)
@@ -26,45 +26,14 @@
 
 ---
 
-## Current phase tasks (phase-06-derived-split)
+## Current phase tasks (phase-08-sheets)
 
-Phase 5 complete — all 26 types (6 actor + 20 item) have DataModels; the actor
-sheet render path was fixed via `buildActorSheetSystemData()`; operator Foundry
-smoke passed. See `phases/phase-05-datamodels.md` for the per-type task history.
+Phase 7 closed. AEs are canonical for modifiers; `attributes` removed from all
+schemas; migration registered; `modifiers.js` reduced to a 24-line 1.907 compat
+shim. The item `*.adjusted` computation pipeline (item-ffg.js) and the legacy
+upgrade/talent modifier popout remain as deferred cleanup.
 
-## Current phase tasks (phase-07-ae-unification)
-
-Phase 6 is complete in its **relaxed scope (ADR-013)** — the AE-independent
-derived work landed additively (no behavior change): 6.0 detail; 6.1 derived
-namespace (ADR-011); AE-independent derived = encumbrance via the Phase 1
-calculator into `derived.*`, plus the `super.prepareDerivedData()` wiring that
-makes the DataModel hook actually run (ActorFFG never chained to super).
-
-Deferred to Phase 7 (ADR-012/013 — they need the Active Effects rework): the
-AE-dependent stat derivation (wounds/strain/soak/defence/forcePool), `_preUpdate`
-removal, `prepareDerivedData` mutation removals, `*.adjusted` stripping + its
-migration, the template switch to `derived.*`, and item `*.adjusted`.
-
-Phase 7 (`phases/phase-07-ae-unification.md`) is the HIGHEST-RISK phase. Its
-preconditions require `test-worlds/` fixtures with rich modifier scenarios that
-**do not exist yet and need real exported worlds from the operator**. Detailing
-(7.0) is unblocked; execution (7.1+) is gated on those fixtures.
-
-- [x] 7.0 — Detail Phase 7 atomic tasks (+ ADR-014)
-- [x] 7.1 — Extract modifier→AE-key taxonomy to a tested module (modifier-map.js; 14 tests; modifiers.js delegates)
-- [x] 7.2 — No custom AE change modes needed: all FFG modifiers already use standard ADD mode (verified); per anti-creep none are invented. The only non-standard logic is the force-pool `applyActiveEffects` override, which is derived computation moved in 7.7.
-- [ ] 7.3 — Synthetic test-world modifier fixtures
-- [x] 7.4 — `attributes`→AE: pure transform extracted + tested (`attribute-to-ae.js`, 6 tests); migration `3.0.0-attributes-to-ae.js` written + lint-clean but **NOT registered** in index.js (held pending operator real-world validation, ADR-002).
-- [x] 7.5 — Add/edit-modifier UI creates AEs directly (modifier-ae-helpers.js; item/actor sheets source `data.attributes` from AEs; onClickAttributeControl creates/deletes AEs; PopoutModifiers + ItemHelpers.itemUpdate sync form to AEs; forcepower/signatureability/specialization retain legacy path for upgrade/talent embedded modifiers; 10 tests)
-- [x] 7.6 — Migrate ModifierHelpers taxonomy callers: actor-ffg.js, item-editor.js, import-helpers.js, item-ffg.js, item-helpers.js now import explodeMod/getModKeyPath/getModTypeByModPath from modifier-map.js directly. Remaining callers use getCalculatedValueFromCurrentAndArray (item-ffg.js, 7.8), getDicePoolModifiers (dice-helpers.js, 7.8), or are migration code (1.907, must not touch).
-- [x] 7.7 — Removed applyActiveEffects override from actor-ffg.js; force-pool dice computation relocated to prepareDerivedData using the Phase 1 computeForcePool calculator. AEs now apply without mutation.
-- [x] 7.8 — Removed `attributes` from ALL DataModel schemas (6 actor + 19 item via item-core.js). 3.0.0-attributes-to-ae migration registered — converts remaining legacy attributes to AEs on world load. `itemmodifier`/`adjusteditemmodifer` and `*.adjusted` removal deferred — the adjusted-value pipeline in item-ffg.js still computes and writes them.
-- [ ] 7.9 — Delete modifiers.js + popout-modifiers.js *(partial: production callers migrated; helpers/modifiers.js is now a 1.907 compatibility shim. Blocked by principle 13 shipped-migration import and live popout legacy upgrade/talent editor path.)*
-- [x] 7.10 — Templates work as-is: modifier editor sources from AEs via getData override; `*.adjusted` template refs still valid (item-ffg.js pipeline still writes them). No template changes needed at this stage.
-
-Phase 7 detailed in `phases/phase-07-ae-unification.md` (ADR-014). Approach: AEs
-become canonical, the `attributes` intermediary is removed; behavior preserved
-by extracting the mod→AE-key taxonomy verbatim (7.1) and reusing it.
+- [ ] 8.0 — Detail Phase 8 atomic tasks
 
 ---
 

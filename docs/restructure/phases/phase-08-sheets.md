@@ -74,10 +74,81 @@ modules/sheets/parts/                 ← shared partials extracted from templat
   render-context building) into base classes. Duplication across type sheets
   is the smell to avoid.
 
-## Tasks (to be detailed before phase begins)
+## Scope clarification — incremental extraction, not ApplicationV2 rewrite
 
-Suggested breakdown:
-- Task 8.1: Create base sheet classes with ApplicationV2 inheritance
-- Tasks 8.2-8.N: One per actor type — extract from monolith, verify rendering
-- Tasks 8.N+1 to 8.M: One per item type
-- Task 8.M+1: Delete legacy sheet files
+True `ApplicationV2` migration (Foundry's `foundry.applications.api.ApplicationV2`)
+changes the entire sheet lifecycle: rendering, form submission, context menus, drag/
+drop. That is a separate concern from splitting the monolith and belongs in Phase 13
+(V14 compat) where the API surface is audited holistically.
+
+Phase 8 splits the monolith sheets into per-type files that extend the **existing
+base class** (`foundry.appv1.sheets.ActorSheet` / `ItemSheet`). Each per-type sheet
+inherits shared logic from a `BaseActorSheet` / `BaseItemSheet` and adds only its
+type-specific getData, activateListeners, and template override. The existing V2
+reskin subclasses are absorbed into the per-type sheets (they add nothing but a CSS
+class).
+
+## Current architecture
+
+- `ActorSheetFFG` (2869 lines) handles ALL actor types via internal branching
+- `ActorSheetFFGV2` (24 lines) adds CSS class "v2", no logic
+- `AdversarySheetFFG` (86 lines) overrides template + adds character sheet options
+- `AdversarySheetFFGV2` (25 lines) V2 reskin of adversary
+- `ItemSheetFFG` (2187 lines) handles ALL item types via internal branching
+- `ItemSheetFFGV2` (17 lines) adds CSS class "v2", no logic
+- Templates already exist per-type (7 actor, 20 item)
+
+## Tasks
+
+### 8.0 — Detail Phase 8 atomic tasks
+
+This task produced the breakdown below.
+
+### 8.1 — Create base actor sheet + homestead extraction (simplest type)
+
+**Files to create:**
+- `modules/sheets/actor/base-actor-sheet.js` — shared actor sheet logic extracted
+  from `ActorSheetFFG`: `getData()` common path, `activateListeners()` shared
+  bindings, `_onDropItem`, edit-mode, popout-editor, drag/drop, XP, skill
+  context menus, persistent sheet size. Everything that isn't type-branched.
+- `modules/sheets/actor/homestead-sheet.js` — homestead-specific sheet (trivial:
+  homestead has no skills, characteristics, or type-specific branching)
+
+**Files to modify:**
+- `modules/swffg-main.js` — register `HomesteadSheet` for type "homestead";
+  keep `ActorSheetFFG` for other types during transition
+
+**Verification:** homestead actor sheet renders identically.
+
+### 8.2-8.7 — Per actor type extraction
+
+One task per remaining actor type, simplest first:
+- 8.2: Vehicle (unique stats, no skills/characteristics)
+- 8.3: Minion (group wounds, quantity)
+- 8.4: Rival (no strain, species/general)
+- 8.5: Nemesis (full humanoid)
+- 8.6: Character (most complex — XP, obligation/duty/morality, specializations)
+- 8.7: Absorb AdversarySheetFFG into a config option on character/nemesis/rival sheets
+
+Each task: create `modules/sheets/actor/<type>-sheet.js`, move type-specific
+logic from `ActorSheetFFG`, register, verify rendering identical.
+
+### 8.8 — Create base item sheet + simple item extraction
+
+**Files to create:**
+- `modules/sheets/item/base-item-sheet.js` — shared item sheet logic
+- Per-type sheets for the simplest items first (ability, motivation, background,
+  obligation, criticalinjury, criticaldamage, homesteadupgrade)
+
+### 8.9-8.12 — Remaining item type extraction
+
+- 8.9: Descriptive items (species, career, talent)
+- 8.10: Tree items (specialization, forcepower, signatureability)
+- 8.11: Equipment items (gear, weapon, armour, shipweapon)
+- 8.12: Modifier carrier items (itemattachment, itemmodifier, shipattachment)
+
+### 8.13 — Delete legacy sheet files
+
+Delete `actor-sheet-ffg.js`, `actor-sheet-ffg-v2.js`, `adversary-sheet-ffg.js`,
+`adversary-sheet-ffg-v2.js`, `item-sheet-ffg.js`, `item-sheet-ffg-v2.js` after
+all types are registered with per-type sheets.
