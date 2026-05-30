@@ -10,6 +10,7 @@ import ModifierHelpers from "../helpers/modifiers.js";
 import ActorHelpers, {xpLogEarn, xpLogSpend} from "../helpers/actor-helpers.js";
 import ItemHelpers from "../helpers/item-helpers.js";
 import EmbeddedItemHelpers from "../helpers/embeddeditem-helpers.js";
+import { getModifierEffectsAsAttributes } from "../active-effects/modifier-ae-helpers.js";
 import EffectHelpers from "../helpers/effects.js";
 import {
   change_role,
@@ -204,6 +205,7 @@ export class ActorSheetFFG extends foundry.appv1.sheets.ActorSheet {
     actorData.system = systemData;
     data.actor = actorData;
     data.data = systemData;
+    data.data.attributes = getModifierEffectsAsAttributes(this.actor);
     data.talentList = this.actor.talentList;
     data.rollData = this.actor.getRollData.bind(this.actor);
 

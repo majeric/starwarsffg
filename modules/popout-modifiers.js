@@ -4,6 +4,7 @@
  */
 
 import ModifierHelpers from "./helpers/modifiers.js";
+import { getModifierEffectsAsAttributes, syncFormToEffects } from "./active-effects/modifier-ae-helpers.js";
 export default class PopoutModifiers extends FormApplication {
   /** @override */
   static get defaultOptions() {
@@ -32,7 +33,7 @@ export default class PopoutModifiers extends FormApplication {
   /** @override */
   getData() {
     const data = {
-      data: this.object.system,
+      data: foundry.utils.deepClone(this.object.system),
       modTypeSelected: "all",
       modifierTypes: CONFIG.FFG.allowableModifierTypes,
       modifierChoices: CONFIG.FFG.allowableModifierChoices,
@@ -42,12 +43,13 @@ export default class PopoutModifiers extends FormApplication {
       data.data = this.object.parent.system.upgrades[this.object.keyname];
     } else if (this.object.isTalent) {
       data.data = this.object.parent.system.talents[this.object.keyname];
+    } else {
+      data.data.attributes = getModifierEffectsAsAttributes(this.object);
     }
 
     data.FFG = CONFIG.FFG;
     data.cssClass = "editable popout-modifiers-window attributes";
 
-    // Return data
     return data;
   }
 
@@ -146,21 +148,7 @@ export default class PopoutModifiers extends FormApplication {
       delete upgradeFormData._id;
       await this.object.parent.update(upgradeFormData);
     } else {
-      // Update the Item
-      const syncFormData = foundry.utils.deepClone(formData);
-      if (syncFormData?.data?.attributes) {
-        for (const attr of Object.keys(syncFormData.data.attributes)) {
-          if (attr.startsWith("-=")) {
-            delete syncFormData.data.attributes[attr];
-          }
-        }
-      }
-      await ModifierHelpers.applyActiveEffectOnUpdate(this.object, syncFormData);
-      // sets _id, which is not settable
-      formData.system = formData.data;
-      delete formData.data;
-      delete formData._id;
-      await this.object.update(formData);
+      await syncFormToEffects(this.object, attributes);
     }
     this.render();
   }

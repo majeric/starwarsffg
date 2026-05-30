@@ -1,5 +1,5 @@
 import ItemHelpers from "../helpers/item-helpers.js";
-import ModifierHelpers from "../helpers/modifiers.js";
+import { explodeMod, getModKeyPath } from "../active-effects/modifier-map.js";
 
 export class itemEditor extends FormApplication  {
   /*
@@ -351,7 +351,7 @@ export class itemEditor extends FormApplication  {
                 continue;
               }
               const match = existingActiveEffects.find(i => i.name === modKey);
-              const explodedMods = ModifierHelpers.explodeMod(
+              const explodedMods = explodeMod(
                 formData.system.attributes[modKey].modtype,
                 formData.system.attributes[modKey].mod
               );
@@ -359,7 +359,7 @@ export class itemEditor extends FormApplication  {
               const changes = [];
               for (const curMod of explodedMods) {
                 changes.push({
-                  key: ModifierHelpers.getModKeyPath(curMod['modType'], curMod['mod']),
+                  key: getModKeyPath(curMod['modType'], curMod['mod']),
                   mode: CONST.ACTIVE_EFFECT_MODES.ADD,
                   value: formData.system.attributes[modKey].value,
                 });
@@ -405,7 +405,7 @@ export class itemEditor extends FormApplication  {
 
 
                 const match = existingActiveEffects.find(i => i.name === modKey);
-                const explodedMods = ModifierHelpers.explodeMod(
+                const explodedMods = explodeMod(
                   modifier.system.attributes[modKey].modtype,
                   modifier.system.attributes[modKey].mod
                 );
@@ -413,7 +413,7 @@ export class itemEditor extends FormApplication  {
                 const changes = [];
                 for (const curMod of explodedMods) {
                   changes.push({
-                    key: ModifierHelpers.getModKeyPath(curMod['modType'], curMod['mod']),
+                    key: getModKeyPath(curMod['modType'], curMod['mod']),
                     mode: CONST.ACTIVE_EFFECT_MODES.ADD,
                     value: modifier.system.attributes[modKey].value,
                   });
@@ -497,7 +497,7 @@ export class itemEditor extends FormApplication  {
         }
 
         const match = existingActiveEffects.find(i => i.name === modKey);
-        const explodedMods = ModifierHelpers.explodeMod(
+        const explodedMods = explodeMod(
           formData.system.attributes[modKey].modtype,
           formData.system.attributes[modKey].mod
         );
@@ -505,7 +505,7 @@ export class itemEditor extends FormApplication  {
         const changes = [];
         for (const curMod of explodedMods) {
           changes.push({
-            key: ModifierHelpers.getModKeyPath(curMod['modType'], curMod['mod']),
+            key: getModKeyPath(curMod['modType'], curMod['mod']),
             mode: CONST.ACTIVE_EFFECT_MODES.ADD,
             value: formData.system.attributes[modKey].value,
           });
@@ -698,7 +698,7 @@ export class talentEditor extends itemEditor {
         }
 
         const match = existingActiveEffects.find(i => i.name === modKey);
-        const explodedMods = ModifierHelpers.explodeMod(
+        const explodedMods = explodeMod(
           formData.attributes[modKey].modtype,
           formData.attributes[modKey].mod
         );
@@ -706,7 +706,7 @@ export class talentEditor extends itemEditor {
         const changes = [];
         for (const curMod of explodedMods) {
           changes.push({
-            key: ModifierHelpers.getModKeyPath(curMod['modType'], curMod['mod']),
+            key: getModKeyPath(curMod['modType'], curMod['mod']),
             mode: CONST.ACTIVE_EFFECT_MODES.ADD,
             value: formData.attributes[modKey].value,
           });
@@ -912,7 +912,7 @@ export class forcePowerEditor extends itemEditor {
         }
 
         const match = existingActiveEffects.find(i => i.name === modKey);
-        const explodedMods = ModifierHelpers.explodeMod(
+        const explodedMods = explodeMod(
           formData.attributes[modKey].modtype,
           formData.attributes[modKey].mod
         );
@@ -920,7 +920,7 @@ export class forcePowerEditor extends itemEditor {
         const changes = [];
         for (const curMod of explodedMods) {
           changes.push({
-            key: ModifierHelpers.getModKeyPath(curMod['modType'], curMod['mod']),
+            key: getModKeyPath(curMod['modType'], curMod['mod']),
             mode: CONST.ACTIVE_EFFECT_MODES.ADD,
             value: formData.attributes[modKey].value,
           });

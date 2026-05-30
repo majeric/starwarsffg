@@ -4,6 +4,7 @@ import {
   getModKeyPath as getModKeyPathImpl,
   getModTypeByModPath as getModTypeByModPathImpl,
 } from "../active-effects/modifier-map.js";
+import { createModifierEffect, deleteModifierEffect } from "../active-effects/modifier-ae-helpers.js";
 
 export default class ModifierHelpers {
   /**
@@ -256,47 +257,16 @@ export default class ModifierHelpers {
         await this._onSubmit(event);
       }
     } else {
-      // Add new attribute
       if (action === "create") {
         CONFIG.logger.debug("Creating new modifier...");
-        const nk = new Date().getTime();
-        if (["criticaldamage", "shipattachment", "shipweapon"].includes(this.object.type)) {
-          await this.object.update({
-            "system.attributes": {
-              [`attr${nk}`]: {
-                modtype: "Vehicle Stat",
-                mod: "Armour",
-                value: 0,
-              },
-            }
-          });
-        } else if (["itemmodifier", "itemattachment"].includes(this.object.type)) {
-          await this.object.update({
-            "system.attributes": {
-              [`attr${nk}`]: {
-                modtype: "Stat",
-                mod: "Wounds",
-                value: 0,
-              },
-            }
-          });
-        } else {
-          await this.object.update({
-            "system.attributes": {
-              [`attr${nk}`]: {
-                modtype: "Stat",
-                mod: "Wounds",
-                value: 0,
-              },
-            }
-          });
-        }
-      }
-      // Remove existing attribute
-      else if (action === "delete") {
+        const defaultModtype = ["criticaldamage", "shipattachment", "shipweapon"].includes(this.object.type)
+          ? "Vehicle Stat" : "Stat";
+        const defaultMod = defaultModtype === "Vehicle Stat" ? "Armour" : "Wounds";
+        await createModifierEffect(this.object, defaultModtype, defaultMod, 0);
+      } else if (action === "delete") {
         const li = a.closest(".attribute");
-        li.parentElement.removeChild(li);
-        await this._onSubmit(event);
+        const effectId = li.dataset.attribute;
+        if (effectId) await deleteModifierEffect(this.object, effectId);
       }
     }
   }

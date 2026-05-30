@@ -9,6 +9,7 @@ import EmbeddedItemHelpers from "../helpers/embeddeditem-helpers.js";
 import ActorHelpers, {xpLogSpend} from "../helpers/actor-helpers.js";
 import ItemOptions from "./item-ffg-options.js";
 import {forcePowerEditor, itemEditor, talentEditor} from "./item-editor.js";
+import { getModifierEffectsAsAttributes } from "../active-effects/modifier-ae-helpers.js";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -69,7 +70,9 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
     // this is the end of the de-duplicating -=key stuff
 
     data.data = data.item.system;
-
+    if (!["forcepower", "signatureability", "specialization"].includes(this.item.type)) {
+      data.data.attributes = getModifierEffectsAsAttributes(this.item);
+    }
 
     if (options?.action === "update" && this.object.compendium) {
       delete options.data._id;

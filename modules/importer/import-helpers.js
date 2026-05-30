@@ -1,7 +1,7 @@
 import Helpers from "../helpers/common.js";
 import {migrateDataToSystem} from "../helpers/migration.js";
 import {ItemFFG} from "../items/item-ffg.js";
-import ModifierHelpers from "../helpers/modifiers.js";
+import { explodeMod, getModKeyPath } from "../active-effects/modifier-map.js";
 
 export default class ImportHelpers {
   /**
@@ -2988,12 +2988,12 @@ export default class ImportHelpers {
         };
         if (item.type === "species") {
           for (const attribute of Object.keys(item.system.attributes)) {
-            const explodedMods = ModifierHelpers.explodeMod(
+            const explodedMods = explodeMod(
               item.system.attributes[attribute].modtype,
               attribute
             );
             for (const cur_mod of explodedMods) {
-              const path = ModifierHelpers.getModKeyPath(
+              const path = getModKeyPath(
                 cur_mod['modType'],
                 cur_mod['mod']
               );
@@ -3005,12 +3005,12 @@ export default class ImportHelpers {
             }
           }
         } else if (["gear", "weapon"].includes(item.type)) {
-          const explodedMods = ModifierHelpers.explodeMod(
+          const explodedMods = explodeMod(
             "Stat",
             "Encumbrance"
           );
           for (const cur_mod of explodedMods) {
-            const path = ModifierHelpers.getModKeyPath(
+            const path = getModKeyPath(
               cur_mod['modType'],
               cur_mod['mod']
             );
@@ -3022,12 +3022,12 @@ export default class ImportHelpers {
           }
         } else if (item.type === "armour") {
           for (const key of ["Encumbrance", "Defence", "Soak"]) {
-            const explodedMods = ModifierHelpers.explodeMod(
+            const explodedMods = explodeMod(
               "Stat",
               key
             );
             for (const cur_mod of explodedMods) {
-              const path = ModifierHelpers.getModKeyPath(
+              const path = getModKeyPath(
                 cur_mod['modType'],
                 cur_mod['mod']
               );
@@ -3039,12 +3039,12 @@ export default class ImportHelpers {
             }
           }
         } else if (item.type === "shipattachment") {
-          const explodedMods = ModifierHelpers.explodeMod(
+          const explodedMods = explodeMod(
             "Vehicle Stat",
             "Vehicle.Hardpoints"
           );
           for (const cur_mod of explodedMods) {
-            const path = ModifierHelpers.getModKeyPath(
+            const path = getModKeyPath(
               cur_mod['modType'],
               cur_mod['mod']
             );
@@ -3085,13 +3085,13 @@ export default class ImportHelpers {
           continue;
         }
 
-        const explodedMods = ModifierHelpers.explodeMod(
+        const explodedMods = explodeMod(
           formData.system.attributes[k].modtype,
           formData.system.attributes[k].mod
         );
 
         for (const curMod of explodedMods) {
-          let modPath = ModifierHelpers.getModKeyPath(curMod['modType'], curMod['mod']);
+          let modPath = getModKeyPath(curMod['modType'], curMod['mod']);
           const inherentEffectChangeIndex = inherentEffect.changes.findIndex(c => c.key === modPath);
           if (inherentEffectChangeIndex >= 0) {
             if (modPath === "system.stats.wounds.max" && item.type === "species") {
@@ -3110,13 +3110,13 @@ export default class ImportHelpers {
     }
     // some inherent effects are not in the `attribute` keyspace; make sure to get them as well
     if (inherentEffect && ["gear", "weapon", "armour"].includes(item.type)) {
-      const explodedMods = ModifierHelpers.explodeMod(
+      const explodedMods = explodeMod(
         "Stat",
         "Encumbrance",
       );
 
       for (const curMod of explodedMods) {
-        let modPath = ModifierHelpers.getModKeyPath(
+        let modPath = getModKeyPath(
           curMod['modType'],
           curMod['mod'],
         );
@@ -3128,12 +3128,12 @@ export default class ImportHelpers {
 
       if (item.type === "armour") {
         // armor has additional stats
-        let explodedMods = ModifierHelpers.explodeMod(
+        let explodedMods = explodeMod(
           "Stat",
           "Defence",
         );
         for (const curMod of explodedMods) {
-          let modPath = ModifierHelpers.getModKeyPath(
+          let modPath = getModKeyPath(
             curMod['modType'],
             curMod['mod'],
           );
@@ -3143,12 +3143,12 @@ export default class ImportHelpers {
           }
         }
 
-        explodedMods = ModifierHelpers.explodeMod(
+        explodedMods = explodeMod(
           "Stat",
           "Soak",
         );
         for (const curMod of explodedMods) {
-          let modPath = ModifierHelpers.getModKeyPath(
+          let modPath = getModKeyPath(
             curMod['modType'],
             curMod['mod'],
           );
@@ -3165,7 +3165,7 @@ export default class ImportHelpers {
     if (formData.system?.attributes) {
       for (let k of Object.keys(formData.system.attributes)) {
         const match = existing.find(i => i.name === k);
-        const explodedMods = ModifierHelpers.explodeMod(
+        const explodedMods = explodeMod(
           formData.system.attributes[k].modtype,
           formData.system.attributes[k].mod
         );
@@ -3173,7 +3173,7 @@ export default class ImportHelpers {
         const changes = [];
         for (const curMod of explodedMods) {
           changes.push({
-            key: ModifierHelpers.getModKeyPath(curMod['modType'], curMod['mod']),
+            key: getModKeyPath(curMod['modType'], curMod['mod']),
             mode: CONST.ACTIVE_EFFECT_MODES.ADD,
             value: formData.system.attributes[k].value,
           });
@@ -3266,14 +3266,14 @@ export default class ImportHelpers {
       if (Object.keys(talent).includes("attributes")) {
         for (const attributeName of Object.keys(talent.attributes)) {
           const attribute = talent.attributes[attributeName];
-          const explodedMods = ModifierHelpers.explodeMod(
+          const explodedMods = explodeMod(
             attribute.modtype,
             attribute.mod
           );
 
           const changes = [];
           for (const curMod of explodedMods) {
-            const changeKey = ModifierHelpers.getModKeyPath(curMod['modType'], curMod['mod']);
+            const changeKey = getModKeyPath(curMod['modType'], curMod['mod']);
             // only create an active effect if the mod is a type requiring one (e.g., weapon stats don't)
             if (changeKey) {
               changes.push({

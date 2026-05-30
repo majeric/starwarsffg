@@ -6,7 +6,6 @@ describe("CharacterData schema", () => {
 
   it("composes the full humanoid templates plus the player-character meta fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "attributes",
       "biography",
       "career",
       "characteristics",

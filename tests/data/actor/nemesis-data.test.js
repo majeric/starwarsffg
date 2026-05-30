@@ -6,7 +6,6 @@ describe("NemesisData schema", () => {
 
   it("composes the full humanoid templates with no per-type fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "attributes",
       "biography",
       "characteristics",
       "general",

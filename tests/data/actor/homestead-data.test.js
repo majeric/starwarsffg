@@ -5,7 +5,7 @@ describe("HomesteadData schema", () => {
   const schema = HomesteadData.defineSchema();
 
   it("composes exactly the homestead fields with no legacy type/label hint keys", () => {
-    expect(Object.keys(schema).sort()).toEqual(["attributes", "biography", "consumables", "cost", "metadata"]);
+    expect(Object.keys(schema).sort()).toEqual(["biography", "consumables", "cost", "metadata"]);
   });
 
   it("defaults cost to zero and reserves an adjusted field for Phase 6", () => {

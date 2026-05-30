@@ -6,7 +6,6 @@ describe("MinionData schema", () => {
 
   it("composes the minion templates plus quantity and unit_wounds", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "attributes",
       "biography",
       "characteristics",
       "metadata",

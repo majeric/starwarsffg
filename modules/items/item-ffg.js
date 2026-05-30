@@ -3,6 +3,7 @@ import PopoutEditor from "../popout-editor.js";
 import ActorOptions from "../actors/actor-ffg-options.js";
 import ImportHelpers from "../importer/import-helpers.js";
 import ModifierHelpers from "../helpers/modifiers.js";
+import { explodeMod, getModKeyPath } from "../active-effects/modifier-map.js";
 import Helpers from "../helpers/common.js";
 import ItemHelpers from "../helpers/item-helpers.js";
 
@@ -87,12 +88,12 @@ export class ItemFFG extends ItemBaseFFG {
               // migrated data may contain attributes that the user has added, and we don't want this in the inherent effect
               continue;
             }
-            const explodedMods = ModifierHelpers.explodeMod(
+            const explodedMods = explodeMod(
               this.system.attributes[attribute].modtype,
               attribute
             );
             for (const cur_mod of explodedMods) {
-              const path = ModifierHelpers.getModKeyPath(
+              const path = getModKeyPath(
                 cur_mod['modType'],
                 cur_mod['mod']
               );
@@ -104,12 +105,12 @@ export class ItemFFG extends ItemBaseFFG {
             }
           }
         } else if (["gear", "weapon"].includes(this.type)) {
-          const explodedMods = ModifierHelpers.explodeMod(
+          const explodedMods = explodeMod(
             "Stat",
             "Encumbrance"
           );
           for (const cur_mod of explodedMods) {
-            const path = ModifierHelpers.getModKeyPath(
+            const path = getModKeyPath(
               cur_mod['modType'],
               cur_mod['mod']
             );
@@ -121,12 +122,12 @@ export class ItemFFG extends ItemBaseFFG {
           }
         } else if (this.type === "armour") {
           for (const key of ["Encumbrance", "Defence", "Soak"]) {
-            const explodedMods = ModifierHelpers.explodeMod(
+            const explodedMods = explodeMod(
               "Stat",
               key
             );
             for (const cur_mod of explodedMods) {
-              const path = ModifierHelpers.getModKeyPath(
+              const path = getModKeyPath(
                 cur_mod['modType'],
                 cur_mod['mod']
               );
@@ -138,12 +139,12 @@ export class ItemFFG extends ItemBaseFFG {
             }
           }
         } else if (this.type === "shipattachment") {
-          const explodedMods = ModifierHelpers.explodeMod(
+          const explodedMods = explodeMod(
             "Vehicle Stat",
             "Vehicle.Hardpoints"
           );
           for (const cur_mod of explodedMods) {
-            const path = ModifierHelpers.getModKeyPath(
+            const path = getModKeyPath(
               cur_mod['modType'],
               cur_mod['mod']
             );
@@ -221,13 +222,13 @@ export class ItemFFG extends ItemBaseFFG {
         // Defensive: only explode mods if modtype and mod are defined
         let explodedMods = [];
         if (attr && typeof attr.modtype !== 'undefined' && typeof attr.mod !== 'undefined') {
-          explodedMods = ModifierHelpers.explodeMod(attr.modtype, attr.mod);
+          explodedMods = explodeMod(attr.modtype, attr.mod);
         }
 
         const changes = [];
         for (const curMod of explodedMods) {
           changes.push({
-            key: ModifierHelpers.getModKeyPath(curMod['modType'], curMod['mod']),
+            key: getModKeyPath(curMod['modType'], curMod['mod']),
             mode: CONST.ACTIVE_EFFECT_MODES.ADD,
             value: attr?.value,
           });

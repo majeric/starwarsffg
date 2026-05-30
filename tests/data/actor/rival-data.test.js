@@ -6,7 +6,6 @@ describe("RivalData schema", () => {
 
   it("composes the rival templates (species and general, no career/specialisation)", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "attributes",
       "biography",
       "characteristics",
       "general",

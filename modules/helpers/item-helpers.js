@@ -1,4 +1,6 @@
 import ModifierHelpers from "./modifiers.js";
+import { getModKeyPath } from "../active-effects/modifier-map.js";
+import { syncFormToEffects } from "../active-effects/modifier-ae-helpers.js";
 
 export default class ItemHelpers {
   static async itemUpdate(event, formData) {
@@ -18,28 +20,25 @@ export default class ItemHelpers {
       return obj;
     }, {});
 
-    // Remove attributes which are no longer used
-    if (this.object.system?.attributes) {
-      for (let k of Object.keys(this.object.system.attributes)) {
-        if (!attributes.hasOwnProperty(k)) attributes[`-=${k}`] = null;
+    if (!["forcepower", "signatureability", "specialization"].includes(this.object.type)) {
+      await syncFormToEffects(this.object, attributes);
+      delete formData.data?.attributes;
+    } else {
+      if (this.object.system?.attributes) {
+        for (let k of Object.keys(this.object.system.attributes)) {
+          if (!attributes.hasOwnProperty(k)) attributes[`-=${k}`] = null;
+        }
+      }
+      await ModifierHelpers.applyActiveEffectOnUpdate(this.object, formData);
+      if (Object.keys(attributes).length > 0) {
+        foundry.utils.setProperty(formData, `data.attributes`, attributes);
       }
     }
 
-    // apply active effects
-    await ModifierHelpers.applyActiveEffectOnUpdate(this.object, formData);
-
-    // recombine attributes to formData
-    if (Object.keys(attributes).length > 0) {
-      foundry.utils.setProperty(formData, `data.attributes`, attributes);
-    }
-
-    // migrate data to v10 structure
-    let updated_id = formData._id;
     delete formData._id;
 
     foundry.utils.setProperty(formData, `flags.starwarsffg.loaded`, false);
     await this.object.update(formData);
-    // sync the active effect state (if applicable). needs to be after the update so we have the updated state
     await ItemHelpers.syncAEStatus(this.object, this.object.getEmbeddedCollection("ActiveEffect"));
     await this.render(true);
 
@@ -305,7 +304,7 @@ export default class ItemHelpers {
     CONFIG.logger.debug("Updating encumbrance Active Effect on equip state change");
     const realEncumbrance = item?.system?.encumbrance?.value;
     if (item.type === "armour" && realEncumbrance) {
-      const encumbranceModPath = ModifierHelpers.getModKeyPath("Stat", "Encumbrance");
+      const encumbranceModPath = getModKeyPath("Stat", "Encumbrance");
       let updatedEncumbrance;
       if (equipped) {
         updatedEncumbrance = Math.max(realEncumbrance - 3, 0);

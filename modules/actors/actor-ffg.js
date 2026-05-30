@@ -1,5 +1,6 @@
 import PopoutEditor from "../popout-editor.js";
-import ModifierHelpers from "../helpers/modifiers.js";
+import { getModTypeByModPath } from "../active-effects/modifier-map.js";
+import { computeForcePool } from "../rules/calculators/force-pool.js";
 
 /**
  * Extend the base Actor entity.
@@ -254,9 +255,16 @@ export class ActorFFG extends Actor {
       this._prepareSources(actor);
     }
 
-    // Phase 6: chain to the system DataModel's prepareDerivedData (this override
-    // never called super, so the DataModel hook never ran). Populates the
-    // derived namespace (ADR-011/013).
+    if (data.skills && data.stats?.forcePool) {
+      const available = computeForcePool({
+        maxForceRating: data.stats.forcePool.max,
+        committedDice: data.stats.forcePool.value,
+      });
+      for (const skill of Object.values(data.skills)) {
+        if (skill.force) skill.force = available;
+      }
+    }
+
     super.prepareDerivedData();
   }
 
@@ -556,7 +564,7 @@ export class ActorFFG extends Actor {
         if (change.key.includes("system.skills")) {
           const skillName = change.key.split('.')[2].capitalize();
           const skillMod = change.key.split('.')[3];
-          const modType = ModifierHelpers.getModTypeByModPath(change.key);
+          const modType = getModTypeByModPath(change.key);
           if (!Object.keys(actorData.system.skills[skillName]).includes(`${skillMod}source`)) {
             actorData.system.skills[skillName][`${skillMod}source`] = [];
           }
@@ -593,7 +601,7 @@ export class ActorFFG extends Actor {
               // system.skills.Astrogation.value
               const skillName = change.key.split('.')[2].capitalize();
               const skillMod = change.key.split('.')[3];
-              const modType = ModifierHelpers.getModTypeByModPath(change.key);
+              const modType = getModTypeByModPath(change.key);
               if (Object.keys(actorData.system.skills).includes(skillName)) {
                 if (!Object.keys(actorData.system.skills[skillName]).includes(`${skillMod}source`)) {
                   actorData.system.skills[skillName][`${skillMod}source`] = [];
@@ -726,25 +734,4 @@ export class ActorFFG extends Actor {
     return allowed !== false ? this.update(updates) : this;
   }
 
-  /** @override **/
-  applyActiveEffects() {
-    // collect force pool modifications since it appears the stat value is without AEs active
-    let maxForceRating = parseInt(this.system?.stats?.forcePool?.max);
-    for (const effect of this.allApplicableEffects()) {
-      for (const change of effect.changes) {
-        if (change.key === "system.stats.forcePool.max") {
-          maxForceRating += parseInt(change.value);
-        }
-      }
-    }
-    // apply the resulting value (minus any committed dice)
-    for (const effect of this.allApplicableEffects()) {
-      for (const change of effect.changes) {
-        if (change.key.includes("system.skills") && change.key.includes(".force")) {
-          change.value = Math.max(maxForceRating - parseInt(this.system?.stats?.forcePool?.value), 0);
-        }
-      }
-    }
-    return super.applyActiveEffects();
-  }
 }

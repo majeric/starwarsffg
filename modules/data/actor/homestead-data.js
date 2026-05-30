@@ -1,6 +1,5 @@
 import { BaseActorData } from "./base-actor-data.js";
 import { biography } from "../shared/actor-biography.js";
-import { attributesField } from "../shared/attributes.js";
 import { metaOnly } from "../shared/actor-meta.js";
 
 /**
@@ -17,7 +16,6 @@ export class HomesteadData extends BaseActorData {
     const { SchemaField, NumberField, StringField } = foundry.data.fields;
     return {
       ...biography(),
-      ...attributesField(),
       ...metaOnly(),
       cost: new SchemaField({
         value: new NumberField({ initial: 0 }),

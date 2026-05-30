@@ -4,9 +4,8 @@ import { VehicleData } from "../../../modules/data/actor/vehicle-data.js";
 describe("VehicleData schema", () => {
   const schema = VehicleData.defineSchema();
 
-  it("composes biography/attributes/metadata plus stats and the top-level vehicle fields", () => {
+  it("composes biography/metadata plus stats and the top-level vehicle fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "attributes",
       "biography",
       "metadata",
       "silhouetteImage",

@@ -1,6 +1,5 @@
 import { BaseActorData } from "./base-actor-data.js";
 import { biography } from "../shared/actor-biography.js";
-import { attributesField } from "../shared/attributes.js";
 import { metaOnly } from "../shared/actor-meta.js";
 import { statsSchema } from "../shared/actor-stats.js";
 import { characteristicsSchema } from "../shared/characteristics.js";
@@ -23,7 +22,6 @@ export class MinionData extends BaseActorData {
       ...statsSchema({ strain: true }),
       ...characteristicsSchema(),
       ...skillsSchema(),
-      ...attributesField(),
       ...metaOnly(),
       quantity: new SchemaField({
         value: new NumberField({ initial: 1 }),

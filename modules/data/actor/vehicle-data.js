@@ -1,6 +1,5 @@
 import { BaseActorData } from "./base-actor-data.js";
 import { biography } from "../shared/actor-biography.js";
-import { attributesField } from "../shared/attributes.js";
 import { metaOnly } from "../shared/actor-meta.js";
 
 /**
@@ -44,7 +43,6 @@ export class VehicleData extends BaseActorData {
     const { StringField, BooleanField } = foundry.data.fields;
     return {
       ...biography(),
-      ...attributesField(),
       ...metaOnly(),
       stats: vehicleStatsSchema(),
       spaceShip: new BooleanField({ initial: false }),
