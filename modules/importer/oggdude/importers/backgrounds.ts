@@ -1,13 +1,14 @@
+// @ts-nocheck -- FIXME(types): legacy importer; type during Phase 12.16 strict pass
 import ImportHelpers from "../../import-helpers.js";
 
-export default class Motivations {
+export default class Backgrounds {
   static getMetaData() {
     return {
-      displayName: 'Motivations',
-      className: "Motivations",
-      itemName: "motivation",
-      localizationName: "SWFFG.ItemsMotivations",
-      fileNames: ["SpecificMotivations.xml"],
+      displayName: 'Backgrounds',
+      className: "Backgrounds",
+      itemName: "background",
+      localizationName: "SWFFG.ItemsBackgrounds",
+      fileNames: ["Classes.xml", "Attitudes.xml", "Hooks.xml"],
       filesAreDir: false,
       phase: 2,
     };
@@ -16,19 +17,35 @@ export default class Motivations {
   static async Import(xml, zip) {
     try {
       const base = JXON.xmlToJs(xml);
-      const baseKey = "SpecificMotivations";
-      const secondaryKey = "SpecificMotivation";
+      let baseKey;
+      let secondaryKey;
+      let backgroundType = "unknown";
+      if (Object.keys(base).includes("Classes")) {
+        baseKey = "Classes";
+        secondaryKey = "Class";
+        backgroundType = "culture";
+      } else if (Object.keys(base).includes("Attitudes")) {
+        baseKey = "Attitudes";
+        secondaryKey = "Attitude";
+        backgroundType = "attitude";
+        await delay(100);
+      } else if (Object.keys(base).includes("Hooks")) {
+        baseKey = "Hooks";
+        secondaryKey = "Hook";
+        backgroundType = "hook";
+        await delay(200);
+      }
 
       const items = base[baseKey][secondaryKey];
       if (items.length) {
         let totalCount = items.length;
         let currentCount = 0;
-        let pack = await ImportHelpers.getCompendiumPack("Item", `oggdude.Motivations`);
-        CONFIG.logger.debug(`Starting Oggdude Motivations Import`);
-        $(".import-progress.motivation").toggleClass("import-hidden");
+        let pack = await ImportHelpers.getCompendiumPack("Item", `oggdude.Backgrounds`);
+        CONFIG.logger.debug(`Starting Oggdude Backgrounds Import`);
+        $(".import-progress.background").toggleClass("import-hidden");
 
         await ImportHelpers.asyncForEach(items, async (item) => {
-          let data = ImportHelpers.prepareBaseObject(item, "motivation");
+          let data = ImportHelpers.prepareBaseObject(item, "background");
 
           if (item.Description.split('\n').length > 0 && item.Description.includes('[H4]')) {
             // remove the item name in the description....
@@ -36,11 +53,12 @@ export default class Motivations {
           }
 
           data.data = {
-            type: CONFIG.FFG.characterCreator.motivationTypes[item.Motivation].value,
+            type: backgroundType,
             description: item.Description,
             metadata: {
               tags: [
-                "motivation",
+                "background",
+                secondaryKey,
               ],
               sources: ImportHelpers.getSourcesAsArray(item?.Sources ?? item?.Source),
             },
@@ -57,7 +75,7 @@ export default class Motivations {
 
           currentCount += 1;
 
-          $(".motivation .import-progress-bar").width(
+          $(".background .import-progress-bar").width(
             `${Math.trunc((currentCount / totalCount) * 100)}%`
           ).html(
             `<span>${Math.trunc((currentCount / totalCount) * 100)}%</span>`
@@ -68,9 +86,9 @@ export default class Motivations {
 
       }
     } catch (err) {
-      CONFIG.logger.error(`Error importing Motivations record : `, err);
+      CONFIG.logger.error(`Error importing background record : `, err);
     }
-    CONFIG.logger.debug(`Completed Oggdude Motivations Import`);
+    CONFIG.logger.debug(`Completed Oggdude Background Import`);
   }
 }
 

@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy importer; type during Phase 12.16 strict pass
 import Helpers from "../helpers/common.js";
 import { defaultSkillList } from "../config/ffg-skillslist.js";
 

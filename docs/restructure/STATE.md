@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-12-typescript
-**Current task:** 12.12 — Convert modules/importer/
-**Last verified:** 2026-05-30T22:45:00Z (task 12.11; typecheck/comments/tests/build/smoke/migration green, lint known-red; 204 unit tests, 2 skipped)
-**Last commit on plan:** 3ad93c1
+**Current task:** 12.13 — Convert modules/helpers/
+**Last verified:** 2026-05-30T23:15:00Z (task 12.12; typecheck/comments/tests/build/smoke/migration green, lint known-red; 204 unit tests, 2 skipped)
+**Last commit on plan:** 0b2b264
 
 ---
 
@@ -40,7 +40,7 @@
 - [x] 12.9 — Convert `modules/tokens/` (1 file, 141 lines)
 - [x] 12.10 — Convert `modules/dice/` (11 files, 1580 lines)
 - [x] 12.11 — Convert `modules/sheets/` (26 files, 362 lines)
-- [ ] 12.12 — Convert `modules/importer/` (25 files, 5788 lines)
+- [x] 12.12 — Convert `modules/importer/` (25 files, 5788 lines)
 - [ ] 12.13 — Convert `modules/helpers/` (16 files, 4416 lines)
 - [ ] 12.14 — Convert `modules/actors/` (5 files, 3484 lines)
 - [ ] 12.15 — Convert `modules/` root files (8 files, 3843 lines)

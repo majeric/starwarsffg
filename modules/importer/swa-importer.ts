@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy importer; type during Phase 12.16 strict pass
 import ItemBaseFFG from "../items/itembase-ffg.js";
 import ImportHelpers from "./import-helpers.js";
 

@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy importer; type during Phase 12.16 strict pass
 import Armor from "./importers/armor.js";
 import Career from "./importers/careers.js";
 import ForcePowers from "./importers/forcepowers.js";

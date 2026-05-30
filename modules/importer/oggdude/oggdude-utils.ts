@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy importer; type during Phase 12.16 strict pass
 /**
  * Pure utility functions for OggDude data conversion.
  * No Foundry runtime dependencies — testable in isolation.

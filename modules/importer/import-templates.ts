@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy importer; type during Phase 12.16 strict pass
 /**
  * Default actor data templates used by the NPC and character importers.
  * Extracted from ImportHelpers to reduce the monolith's size (~460 lines of

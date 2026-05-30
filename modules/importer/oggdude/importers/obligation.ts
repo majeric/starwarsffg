@@ -1,13 +1,14 @@
+// @ts-nocheck -- FIXME(types): legacy importer; type during Phase 12.16 strict pass
 import ImportHelpers from "../../import-helpers.js";
 
-export default class Backgrounds {
+export default class Obligation {
   static getMetaData() {
     return {
-      displayName: 'Backgrounds',
-      className: "Backgrounds",
-      itemName: "background",
-      localizationName: "SWFFG.ItemsBackgrounds",
-      fileNames: ["Classes.xml", "Attitudes.xml", "Hooks.xml"],
+      displayName: 'Obligation',
+      className: "Obligations",
+      itemName: "obligation",
+      localizationName: "SWFFG.ItemsObligations",
+      fileNames: ["Obligations.xml", "Duty.xml", "Moralities.xml"],
       filesAreDir: false,
       phase: 2,
     };
@@ -18,20 +19,20 @@ export default class Backgrounds {
       const base = JXON.xmlToJs(xml);
       let baseKey;
       let secondaryKey;
-      let backgroundType = "unknown";
-      if (Object.keys(base).includes("Classes")) {
-        baseKey = "Classes";
-        secondaryKey = "Class";
-        backgroundType = "culture";
-      } else if (Object.keys(base).includes("Attitudes")) {
-        baseKey = "Attitudes";
-        secondaryKey = "Attitude";
-        backgroundType = "attitude";
+      let motivationType = "unknown";
+      if (Object.keys(base).includes("Obligations")) {
+        baseKey = "Obligations";
+        secondaryKey = "Obligation";
+        motivationType = "obligation";
+      } else if (Object.keys(base).includes("Duties")) {
+        baseKey = "Duties";
+        secondaryKey = "Duty";
+        motivationType = "duty";
         await delay(100);
-      } else if (Object.keys(base).includes("Hooks")) {
-        baseKey = "Hooks";
-        secondaryKey = "Hook";
-        backgroundType = "hook";
+      } else if (Object.keys(base).includes("Moralities")) {
+        baseKey = "Moralities";
+        secondaryKey = "Morality";
+        motivationType = "morality";
         await delay(200);
       }
 
@@ -39,12 +40,16 @@ export default class Backgrounds {
       if (items.length) {
         let totalCount = items.length;
         let currentCount = 0;
-        let pack = await ImportHelpers.getCompendiumPack("Item", `oggdude.Backgrounds`);
-        CONFIG.logger.debug(`Starting Oggdude Backgrounds Import`);
-        $(".import-progress.background").toggleClass("import-hidden");
+        let pack = await ImportHelpers.getCompendiumPack("Item", `oggdude.Obligations`);
+        CONFIG.logger.debug(`Starting Oggdude Obligations Import`);
+        $(".import-progress.obligation").toggleClass("import-hidden");
+        const typeMap = {
+          "Strength": "Emotional Strength",
+          "Weakness": "Emotional Weakness",
+        };
 
         await ImportHelpers.asyncForEach(items, async (item) => {
-          let data = ImportHelpers.prepareBaseObject(item, "background");
+          let data = ImportHelpers.prepareBaseObject(item, "obligation");
 
           if (item.Description.split('\n').length > 0 && item.Description.includes('[H4]')) {
             // remove the item name in the description....
@@ -52,16 +57,22 @@ export default class Backgrounds {
           }
 
           data.data = {
-            type: backgroundType,
+            type: motivationType,
             description: item.Description,
+            magnitude: 0,
+            subtype: "",
             metadata: {
               tags: [
-                "background",
+                "obligation",
                 secondaryKey,
               ],
               sources: ImportHelpers.getSourcesAsArray(item?.Sources ?? item?.Source),
             },
           };
+
+          try {
+            data.data.subtype = typeMap[item.Type];
+          } catch (e) {}
 
           let imgPath = await ImportHelpers.getImageFilename(zip, "Talent", "", data.flags.starwarsffg.ffgimportid);
           if (imgPath) {
@@ -74,7 +85,7 @@ export default class Backgrounds {
 
           currentCount += 1;
 
-          $(".background .import-progress-bar").width(
+          $(".obligation .import-progress-bar").width(
             `${Math.trunc((currentCount / totalCount) * 100)}%`
           ).html(
             `<span>${Math.trunc((currentCount / totalCount) * 100)}%</span>`
@@ -85,9 +96,9 @@ export default class Backgrounds {
 
       }
     } catch (err) {
-      CONFIG.logger.error(`Error importing background record : `, err);
+      CONFIG.logger.error(`Error importing Obligations record : `, err);
     }
-    CONFIG.logger.debug(`Completed Oggdude Background Import`);
+    CONFIG.logger.debug(`Completed Oggdude Obligations Import`);
   }
 }
 

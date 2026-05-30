@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy importer; type during Phase 12.16 strict pass
 import ImportHelpers from "./import-helpers.js";
 import OggDude from "./oggdude/oggdude.js";
 

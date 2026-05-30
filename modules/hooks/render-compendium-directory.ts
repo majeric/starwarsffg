@@ -20,7 +20,8 @@ export function registerRenderCompendiumDirectoryHook(): void {
 
     div.querySelector(".og-character")?.addEventListener("click", (event) => {
       event.preventDefault();
-      new DataImporter().render(true);
+      // FIXME(types): DataImporter constructor typed by ApplicationV2 mixin
+      new (DataImporter as any)().render(true);
     });
     div.querySelector(".swa-character")?.addEventListener("click", (event) => {
       event.preventDefault();

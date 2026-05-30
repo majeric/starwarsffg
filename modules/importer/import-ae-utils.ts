@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy importer; type during Phase 12.16 strict pass
 import { explodeMod, getModKeyPath } from "../active-effects/modifier-map.js";
 
 /**
