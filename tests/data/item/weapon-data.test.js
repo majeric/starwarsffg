@@ -8,7 +8,6 @@ describe("WeaponData schema", () => {
     expect(Object.keys(schema).sort()).toEqual([
       "adjusteditemmodifer",
       "ammo",
-      "attributes",
       "characteristic",
       "crit",
       "damage",

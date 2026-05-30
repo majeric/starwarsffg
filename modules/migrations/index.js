@@ -2,6 +2,7 @@ import { MIGRATION_REGISTRY, handleUpdate, runMigrations, compareVersions } from
 import * as migration1_901 from "./1.901-species-talents.js";
 import * as migration1_906 from "./1.906-compendium-paths.js";
 import * as migration1_907 from "./1.907-active-effects.js";
+import * as migration3_000 from "./3.0.0-attributes-to-ae.js";
 
 /**
  * Populate MIGRATION_REGISTRY at module load. swffg-main.js imports this
@@ -11,7 +12,7 @@ import * as migration1_907 from "./1.907-active-effects.js";
  * Ordering note: the runner sorts and selects by version when running,
  * so the registration order here is documentation only.
  */
-for (const m of [migration1_901, migration1_906, migration1_907]) {
+for (const m of [migration1_901, migration1_906, migration1_907, migration3_000]) {
   MIGRATION_REGISTRY.push({
     version: m.version,
     slug: m.slug,

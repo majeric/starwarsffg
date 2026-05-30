@@ -7,7 +7,6 @@ describe("ShipWeaponData schema", () => {
   it("composes shared weapon fragments plus ship weapon-specific fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
       "adjusteditemmodifer",
-      "attributes",
       "crit",
       "damage",
       "description",

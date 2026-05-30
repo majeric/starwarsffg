@@ -6,7 +6,6 @@ describe("ObligationData schema", () => {
 
   it("composes core and basic item fields plus obligation fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "attributes",
       "description",
       "encumbrance",
       "magnitude",

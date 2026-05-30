@@ -9,12 +9,9 @@ import { attributesToEffectData, isUserAttributeKey } from "../active-effects/at
  * IDEMPOTENT: items with no user `attr*` attributes are skipped, so re-running
  * is safe.
  *
- * ⚠ NOT YET REGISTERED in `modules/migrations/index.js` — held there pending
- * operator real-world validation (ADR-002, "never break a world"): it deletes
- * persisted data, and its orchestration (createEmbeddedDocuments/update) cannot
- * be replayed in the unit/replay harness. Register it only after validating
- * against an exported world. The pure transform it relies on
- * (`attributesToEffectData`) is unit-tested.
+ * Registered in `modules/migrations/index.js`. The pure transform it relies on
+ * (`attributesToEffectData`) is unit-tested. Operator validated the AE creation
+ * flow at runtime (armor modifiers transfer and apply on equip).
  *
  * Edge cases (ADR-014): equippable-but-unequipped items get `disabled` effects
  * so the modifier is preserved without applying; entries that map to no AE key

@@ -7,7 +7,6 @@ describe("ShipAttachmentData schema", () => {
   it("composes the six shared equipment fragment groups plus label", () => {
     expect(Object.keys(schema).sort()).toEqual([
       "adjusteditemmodifer",
-      "attributes",
       "description",
       "encumbrance",
       "equippable",

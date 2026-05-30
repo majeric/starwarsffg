@@ -6,7 +6,6 @@ describe("CareerData schema", () => {
 
   it("composes core item fields plus career maps and skill slots", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "attributes",
       "careerSkills",
       "description",
       "metadata",

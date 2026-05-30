@@ -14,7 +14,6 @@ describe("ForcePowerData schema", () => {
 
   it("composes core item fields plus force power fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "attributes",
       "base_cost",
       "description",
       "metadata",

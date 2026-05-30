@@ -50,7 +50,11 @@ export function attributesToEffectData(attributes = {}) {
     if (!isUserAttributeKey(key)) continue;
     const changes = attributeToChanges(attr).filter((c) => c.key !== undefined);
     if (changes.length === 0) continue;
-    effects.push({ name: attr.mod ? `Migrated: ${attr.mod}` : `Migrated: ${attr.modtype}`, changes });
+    effects.push({
+      name: `${attr.modtype}: ${attr.mod}`,
+      changes,
+      flags: { starwarsffg: { ffgModType: attr.modtype, ffgMod: attr.mod } },
+    });
   }
   return effects;
 }

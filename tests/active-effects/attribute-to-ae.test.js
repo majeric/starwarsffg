@@ -49,10 +49,12 @@ describe("attributesToEffectData", () => {
     });
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
-      name: "Migrated: Soak",
+      name: "Stat: Soak",
       changes: [{ key: "system.stats.soak.value", mode: 2, value: 1 }],
+      flags: { starwarsffg: { ffgModType: "Stat", ffgMod: "Soak" } },
     });
-    expect(result[1].name).toBe("Migrated: Cool");
+    expect(result[1].name).toBe("Skill Boost: Cool");
+    expect(result[1].flags.starwarsffg.ffgModType).toBe("Skill Boost");
   });
 
   it("skips user attributes that map to no key", () => {

@@ -7,7 +7,6 @@ describe("ItemAttachmentData schema", () => {
   it("composes core, basic, hardpoint, quality, and attachment fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
       "adjusteditemmodifer",
-      "attributes",
       "description",
       "encumbrance",
       "hardpoints",

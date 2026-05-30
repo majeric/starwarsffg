@@ -7,7 +7,6 @@ describe("ItemModifierData schema", () => {
   it("composes core fields plus quality arrays and modifier fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
       "adjusteditemmodifer",
-      "attributes",
       "description",
       "itemmodifier",
       "metadata",

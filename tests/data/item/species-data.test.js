@@ -7,7 +7,6 @@ describe("SpeciesData schema", () => {
   it("composes core item fields plus species-specific maps and starting XP", () => {
     expect(Object.keys(schema).sort()).toEqual([
       "abilities",
-      "attributes",
       "description",
       "metadata",
       "species",

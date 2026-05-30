@@ -7,7 +7,6 @@ describe("TalentData schema", () => {
   it("composes core item fields plus talent-specific fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
       "activation",
-      "attributes",
       "description",
       "isConflictTalent",
       "isForceTalent",

@@ -14,7 +14,6 @@ describe("SignatureAbilityData schema", () => {
 
   it("composes core item fields plus signature ability fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "attributes",
       "base_cost",
       "description",
       "metadata",

@@ -14,7 +14,6 @@ describe("SpecializationData schema", () => {
 
   it("composes core item fields plus specialization fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "attributes",
       "careerSkills",
       "description",
       "metadata",

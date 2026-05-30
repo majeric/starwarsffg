@@ -6,7 +6,6 @@ describe("BackgroundData schema", () => {
 
   it("composes core and basic item fields plus type", () => {
     expect(Object.keys(schema).sort()).toEqual([
-      "attributes",
       "description",
       "encumbrance",
       "metadata",

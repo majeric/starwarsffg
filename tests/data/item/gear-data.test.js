@@ -7,7 +7,6 @@ describe("GearData schema", () => {
   it("composes core, basic, item attachment, and quality fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
       "adjusteditemmodifer",
-      "attributes",
       "description",
       "encumbrance",
       "itemattachment",

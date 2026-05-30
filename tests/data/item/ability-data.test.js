@@ -5,12 +5,11 @@ describe("AbilityData schema", () => {
   const schema = AbilityData.defineSchema();
 
   it("is a core-only item schema", () => {
-    expect(Object.keys(schema).sort()).toEqual(["attributes", "description", "metadata"]);
+    expect(Object.keys(schema).sort()).toEqual(["description", "metadata"]);
   });
 
   it("starts the core item fields empty", () => {
     expect(schema.description.getInitial()).toBe("");
-    expect(schema.attributes.getInitial()).toEqual({});
     expect(schema.metadata.getInitial()).toEqual({ tags: [], sources: [] });
   });
 });

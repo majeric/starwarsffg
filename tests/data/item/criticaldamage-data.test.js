@@ -5,7 +5,7 @@ describe("CriticalDamageData schema", () => {
   const schema = CriticalDamageData.defineSchema();
 
   it("composes core item fields plus the critical damage fields", () => {
-    expect(Object.keys(schema).sort()).toEqual(["attributes", "description", "max", "metadata", "min", "severity"]);
+    expect(Object.keys(schema).sort()).toEqual(["description", "max", "metadata", "min", "severity"]);
   });
 
   it("defaults the roll range to zero and severity to one", () => {
@@ -16,7 +16,6 @@ describe("CriticalDamageData schema", () => {
 
   it("starts the core item fields empty", () => {
     expect(schema.description.getInitial()).toBe("");
-    expect(schema.attributes.getInitial()).toEqual({});
     expect(schema.metadata.getInitial()).toEqual({ tags: [], sources: [] });
   });
 });

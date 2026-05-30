@@ -7,7 +7,6 @@ describe("ArmourData schema", () => {
   it("composes shared equipment fragments plus armour-specific fields", () => {
     expect(Object.keys(schema).sort()).toEqual([
       "adjusteditemmodifer",
-      "attributes",
       "defence",
       "description",
       "encumbrance",
