@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-07-ae-unification
-**Current task:** 7.2 — Register custom FFG AE change modes (+ force-pool)
-**Last verified:** 2026-05-29T23:49:14Z (after task 7.1; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 167 unit tests — +14 modifier-map characterization)
-**Last commit on plan:** 3050061
+**Current task:** 7.4 — Migration attributes→AE (pure transform done + tested; orchestration/auto-run pending real-world validation — see Open issues)
+**Last verified:** 2026-05-30T00:29:38Z (after 7.1 + 7.4 pure transform; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 173 unit tests — +14 modifier-map +6 attribute-to-ae)
+**Last commit on plan:** 5c27fea
 
 ---
 
@@ -52,7 +52,8 @@ preconditions require `test-worlds/` fixtures with rich modifier scenarios that
 
 - [x] 7.0 — Detail Phase 7 atomic tasks (+ ADR-014)
 - [x] 7.1 — Extract modifier→AE-key taxonomy to a tested module (modifier-map.js; 14 tests; modifiers.js delegates)
-- [ ] 7.2 — Register custom FFG AE change modes (+ force-pool)   ← CURRENT
+- [x] 7.2 — No custom AE change modes needed: all FFG modifiers already use standard ADD mode (verified); per anti-creep none are invented. The only non-standard logic is the force-pool `applyActiveEffects` override, which is derived computation moved in 7.7.
+- [~] 7.4 — Pure `attributes`→AE-changes transform extracted + tested (`attribute-to-ae.js`, 6 tests). Migration orchestration + auto-registration held pending real-world validation (ADR-002 — see Open issues).   ← CURRENT
 - [ ] 7.2 — Register custom FFG AE change modes (+ force-pool)
 - [ ] 7.3 — Synthetic test-world modifier fixtures
 - [ ] 7.4 — Migration: attributes → AEs, clear attributes
@@ -571,6 +572,23 @@ before the stop gate closes.
   (relaxed scope); current phase → phase-07-ae-unification. Phase 7 execution is
   gated on operator-provided `test-worlds/` modifier fixtures; 7.0 detailing is
   unblocked.
+- 2026-05-30 — Phase 7 verifiability + data-safety reality (confirmed during
+  7.4). The migration-replay gate does NOT execute migrations — it only parses
+  fixtures (`scripts/replay-migrations.mjs`: "Full replay requires Foundry
+  document instances that this script does not provide"). AE application, the
+  modifier UI, and migration orchestration (createEmbeddedDocuments/update) are
+  all Foundry-runtime, so Phase 7's behavior is not self-verifiable — only the
+  operator real-world smoke validates it. Verified so far: 7.1 taxonomy
+  (modifier-map.js, 14 tests) + the 7.4 PURE transform (attribute-to-ae.js, 6
+  tests). HELD pending validation (ADR-002 "never break a world"): registering
+  an auto-running attributes→AE migration that clears `attributes` — if its
+  untestable orchestration is wrong it could drop modifiers on upgrade. Remaining
+  tasks (7.4 orchestration, 7.5 UI→AE, 7.6 caller migration, 7.7 override→derived,
+  7.8 schema removal, 7.9 delete modifiers.js, 7.10 templates) are runtime-heavy
+  and coupled (cannot remove `attributes`/delete modifiers.js until the UI
+  authors AEs directly). Recommend an exported world in `test-worlds/` to
+  validate the migration + smoke the UI/behavior before the irreversible tasks
+  land.
 
 ---
 
