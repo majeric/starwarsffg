@@ -2,7 +2,7 @@ import { BaseItemData } from "./base-item-data.js";
 import { core } from "../shared/item-core.js";
 
 function upgradesInitial() {
-  const upgrades = {};
+  const upgrades: Record<string, any> = {};
   for (let index = 0; index < 16; index += 1) {
     upgrades[`upgrade${index}`] = {};
   }

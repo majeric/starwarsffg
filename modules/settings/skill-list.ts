@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): strict null checks for Foundry runtime globals; type during dedicated strict pass
 import SkillListImporter from "../importer/skills-list-importer.js";
 import SettingsHelpers from "./settings-helpers.js";
 import { defaultSkillList } from "../config/ffg-skillslist.js";

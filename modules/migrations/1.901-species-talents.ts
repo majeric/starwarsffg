@@ -9,10 +9,10 @@ export const description = "Tag species-granted talents with fromSpecies flag";
 
 export default async function migrate(world: any): Promise<void> {
   for (const actor of world.actors) {
-    for (const species of actor.items.filter((a) => a.type === "species")) {
+    for (const species of actor.items.filter((a: any) => a.type === "species")) {
       for (const talent of Object.values(species.system.talents) as any[]) {
         await actor.items
-          .find((i) => i.name === talent.name)
+          .find((i: any) => i.name === talent.name)
           ?.update({ flags: { starwarsffg: { fromSpecies: true } } });
       }
     }

@@ -164,11 +164,11 @@ export default async function migrate(world: any): Promise<void> {
       try {
         await ModifierHelpers.applyActiveEffectOnUpdate(item, itemData);
       } catch {
-        ui.notifications.warn(`Failed to migrate item ${item.name}, it may need to be recreated by hand`);
+        ui.notifications!.warn(`Failed to migrate item ${item.name}, it may need to be recreated by hand`);
       }
     }
   } catch (e) {
-    ui.notifications.error("The migration to 1.907 has failed for an unknown world. You may need to replace items on actors with items to fully experience 1.907.");
+    ui.notifications!.error("The migration to 1.907 has failed for an unknown world. You may need to replace items on actors with items to fully experience 1.907.");
     CONFIG.logger.debug(e);
   }
 }

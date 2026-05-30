@@ -35,7 +35,7 @@ function reverseModKeyPath(key: string): { modtype: string; mod: string } | unde
   const charMatch = key.match(/^system\.characteristics\.(\w+)\.value$/);
   if (charMatch) return { modtype: "Characteristic", mod: charMatch[1] };
 
-  if (STAT_KEYS[key]) return STAT_KEYS[key];
+  if ((STAT_KEYS as any)[key]) return (STAT_KEYS as any)[key];
 
   const skillMatch = key.match(/^system\.skills\.(.+?)\.(\w+)$/);
   if (skillMatch) {
@@ -79,7 +79,7 @@ export function getModifierEffectsAsAttributes(doc: any): Record<string, Modifie
   for (const effect of effects) {
     if (!isModifierEffect(effect)) continue;
     const mod = effectToModifier(effect);
-    if (mod) result[mod.key] = mod;
+    if (mod) result[mod.key!] = mod;
   }
   return result;
 }

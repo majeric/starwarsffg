@@ -253,7 +253,7 @@ export class DicePoolFFG {
   }
 
   renderDiceExpression(): string {
-    let setbackDice = game.settings.get("starwarsffg", "ApplyRemoveSetbackMods")
+    let setbackDice = game.settings!.get("starwarsffg", "ApplyRemoveSetbackMods")
       ? Math.max(0, this.setback - this.remsetback)
       : this.setback;
 

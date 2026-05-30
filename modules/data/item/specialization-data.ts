@@ -2,7 +2,7 @@ import { BaseItemData } from "./base-item-data.js";
 import { core } from "../shared/item-core.js";
 
 function talentsInitial() {
-  const talents = {};
+  const talents: Record<string, any> = {};
   for (let index = 0; index < 20; index += 1) {
     talents[`talent${index}`] = {};
   }
@@ -10,7 +10,7 @@ function talentsInitial() {
 }
 
 function careerSkillsInitial() {
-  const skills = {};
+  const skills: Record<string, any> = {};
   for (let index = 0; index < 5; index += 1) {
     skills[`careerSkill${index}`] = "(none)";
   }

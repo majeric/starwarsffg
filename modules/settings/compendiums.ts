@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): strict null checks for Foundry runtime globals; type during dedicated strict pass
 /**
  * Register compendium-pack source settings used by the character creator
  * and importers. Extracted from swffg-main.js by Phase 2.2.

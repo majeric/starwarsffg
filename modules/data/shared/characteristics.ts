@@ -18,7 +18,7 @@ const CHARACTERISTICS = {
  */
 export function characteristicsSchema(): foundry.data.fields.DataSchema {
   const { SchemaField, NumberField, StringField } = foundry.data.fields;
-  const characteristics = {};
+  const characteristics: Record<string, any> = {};
   for (const [key, [label, abrev]] of Object.entries(CHARACTERISTICS)) {
     characteristics[key] = new SchemaField({
       value: new NumberField({ initial: 0 }),

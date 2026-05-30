@@ -63,6 +63,6 @@ export class ChallengeDie extends foundry.dice.terms.DiceTerm {
   /** @override */
   getResultLabel(result: any): string {
     const die = CONFIG.FFG.CHALLENGE_RESULTS[result.result];
-    return `<img src='${die.image}' title='${game.i18n.localize(die.label)}' alt=''/>`;
+    return `<img src='${die.image}' title='${game.i18n!.localize(die.label)}' alt=''/>`;
   }
 }

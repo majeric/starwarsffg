@@ -48,8 +48,8 @@ export interface MigrationSummary {
 export const MIGRATION_REGISTRY: MigrationEntry[] = [];
 
 export async function handleUpdate(): Promise<void> {
-  const registeredVersion = game.settings.get("starwarsffg", "systemMigrationVersion") as unknown as string;
-  const runningVersion = game.system.version;
+  const registeredVersion = game.settings!.get("starwarsffg", "systemMigrationVersion") as unknown as string;
+  const runningVersion = game.system!.version;
   if (registeredVersion === runningVersion) return;
 
   await runMigrations(registeredVersion, runningVersion);
@@ -57,7 +57,7 @@ export async function handleUpdate(): Promise<void> {
   await warnTheme();
 
   if (canRegisterMigrationVersion(registeredVersion)) {
-    await game.settings.set("starwarsffg", "systemMigrationVersion", runningVersion);
+    await game.settings!.set("starwarsffg", "systemMigrationVersion", runningVersion);
   } else {
     await warnUnsupportedWorld();
   }
@@ -128,16 +128,16 @@ async function sendChanges(newVersion: string): Promise<void> {
   const template = "systems/starwarsffg/templates/notifications/new_version.html";
   const html = await foundry.applications.handlebars.renderTemplate(template, { version: newVersion });
   ChatMessage.create({
-    user: game.user.id,
+    user: game.user!.id,
     type: CONST.CHAT_MESSAGE_TYPES.OTHER,
     content: html,
   } as any);
 }
 
 async function warnTheme(): Promise<void> {
-  if ((game.settings.get("starwarsffg", "ui-uitheme") as unknown as string) !== "default") return;
+  if ((game.settings!.get("starwarsffg", "ui-uitheme") as unknown as string) !== "default") return;
   ChatMessage.create({
-    user: game.user.id,
+    user: game.user!.id,
     type: CONST.CHAT_MESSAGE_TYPES.OTHER,
     content:
       "You are using an unsupported theme. Expected issues, or swap to the Mandar theme.<br>(This message will only show once.)",
@@ -145,15 +145,15 @@ async function warnTheme(): Promise<void> {
 }
 
 async function warnUnsupportedWorld(): Promise<void> {
-  const content = game.i18n.localize("SWFFG.Migrate.Unsupported.Text");
+  const content = game.i18n!.localize("SWFFG.Migrate.Unsupported.Text");
   new Dialog(
     {
-      title: game.i18n.localize("SWFFG.Migrate.Unsupported.Title"),
+      title: game.i18n!.localize("SWFFG.Migrate.Unsupported.Title"),
       content,
       buttons: {
         ok: {
           icon: '<i class="fas fa-exclamation"></i>',
-          label: game.i18n.localize("SWFFG.Migrate.Unsupported.Button"),
+          label: game.i18n!.localize("SWFFG.Migrate.Unsupported.Button"),
         },
       },
     },

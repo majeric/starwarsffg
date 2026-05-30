@@ -32,7 +32,7 @@ function changesForAttribute(attr: any): any[] {
 function applyAttributeToEffect(effect: any, attr: any): void {
   for (const curMod of explodeMod(attr.modtype, attr.mod)) {
     const modPath = getModKeyPath(curMod.modType, curMod.mod);
-    const index = effect.changes.findIndex((change) => change.key === modPath);
+    const index = effect.changes.findIndex((change: any) => change.key === modPath);
     if (index >= 0) effect.changes[index].value = attr.value;
   }
 }
@@ -68,7 +68,7 @@ function inherentStatUpdates(item: any, formData: any): any[] {
 function applyInherentStatUpdate(effect: any, update: any): void {
   for (const curMod of explodeMod(update.modtype, update.mod)) {
     const modPath = getModKeyPath(curMod.modType, curMod.mod);
-    const index = effect.changes.findIndex((change) => change.key === modPath);
+    const index = effect.changes.findIndex((change: any) => change.key === modPath);
     if (index >= 0) effect.changes[index].value = update.value;
   }
 }
@@ -87,7 +87,7 @@ async function updateInherentStats(item: any, formData: any, inherentEffect: any
 
 function stageDeletedAttributeEffects(item: any, existingEffects: any, attributes: Record<string, any>, toDelete: string[]): void {
   for (const key of Object.keys(item.system?.attributes ?? {})) {
-    const match = existingEffects.find((effect) => effect.name === key);
+    const match = existingEffects.find((effect: any) => effect.name === key);
     if (!hasKey(attributes, key)) {
       attributes[`-=${key}`] = null;
       if (match) toDelete.push(match.id);
@@ -99,7 +99,7 @@ async function syncSubmittedAttributeEffects(existingEffects: any, formData: any
   if (!formData.data?.attributes) return;
 
   for (const key of Object.keys(formData.data.attributes)) {
-    const match = existingEffects.find((effect) => effect.name === key);
+    const match = existingEffects.find((effect: any) => effect.name === key);
     const changes = changesForAttribute(formData.data.attributes[key]);
 
     if (match) {
@@ -136,11 +136,11 @@ function updateSpeciesThresholdChange(change: any, values: Record<string, number
     "system.stats.encumbrance.max": values.encumbrance,
   };
 
-  if (hasKey(thresholdValues, change.key)) change.value = thresholdValues[change.key];
+  if (hasKey(thresholdValues, change.key)) change.value = (thresholdValues as any)[change.key];
 }
 
 async function updateSpeciesThresholdEffects(item: any, formData: any, existingEffects: any): Promise<void> {
-  const itemEffect = existingEffects.find((effect) => effect.name === "(inherent)");
+  const itemEffect = existingEffects.find((effect: any) => effect.name === "(inherent)");
   if (!itemEffect || item.type !== "species") return;
 
   const newChanges = foundry.utils.deepClone(itemEffect.changes);
@@ -165,7 +165,7 @@ export async function applyActiveEffectOnUpdate(item: any, formData: any): Promi
 
   const attributes = submittedAttributes(updateData);
   const existingEffects = item.getEmbeddedCollection("ActiveEffect");
-  const inherentEffect = existingEffects.find((effect) => effect.name === "(inherent)");
+  const inherentEffect = existingEffects.find((effect: any) => effect.name === "(inherent)");
   const toDelete: string[] = [];
   const toCreate: any[] = [];
 

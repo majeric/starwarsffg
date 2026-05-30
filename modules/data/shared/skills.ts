@@ -51,7 +51,7 @@ const SKILLS = {
  */
 export function skillsSchema(): foundry.data.fields.DataSchema {
   const { SchemaField, NumberField, StringField, BooleanField } = foundry.data.fields;
-  const skills = {};
+  const skills: Record<string, any> = {};
   for (const [name, [characteristic, type]] of Object.entries(SKILLS)) {
     skills[name] = new SchemaField({
       rank: new NumberField({ initial: 0 }),

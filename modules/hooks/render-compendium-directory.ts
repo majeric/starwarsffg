@@ -9,7 +9,7 @@ import SWAImporter from "../importer/swa-importer.js";
  */
 export function registerRenderCompendiumDirectoryHook(): void {
   Hooks.on("renderCompendiumDirectory", (_app: unknown, html: HTMLElement) => {
-    if (!game.user.isGM) return;
+    if (!game.user!.isGM) return;
 
     const div = document.createElement("div");
     div.className = "og-character-import";

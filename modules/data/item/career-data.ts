@@ -2,7 +2,7 @@ import { BaseItemData } from "./base-item-data.js";
 import { core } from "../shared/item-core.js";
 
 function careerSkillsInitial() {
-  const skills = {};
+  const skills: Record<string, any> = {};
   for (let index = 0; index < 8; index += 1) {
     skills[`careerSkill${index}`] = "(none)";
   }

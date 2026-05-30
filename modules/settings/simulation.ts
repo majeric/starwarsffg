@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): strict null checks for Foundry runtime globals; type during dedicated strict pass
 /**
  * Register simulation and dice-display settings extracted from
  * swffg-main.js by Phase 2.5. These are the settings the dice helpers

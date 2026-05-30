@@ -26,7 +26,7 @@ function rewriteSettingPaths(settings: any, key: string): void {
   if (!original) return;
   const rewritten = original
     .split(",")
-    .map((path) => (path.includes("starwarsffg.") ? path.replace("starwarsffg.", "world.") : path))
+    .map((path: any) => (path.includes("starwarsffg.") ? path.replace("starwarsffg.", "world.") : path))
     .join(",");
   if (rewritten !== original) {
     settings.set("starwarsffg", key, rewritten);

@@ -5,9 +5,9 @@
  */
 export function registerRenderGamePauseHook(): void {
   Hooks.on("renderGamePause", (_application: unknown, element: HTMLElement) => {
-    const pausedImage = game.settings.get("starwarsffg", "ui-pausedImage") as unknown as string;
+    const pausedImage = game.settings!.get("starwarsffg", "ui-pausedImage") as unknown as string;
     if (pausedImage) {
-      element.querySelector("img").src = pausedImage;
+      element.querySelector("img")!.src = pausedImage;
     }
   });
 }

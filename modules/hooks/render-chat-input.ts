@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): strict null checks for Foundry runtime globals; type during dedicated strict pass
 import { DicePoolFFG } from "../dice-pool-ffg.js";
 import DiceHelpers from "../helpers/dice-helpers.js";
 

@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-12-typescript
-**Current task:** 12.16 — Enable strict: true and noImplicitAny: true
-**Last verified:** 2026-05-31T00:00:00Z (task 12.15; typecheck/comments/tests/build/smoke/migration green, lint known-red; 204 unit tests, 2 skipped)
-**Last commit on plan:** e0298ff
+**Current task:** 12.last — Phase 12 stop-gate
+**Last verified:** 2026-05-31T00:30:00Z (task 12.16; typecheck/comments/tests/build/smoke/migration green, lint known-red; 204 unit tests, 2 skipped; strict: true, noImplicitAny: true, tsc --noEmit zero errors)
+**Last commit on plan:** f9ce6d4
 
 ---
 
@@ -44,7 +44,7 @@
 - [x] 12.13 — Convert `modules/helpers/` (16 files, 4416 lines)
 - [x] 12.14 — Convert `modules/actors/` (5 files, 3484 lines)
 - [x] 12.15 — Convert `modules/` root files (8 files, 3843 lines)
-- [ ] 12.16 — Enable `strict: true` and `noImplicitAny: true`
+- [x] 12.16 — Enable `strict: true` and `noImplicitAny: true`
 - [ ] 12.last — Phase 12 stop-gate
 
 ---

@@ -23,7 +23,7 @@ async function updateLegacyUpgradeAttribute(this: any, event: Event, action?: st
     await this._onSubmit(event);
   } else if (action === "delete") {
     const li = (event.currentTarget as HTMLElement).closest(".attribute");
-    li.parentElement.removeChild(li);
+    li!.parentElement!.removeChild(li!);
     await this._onSubmit(event);
   }
 }
