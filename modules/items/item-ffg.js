@@ -83,7 +83,7 @@ export class ItemFFG extends ItemBaseFFG {
           changes: [],
         };
         if (this.type === "species") {
-          for (const attribute of Object.keys(this.system.attributes)) {
+          for (const attribute of Object.keys(this.system.attributes ?? {})) {
             if (attribute.startsWith("attr")) {
               // migrated data may contain attributes that the user has added, and we don't want this in the inherent effect
               continue;

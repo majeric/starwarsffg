@@ -25,7 +25,7 @@ export default class ItemHelpers {
       delete formData.data?.attributes;
     } else {
       if (this.object.system?.attributes) {
-        for (let k of Object.keys(this.object.system.attributes)) {
+        for (let k of Object.keys(this.object.system.attributes ?? {})) {
           if (!attributes.hasOwnProperty(k)) attributes[`-=${k}`] = null;
         }
       }
@@ -333,17 +333,17 @@ export default class ItemHelpers {
   static async uniqueAttrs(droppedItem, parentItem) {
     CONFIG.logger.debug(`Unique-ing attributes for dropped item ${droppedItem.name} on parent item ${parentItem.name}`);
     // collect the existing attrs so we can determine if there's a collision
-    let existingAttrs = Object.keys(parentItem.system.attributes) || [];
+    let existingAttrs = Object.keys(parentItem.system.attributes ?? {});
     if (Object.keys(parentItem.system).includes("itemmodifier")) {
       for (const modifier of parentItem.system.itemmodifier) {
-        existingAttrs = [...existingAttrs, ...Object.keys(modifier.system.attributes)];
+        existingAttrs = [...existingAttrs, ...Object.keys(modifier.system?.attributes ?? {})];
       }
     }
     if (Object.keys(parentItem.system).includes("itemattachment")) {
       for (const attachment of parentItem.system.itemattachment) {
-        existingAttrs = [...existingAttrs, ...Object.keys(attachment.system.attributes)];
-        for (const modification of attachment.system.itemmodifier) {
-          existingAttrs = [...existingAttrs, ...Object.keys(modification.system.attributes)];
+        existingAttrs = [...existingAttrs, ...Object.keys(attachment.system?.attributes ?? {})];
+        for (const modification of attachment.system?.itemmodifier ?? []) {
+          existingAttrs = [...existingAttrs, ...Object.keys(modification.system?.attributes ?? {})];
         }
       }
     }

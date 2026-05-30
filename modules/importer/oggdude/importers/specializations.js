@@ -89,7 +89,7 @@ export default class Specializations {
                   talentItem = ImportHelpers.findEntityByImportId("items", talentKey);
                 }
 
-                const originalAttributes = foundry.utils.deepClone(talentItem.system.attributes);
+                const originalAttributes = foundry.utils.deepClone(talentItem.system.attributes ?? {});
                 for (const attribute of Object.keys(originalAttributes)) {
                   const nk = new Date().getTime();
                   talentItem.system.attributes[`attr${nk}`] = foundry.utils.deepClone(originalAttributes[attribute]);
