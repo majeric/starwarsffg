@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import globals from "globals";
+import tseslint from "typescript-eslint";
 
 const foundryGlobals = {
   game: "readonly",
@@ -66,6 +67,24 @@ export default [
     },
     rules: {
       "no-undef": "warn",
+      "no-unused-vars": "warn",
+    },
+  },
+  {
+    files: ["**/*.ts"],
+    languageOptions: {
+      parser: tseslint.parser,
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...foundryGlobals,
+        ...testGlobals,
+      },
+    },
+    rules: {
+      "no-undef": "off",
       "no-unused-vars": "warn",
     },
   },

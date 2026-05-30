@@ -624,6 +624,42 @@ reach "AE as the sole pipeline" (ADR-004) and how to handle migration edge cases
 
 ---
 
+## ADR-015: 2026-05-30 — Add typescript-eslint for Phase 12 TS conversion
+
+**Status:** accepted
+**Phase:** 12
+
+**Context:** Phase 12 converts all `modules/*.js` files to `.ts`. ESLint's
+default parser cannot parse TypeScript syntax (type annotations, interfaces,
+generics). Without a TS-aware parser, renamed files either crash ESLint or
+silently drop out of lint coverage — both unacceptable since the
+maintainability rules (max-lines, complexity, etc.) are enforced gates.
+
+**Options considered:**
+- (a) Add `typescript-eslint` — the standard TypeScript ESLint integration.
+  Provides a parser and optional type-aware rules. Widely adopted; maintained
+  by the TypeScript ESLint team.
+- (b) Disable ESLint for `.ts` files and rely solely on `tsc` — loses the
+  maintainability rules (max-lines, complexity, max-depth) that are central
+  to ADR-006.
+- (c) Use a separate linter (`biome`, `oxlint`) for TS files — introduces a
+  second tool with different semantics; configuration drift risk.
+
+**Decision:** (a) — add `typescript-eslint` as a dev dependency.
+
+**Consequences:**
+- One new dev dependency (`typescript-eslint`, which bundles the parser and
+  plugin).
+- `eslint.config.mjs` gains a TS file pattern using the typescript-eslint
+  parser. `no-undef` is disabled for `.ts` files (TypeScript's own type
+  checker handles undefined references more accurately than ESLint).
+- All existing maintainability rules apply identically to `.ts` files.
+- No type-aware lint rules are enabled initially (they require
+  `parserOptions.project` pointing at `tsconfig.json`, which slows linting).
+  A future task can enable them if the benefit justifies the cost.
+
+---
+
 ## ADR template (for future entries)
 
 ```
