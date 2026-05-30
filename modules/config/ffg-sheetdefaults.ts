@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy config; type during Phase 12.16 strict pass
 export const default_width = {
   character: 630,
   minion: 595,

@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy root module; type during Phase 12.16 strict pass
 /**
  * Establish each FFG dice type here as extensions of DiceTerm.
  * @extends {DiceTerm}

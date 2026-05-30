@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy root module; type during Phase 12.16 strict pass
 import { itemstatus } from "./config/ffg-itemstatus.js";
 import { personal_ranges, configureVehicleRange, sensor_ranges } from "./config/ffg-ranges.js";
 import {

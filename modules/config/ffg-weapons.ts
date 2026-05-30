@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy config; type during Phase 12.16 strict pass
 export const weapon_stats = {
   "damage": {
     value: "damage",

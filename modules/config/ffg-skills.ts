@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy config; type during Phase 12.16 strict pass
 export const skills = {
   "Astrogation": { value: "Astrogation", label: "SWFFG.SkillsNameAstrogation", abrev: "SWFFG.SkillsNameAstrogation" },
   "Athletics": { value: "Athletics", label: "SWFFG.SkillsNameAthletics", abrev: "SWFFG.SkillsNameAthletics" },

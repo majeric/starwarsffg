@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy config; type during Phase 12.16 strict pass
 export const vehicle_stats = {
   "armour": {
     value: "Armour",

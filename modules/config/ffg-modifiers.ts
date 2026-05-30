@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy config; type during Phase 12.16 strict pass
 import {weapon_stats} from "./ffg-weapons.js";
 import {armor_stats} from "./ffg-armor.js";
 import {vehicle_stats} from "./ffg-vehicles.js";

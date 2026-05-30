@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy config; type during Phase 12.16 strict pass
 export default class PauseFFG extends foundry.applications.ui.GamePause {
   static get defaultOptions() {
     const options = super.defaultOptions;

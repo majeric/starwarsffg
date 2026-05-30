@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy root module; type during Phase 12.16 strict pass
 import {DicePoolFFG, RollFFG} from "./dice-pool-ffg.js";
 import PopoutEditor from "./popout-editor.js";
 

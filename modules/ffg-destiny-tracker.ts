@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy root module; type during Phase 12.16 strict pass
 import { GroupManager } from "./groupmanager-ffg.js";
 
 /**
