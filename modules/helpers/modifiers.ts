@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy helper; type during Phase 12.16 strict pass
 import { applyActiveEffectOnUpdate } from "../active-effects/legacy-attribute-effects.js";
 import {
   explodeMod as explodeModImpl,

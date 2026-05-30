@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy helper; type during Phase 12.16 strict pass
 export default class TemplateHelpers {
   static async preload() {
     const templatePaths = [

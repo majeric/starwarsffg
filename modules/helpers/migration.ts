@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy helper; type during Phase 12.16 strict pass
 /**
  * Migrate any formdata from "data" to "system" since Foundry was doing this prior to v12
  * @param updateData

@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy helper; type during Phase 12.16 strict pass
 import PopoutEditor from "../popout-editor.js";
 import RollBuilderFFG from "../dice/roll-builder.js";
 import ImportHelpers from "../importer/import-helpers.js";

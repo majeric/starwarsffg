@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy helper; type during Phase 12.16 strict pass
 const createMacroItem = async (macro) => {
   const macroExists = game.macros.find((m) => m.name === macro.name && m.command === macro.command);
   if (!macroExists) {

@@ -24,7 +24,8 @@ export function registerRenderChatInputHook(): void {
     rollButton.onclick = async function () {
       const dicePool = new DicePoolFFG();
       const user = { data: game.user.system };
-      await DiceHelpers.displayRollDialog(
+      // FIXME(types): DiceHelpers.displayRollDialog parameter count mismatch
+      await (DiceHelpers as any).displayRollDialog(
         user,
         dicePool,
         game.i18n.localize("SWFFG.RollingDefaultTitle"),

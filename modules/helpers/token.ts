@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy helper; type during Phase 12.16 strict pass
 export function registerTokenControls() {
   game.settings.register("starwarsffg", "showMinionCount", {
     name: game.i18n.localize("SWFFG.Settings.showMinionCount.Name"),

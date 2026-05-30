@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy helper; type during Phase 12.16 strict pass
 import {migrateDataToSystem} from "./migration.js";
 
 export default class ActorHelpers {

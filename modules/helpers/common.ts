@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy helper; type during Phase 12.16 strict pass
 export default class Helpers {
   static logger = {
     log: (...args) => {

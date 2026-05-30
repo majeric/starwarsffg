@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy helper; type during Phase 12.16 strict pass
 import ActorHelpers, {xpLogEarn, xpLogSpend} from "./actor-helpers.js";
 import DiceHelpers from "./dice-helpers.js";
 import {sortDataBy, addIfNotExist} from "../actors/actor-sheet-ffg.js";

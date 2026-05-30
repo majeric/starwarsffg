@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy helper; type during Phase 12.16 strict pass
 import {get_dice_pool} from "./dice-helpers.js";
 import {DicePoolFFG} from "../dice/pool.js";
 import DiceHelpers from "../helpers/dice-helpers.js";

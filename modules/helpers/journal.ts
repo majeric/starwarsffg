@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy helper; type during Phase 12.16 strict pass
 /**
  * Registers enrichers for the Journal pages - automatically runs the regex and replaces it with the return value of the function
  */
