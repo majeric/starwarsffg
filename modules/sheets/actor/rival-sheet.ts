@@ -1,14 +1,15 @@
 import { ActorSheetFFG } from "../../actors/actor-sheet-ffg.js";
 
 /**
- * Sheet for the nemesis actor type. Full humanoid with strain —
- * the canonical "boss" NPC type.
+ * Sheet for the rival actor type. Full humanoid minus strain.
+ * Species, general features, characteristics, skills.
  */
-export class NemesisSheet extends ActorSheetFFG {
+export class RivalSheet extends ActorSheetFFG {
   /** @override */
-  static get defaultOptions() {
+  // FIXME(types): fvtt-types tuple width mismatch on classes array
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["starwarsffg", "sheet", "actor", "v2", "nemesis"],
+      classes: ["starwarsffg", "sheet", "actor", "v2", "rival"],
       width: 710,
       height: 650,
       tabs: [
@@ -20,6 +21,6 @@ export class NemesisSheet extends ActorSheetFFG {
 
   /** @override */
   get template() {
-    return "systems/starwarsffg/templates/actors/ffg-nemesis-sheet.html";
+    return "systems/starwarsffg/templates/actors/ffg-rival-sheet.html";
   }
 }

@@ -1,14 +1,15 @@
 import { ActorSheetFFG } from "../../actors/actor-sheet-ffg.js";
 
 /**
- * Sheet for the rival actor type. Full humanoid minus strain.
- * Species, general features, characteristics, skills.
+ * Sheet for the minion actor type. Group wounds (quantity × unit_wounds),
+ * group skill ranks, and a simplified stat block.
  */
-export class RivalSheet extends ActorSheetFFG {
+export class MinionSheet extends ActorSheetFFG {
   /** @override */
-  static get defaultOptions() {
+  // FIXME(types): fvtt-types tuple width mismatch on classes array
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["starwarsffg", "sheet", "actor", "v2", "rival"],
+      classes: ["starwarsffg", "sheet", "actor", "v2", "minion"],
       width: 710,
       height: 650,
       tabs: [
@@ -20,6 +21,6 @@ export class RivalSheet extends ActorSheetFFG {
 
   /** @override */
   get template() {
-    return "systems/starwarsffg/templates/actors/ffg-rival-sheet.html";
+    return "systems/starwarsffg/templates/actors/ffg-minion-sheet.html";
   }
 }

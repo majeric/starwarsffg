@@ -1,14 +1,15 @@
 import { ActorSheetFFG } from "../../actors/actor-sheet-ffg.js";
 
 /**
- * Sheet for the minion actor type. Group wounds (quantity × unit_wounds),
- * group skill ranks, and a simplified stat block.
+ * Sheet for the nemesis actor type. Full humanoid with strain —
+ * the canonical "boss" NPC type.
  */
-export class MinionSheet extends ActorSheetFFG {
+export class NemesisSheet extends ActorSheetFFG {
   /** @override */
-  static get defaultOptions() {
+  // FIXME(types): fvtt-types tuple width mismatch on classes array
+  static get defaultOptions(): any {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["starwarsffg", "sheet", "actor", "v2", "minion"],
+      classes: ["starwarsffg", "sheet", "actor", "v2", "nemesis"],
       width: 710,
       height: 650,
       tabs: [
@@ -20,6 +21,6 @@ export class MinionSheet extends ActorSheetFFG {
 
   /** @override */
   get template() {
-    return "systems/starwarsffg/templates/actors/ffg-minion-sheet.html";
+    return "systems/starwarsffg/templates/actors/ffg-nemesis-sheet.html";
   }
 }
