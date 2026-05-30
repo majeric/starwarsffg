@@ -90,7 +90,7 @@ export class ItemSheetFFG extends foundry.appv1.sheets.ItemSheet {
       data.item = foundry.utils.mergeObject(data.item, options.data); // some fields are read out of item, some are read out of data
     }
 
-    data.classType = this.constructor.name;
+    data.classType = this.options.classes?.includes("v2") ? "V2" : this.constructor.name;
     CONFIG.logger.debug(`Getting Item Data ${this.object.name}`);
 
     data.dtypes = ["String", "Number", "Boolean"];
