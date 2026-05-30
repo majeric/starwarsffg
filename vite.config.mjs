@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 
 import { defineConfig } from "vite";
 
+import { resolveJsToTsImports } from "./scripts/resolve-js-to-ts-imports.mjs";
+
 // Reference: https://foundryvtt.wiki/en/development/guides/vite
 // This build writes Foundry-loadable ES modules to dist/ while preserving paths.
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
@@ -45,7 +47,7 @@ export default defineConfig(({ mode }) => {
     resolve: {
       extensions: [".ts", ".js", ".mjs", ".cjs", ".json"],
     },
-    plugins: [copyFoundryAssets()],
+    plugins: [resolveJsToTsImports(), copyFoundryAssets()],
     build: {
       outDir,
       emptyOutDir: true,

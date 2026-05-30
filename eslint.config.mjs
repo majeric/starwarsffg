@@ -72,6 +72,9 @@ export default [
   },
   {
     files: ["**/*.ts"],
+    plugins: {
+      "@typescript-eslint": tseslint.plugin,
+    },
     languageOptions: {
       parser: tseslint.parser,
       ecmaVersion: 2022,
@@ -85,7 +88,8 @@ export default [
     },
     rules: {
       "no-undef": "off",
-      "no-unused-vars": "warn",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "warn",
     },
   },
   {

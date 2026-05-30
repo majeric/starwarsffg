@@ -1,6 +1,9 @@
 import { defineConfig } from "vitest/config";
 
+import { resolveJsToTsImports } from "./scripts/resolve-js-to-ts-imports.mjs";
+
 export default defineConfig({
+  plugins: [resolveJsToTsImports()],
   resolve: {
     extensions: [".ts", ".js", ".mjs", ".cjs", ".json"],
   },

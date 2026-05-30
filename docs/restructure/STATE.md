@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-12-typescript
-**Current task:** 12.3 — Convert modules/rules/systems/
-**Last verified:** 2026-05-30T09:50:00Z (phase 7 close; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 187 unit tests)
-**Last commit on plan:** 01beceb
+**Current task:** 12.4 — Convert modules/data/
+**Last verified:** 2026-05-30T18:54:31Z (task 12.3; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors, 986 warnings; 196 unit tests, 2 skipped)
+**Last commit on plan:** e30efe5
 
 ---
 
@@ -31,7 +31,7 @@
 - [x] 12.0 — Detail Phase 12 task list
 - [x] 12.1 — Add TypeScript ESLint tooling
 - [x] 12.2 — Convert `modules/rules/calculators/` (7 files, 317 lines)
-- [ ] 12.3 — Convert `modules/rules/systems/` (1 file, 43 lines)
+- [x] 12.3 — Convert `modules/rules/systems/` (1 file, 43 lines)
 - [ ] 12.4 — Convert `modules/data/` (45 files, 1218 lines)
 - [ ] 12.5 — Convert `modules/settings/` (11 files, 1086 lines)
 - [ ] 12.6 — Convert `modules/hooks/` (8 files, 210 lines)
@@ -51,6 +51,18 @@
 
 ## Open issues
 
+- 2026-05-30 — Session start for task 12.3 found pre-existing in-progress
+  rename `modules/rules/systems/rules-system.js` → `.ts`. Baseline
+  `npm run verify` passed typecheck/comments/smoke/migration, hit the known
+  lint warning gate (0 errors, 986 warnings), and newly failed unit tests/build
+  because `.js` import specifiers for `rules-system` did not resolve to the
+  renamed `.ts` source (`tests/rules/rules-system.test.js` and
+  `modules/config/ffg-dice.js`). This is inside task 12.3 scope; resolve by
+  completing the TypeScript conversion and preserving Foundry/Vite import
+  compatibility. Resolved in task 12.3 by adding a shared Vite/Vitest
+  resolver for relative `.js` imports whose source has been converted to
+  `.ts`; repeated `npm run verify` passed all gates except the known lint
+  warning gate.
 - 2026-05-30 — Session start before Phase 7 task 7.9. `npm run verify`
   exited non-zero at the known lint gate: typecheck/comments/unit
   tests/build/smoke/migration replay passed, while lint reported warnings
