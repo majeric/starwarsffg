@@ -9,10 +9,13 @@ export const pool_results = {
   dark: "SWFFG.RollResultDark",
 };
 
+import { createRulesSystem } from "../rules/systems/rules-system.js";
+
 export function configureDice() {
   // Set up dice with dynamic dice theme
   const dicetheme = game.settings.get("starwarsffg", "dicetheme");
   CONFIG.FFG.theme = dicetheme;
+  CONFIG.FFG.rules = createRulesSystem(dicetheme);
 
   CONFIG.FFG.PROFICIENCY_ICON = `systems/starwarsffg/images/dice/${dicetheme}/yellow.png`;
   CONFIG.FFG.ABILITY_ICON = `systems/starwarsffg/images/dice/${dicetheme}/green.png`;

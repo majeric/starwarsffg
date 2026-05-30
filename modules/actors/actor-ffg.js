@@ -364,8 +364,9 @@ export class ActorFFG extends Actor {
         item.rank = "N/A";
       }
 
-      if (CONFIG.FFG.theme !== "starwars") {
-        item.tier = parseInt(element.system.tier, 10);
+      const rules = CONFIG.FFG.rules;
+      if (rules?.sortTalentsByTier) {
+        item.tier = rules.talentTier(element);
       }
 
       let index = globalTalentList.findIndex((obj) => {
@@ -377,32 +378,12 @@ export class ActorFFG extends Actor {
       } else {
         globalTalentList[index].source.push({ type: "talent", typeLabel: "SWFFG.Talent", name: element.name, id: element.id });
         globalTalentList[index].rank += element.system.ranks?.current;
-        if (CONFIG.FFG.theme !== "starwars") {
+        if (rules?.sortTalentsByTier) {
           globalTalentList[index].tier = Math.abs(globalTalentList[index].rank + (parseInt(element.system.tier, 10) - 1));
         }
       }
     });
-    if (CONFIG.FFG.theme !== "starwars") {
-      globalTalentList.sort((a, b) => {
-        let comparison = 0;
-        if (a.tier > b.tier) {
-          comparison = 1;
-        } else if (a.tier < b.tier) {
-          comparison = -1;
-        }
-        return comparison;
-      });
-    } else {
-      globalTalentList.sort((a, b) => {
-        let comparison = 0;
-        if (a.name > b.name) {
-          comparison = 1;
-        } else if (a.name < b.name) {
-          comparison = -1;
-        }
-        return comparison;
-      });
-    }
+    globalTalentList.sort((a, b) => CONFIG.FFG.rules?.compareTalents(a, b) ?? a.name.localeCompare(b.name));
     actorData.talentList = globalTalentList;
   }
 
@@ -472,8 +453,8 @@ export class ActorFFG extends Actor {
         item.rank = "N/A";
       }
 
-      if (CONFIG.FFG.theme !== "starwars") {
-        item.tier = parseInt(element.system?.tier, 10);
+      if (CONFIG.FFG.rules?.sortTalentsByTier) {
+        item.tier = CONFIG.FFG.rules.talentTier(element);
       }
 
       let index = globalTalentList.findIndex((obj) => {
@@ -492,33 +473,12 @@ export class ActorFFG extends Actor {
           id: element.id,
         });
         globalTalentList[index].rank += element.system.ranks.current;
-        if (CONFIG.FFG.theme !== "starwars") {
+        if (CONFIG.FFG.rules?.sortTalentsByTier) {
           globalTalentList[index].tier = Math.abs(parseInt(globalTalentList[index].rank) + (parseInt(element.system?.tier, 10) - 1));
         }
       }
     });
-
-    if (CONFIG.FFG.theme !== "starwars") {
-      globalTalentList.sort((a, b) => {
-        let comparison = 0;
-        if (a.tier > b.tier) {
-          comparison = 1;
-        } else if (a.tier < b.tier) {
-          comparison = -1;
-        }
-        return comparison;
-      });
-    } else {
-      globalTalentList.sort((a, b) => {
-        let comparison = 0;
-        if (a.name > b.name) {
-          comparison = 1;
-        } else if (a.name < b.name) {
-          comparison = -1;
-        }
-        return comparison;
-      });
-    }
+    globalTalentList.sort((a, b) => CONFIG.FFG.rules?.compareTalents(a, b) ?? a.name.localeCompare(b.name));
 
     // enable talent sorting if global to true and sheet is set to inherit or sheet is set to true.
     if ((game.settings.get("starwarsffg", "talentSorting") && (!actorData.flags?.config?.talentSorting || actorData.flags?.config?.talentSorting === "0")) || actorData.flags?.config?.talentSorting === "1") {
