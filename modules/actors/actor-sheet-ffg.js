@@ -197,7 +197,7 @@ export class ActorSheetFFG extends foundry.appv1.sheets.ActorSheet {
   /** @override */
   async getData(options) {
     const data = await super.getData();
-    data.classType = this.constructor.name;
+    data.classType = this.options.classes?.includes("v2") ? "V2" : this.constructor.name;
 
     // Compatibility for Foundry 0.8.x with backwards compatibility (hopefully) for 0.7.x
     const actorData = this.actor.toObject(false);
