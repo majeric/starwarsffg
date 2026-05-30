@@ -1,7 +1,7 @@
 # Restructure State
 
-**Current phase:** phase-10-system-abstraction (closing)
-**Current task:** complete
+**Current phase:** phase-12-typescript
+**Current task:** 12.0 — Detail Phase 12 task list
 **Last verified:** 2026-05-30T09:50:00Z (phase 7 close; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 187 unit tests)
 **Last commit on plan:** 01beceb
 
@@ -26,16 +26,26 @@
 
 ---
 
-## Current phase tasks (phase-08-sheets)
+## Current phase tasks (phase-12-typescript)
 
-Phase 8 closed. 26 per-type sheets registered; V2 reskins deleted; monoliths
-retained as base classes. Phase 9 in progress — extracting import-helpers.js.
-
-- [x] 9.1 — Extracted AE utilities (createInherentEffect, applyTalentActiveEffects, applyImportActiveEffects) to import-ae-utils.js; compendium utilities to compendium-utils.js. ImportHelpers delegates; callers unchanged.
-- [x] 9.2 — Extracted OggDude parsing utilities (convertOGCharacteristic, getAttributeObject, getSources, getSourcesAsArray, prepareBaseObject) to oggdude/oggdude-utils.js. 9 tests.
-- [x] 9.3 — Extracted actor templates (minionTemplate, characterTemplate — 460 lines of data literals) to import-templates.js, built programmatically from a skill table.
-- [x] 9.4 — Extracted import-specific AE sync (applyActiveEffectOnUpdate — 185 lines) to import-ae-utils.js, decomposed into focused helpers.
-- [ ] 9.x — Remaining in import-helpers.js (2458 lines): adversary extractors (~530 lines), characterImport (~603 lines), modifier processing (~260 lines), compendium I/O, image handling. The adversary + character methods are deeply coupled with runtime globals.
+- [x] 12.0 — Detail Phase 12 task list
+- [ ] 12.1 — Add TypeScript ESLint tooling
+- [ ] 12.2 — Convert `modules/rules/calculators/` (7 files, 317 lines)
+- [ ] 12.3 — Convert `modules/rules/systems/` (1 file, 43 lines)
+- [ ] 12.4 — Convert `modules/data/` (45 files, 1218 lines)
+- [ ] 12.5 — Convert `modules/settings/` (11 files, 1086 lines)
+- [ ] 12.6 — Convert `modules/hooks/` (8 files, 210 lines)
+- [ ] 12.7 — Convert `modules/migrations/` (6 files, 456 lines)
+- [ ] 12.8 — Convert `modules/active-effects/` (8 files, 649 lines)
+- [ ] 12.9 — Convert `modules/tokens/` (1 file, 141 lines)
+- [ ] 12.10 — Convert `modules/dice/` (11 files, 1580 lines)
+- [ ] 12.11 — Convert `modules/sheets/` (26 files, 362 lines)
+- [ ] 12.12 — Convert `modules/importer/` (25 files, 5788 lines)
+- [ ] 12.13 — Convert `modules/helpers/` (16 files, 4416 lines)
+- [ ] 12.14 — Convert `modules/actors/` (5 files, 3484 lines)
+- [ ] 12.15 — Convert `modules/` root files (8 files, 3843 lines)
+- [ ] 12.16 — Enable `strict: true` and `noImplicitAny: true`
+- [ ] 12.last — Phase 12 stop-gate
 
 ---
 
