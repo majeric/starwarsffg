@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy document class; type during Phase 12.16 strict pass
 import ItemHelpers from "../helpers/item-helpers.js";
 import { explodeMod, getModKeyPath } from "../active-effects/modifier-map.js";
 

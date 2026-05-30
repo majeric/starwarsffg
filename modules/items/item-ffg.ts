@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy document class; type during Phase 12.16 strict pass
 import ItemBaseFFG from "./itembase-ffg.js";
 import PopoutEditor from "../popout-editor.js";
 import ActorOptions from "../actors/actor-ffg-options.js";

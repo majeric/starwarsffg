@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy document class; type during Phase 12.16 strict pass
 import ActorHelpers from "../helpers/actor-helpers.js";
 
 export default class ActorOptions {

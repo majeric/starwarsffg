@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy document class; type during Phase 12.16 strict pass
 function isObject(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }

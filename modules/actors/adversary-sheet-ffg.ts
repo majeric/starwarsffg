@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy document class; type during Phase 12.16 strict pass
 import { ActorSheetFFG } from "./actor-sheet-ffg.js";
 import ActorOptions from "./actor-ffg-options.js";
 

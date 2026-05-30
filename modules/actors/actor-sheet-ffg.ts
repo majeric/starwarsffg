@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy document class; type during Phase 12.16 strict pass
 /**
  * Extend the basic ActorSheet with some very simple modifications
  * @extends {ActorSheet}

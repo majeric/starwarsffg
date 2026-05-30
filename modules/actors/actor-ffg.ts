@@ -1,3 +1,4 @@
+// @ts-nocheck -- FIXME(types): legacy document class; type during Phase 12.16 strict pass
 import PopoutEditor from "../popout-editor.js";
 import { getModTypeByModPath } from "../active-effects/modifier-map.js";
 import { computeForcePool } from "../rules/calculators/force-pool";
