@@ -1,9 +1,9 @@
 # Restructure State
 
 **Current phase:** phase-12-typescript
-**Current task:** 12.4 — Convert modules/data/
-**Last verified:** 2026-05-30T18:54:31Z (task 12.3; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors, 986 warnings; 196 unit tests, 2 skipped)
-**Last commit on plan:** e30efe5
+**Current task:** 12.5 — Convert modules/settings/
+**Last verified:** 2026-05-30T19:01:39Z (task 12.4; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors, 986 warnings; 196 unit tests, 2 skipped)
+**Last commit on plan:** 1b2ff12
 
 ---
 
@@ -32,7 +32,7 @@
 - [x] 12.1 — Add TypeScript ESLint tooling
 - [x] 12.2 — Convert `modules/rules/calculators/` (7 files, 317 lines)
 - [x] 12.3 — Convert `modules/rules/systems/` (1 file, 43 lines)
-- [ ] 12.4 — Convert `modules/data/` (45 files, 1218 lines)
+- [x] 12.4 — Convert `modules/data/` (45 files, 1218 lines)
 - [ ] 12.5 — Convert `modules/settings/` (11 files, 1086 lines)
 - [ ] 12.6 — Convert `modules/hooks/` (8 files, 210 lines)
 - [ ] 12.7 — Convert `modules/migrations/` (6 files, 456 lines)
