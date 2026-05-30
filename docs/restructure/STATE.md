@@ -1,7 +1,7 @@
 # Restructure State
 
-**Current phase:** phase-08-sheets
-**Current task:** 8.0 — Detail Phase 8 atomic tasks
+**Current phase:** phase-09-importer
+**Current task:** 9.x — Extract remaining import-helpers methods
 **Last verified:** 2026-05-30T09:50:00Z (phase 7 close; typecheck/comments/tests/build/smoke/migration green, lint known-red — 0 errors; 187 unit tests)
 **Last commit on plan:** 01beceb
 
@@ -28,15 +28,11 @@
 
 ## Current phase tasks (phase-08-sheets)
 
-Phase 7 closed. AEs are canonical for modifiers; `attributes` removed from all
-schemas; migration registered; `modifiers.js` reduced to a 24-line 1.907 compat
-shim. The item `*.adjusted` computation pipeline (item-ffg.js) and the legacy
-upgrade/talent modifier popout remain as deferred cleanup.
+Phase 8 closed. 26 per-type sheets registered; V2 reskins deleted; monoliths
+retained as base classes. Phase 9 in progress — extracting import-helpers.js.
 
-- [x] 8.0 — Detail Phase 8 atomic tasks
-- [x] 8.1-8.7 — Per-type actor sheets: 6 sheets in modules/sheets/actor/ (homestead, vehicle, minion, rival, nemesis, character) + classType fix for tab icons
-- [x] 8.8-8.12 — Per-type item sheets: 20 sheets in modules/sheets/item/ + classType fix for item tab icons
-- [x] 8.13 — Deleted V2 reskin files (3 files, 66 lines); cleaned up registrations. Monolith base classes retained as "(legacy)" fallback and base for per-type sheets.
+- [x] 9.1 — Extracted AE utilities (createInherentEffect, applyTalentActiveEffects) to import-ae-utils.js; compendium utilities to compendium-utils.js. ImportHelpers delegates; callers unchanged. import-helpers.js: 3322→3195 lines.
+- [ ] 9.x — Remaining: modifier processing (processDieMod/processModsData/etc.), adversary extraction, character import, qualities processing (503 lines). Deeply coupled with internal helpers and game settings.
 
 ---
 
