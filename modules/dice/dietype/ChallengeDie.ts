@@ -35,14 +35,14 @@ export class ChallengeDie extends foundry.dice.terms.DiceTerm {
     // Combine all FFG results.
     this.ffg = { success: 0, failure: 0, advantage: 0, threat: 0, triumph: 0, despair: 0, light: 0, dark: 0 };
     this.results.forEach((result: any) => {
-      this.ffg.success += parseInt(result.ffg.success);
-      this.ffg.failure += parseInt(result.ffg.failure);
-      this.ffg.advantage += parseInt(result.ffg.advantage);
-      this.ffg.threat += parseInt(result.ffg.threat);
-      this.ffg.triumph += parseInt(result.ffg.triumph);
-      this.ffg.despair += parseInt(result.ffg.despair);
-      this.ffg.light += parseInt(result.ffg.light);
-      this.ffg.dark += parseInt(result.ffg.dark);
+      this.ffg.success += result.ffg.success;
+      this.ffg.failure += result.ffg.failure;
+      this.ffg.advantage += result.ffg.advantage;
+      this.ffg.threat += result.ffg.threat;
+      this.ffg.triumph += result.ffg.triumph;
+      this.ffg.despair += result.ffg.despair;
+      this.ffg.light += result.ffg.light;
+      this.ffg.dark += result.ffg.dark;
     });
 
     // Return the evaluated term

@@ -1013,11 +1013,11 @@ function _getInitiativeFormula(skill, ability) {
 function _findActorForInitiative(c) {
   let data = c.actor.system;
   const initiativeRole = game.settings.get('starwarsffg', 'initiativeCrewRole');
-  CONFIG.logger.debug("Attempting to find initiative data for actor in combat");
+    CONFIG.logger.debug("Attempting to find initiative data for actor in combat");
   if (c.actor.type === "vehicle") {
     CONFIG.logger.debug("Actor is a vehicle, looking for initiative crew role.");
     const crew = c.actor.getFlag("starwarsffg", "crew");
-    if (crew !== undefined && crew !== []) {
+    if (Array.isArray(crew) && crew.length > 0) {
       const initiativeCrew = crew.find((c) => c.role === "Pilot");
       if (initiativeCrew) {
         CONFIG.logger.debug("Found initiative crew role, swapping data to crew member");

@@ -1,3 +1,5 @@
+import type { MigrationWorld } from "./runner.js";
+
 /**
  * Migration to 1.906: rewrite compendium pack paths from system-scoped
  * to world-scoped (e.g. `starwarsffg.X` → `world.X`). Relocated from
@@ -15,7 +17,8 @@ const COMPENDIUM_SETTINGS = [
   "talentCompendiums",
 ];
 
-export default async function migrate(world: any): Promise<void> {
+export default async function migrate(world: MigrationWorld): Promise<void> {
+  if (!world.settings) return;
   for (const settingKey of COMPENDIUM_SETTINGS) {
     rewriteSettingPaths(world.settings, settingKey);
   }

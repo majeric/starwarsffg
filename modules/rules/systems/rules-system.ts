@@ -38,7 +38,7 @@ export class StarWarsRules implements RulesSystem {
   talentTier(): undefined { return undefined; }
 
   compareTalents(a: TalentLike, b: TalentLike): number {
-    return a.name!.localeCompare(b.name!);
+    return (a.name ?? "").localeCompare(b.name ?? "");
   }
 }
 

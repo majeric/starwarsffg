@@ -38,7 +38,7 @@ task that will fix them.
 **Owning task:** phase-00 task 0.11 (document) / phase-12 task TBD (tighten)
 **Workaround:** Tolerated for Phase 0 exit. The current legacy codebase emits
 1023 ESLint warnings, mostly from legacy Foundry globals, oversized files and
-functions, complexity limits, unused variables, and old Mocha/Cypress globals.
+functions, complexity limits, and unused variables.
 Later phases fix these as files are moved into the restructured architecture;
 CI records the verify exit code but does not enforce it during Phase 0.
 

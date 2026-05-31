@@ -1,4 +1,5 @@
 import { attributesToEffectData, isUserAttributeKey } from "../active-effects/attribute-to-ae.js";
+import type { MigrationWorld } from "./runner.js";
 
 /**
  * Phase 7 migration: convert any remaining user `item.system.attributes`
@@ -22,7 +23,7 @@ export const version = "3.0.0";
 export const slug = "attributes-to-ae";
 export const description = "Convert remaining legacy item attributes to Active Effects and clear them (Phase 7)";
 
-export default async function migrate(world: any): Promise<{ changed: number }> {
+export default async function migrate(world: MigrationWorld): Promise<{ changed: number }> {
   let changed = 0;
   for (const item of allItems(world)) {
     changed += await migrateItem(item);
@@ -30,9 +31,9 @@ export default async function migrate(world: any): Promise<{ changed: number }> 
   return { changed };
 }
 
-function* allItems(world: any): Generator<any> {
-  for (const item of world.items) yield item;
-  for (const actor of world.actors) {
+function* allItems(world: MigrationWorld): Generator<any> {
+  for (const item of world.items ?? []) yield item;
+  for (const actor of world.actors ?? []) {
     for (const item of actor.items) yield item;
   }
 }

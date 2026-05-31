@@ -28,14 +28,14 @@ interface ModifierData {
   key?: string;
   modtype: string;
   mod: string;
-  value: any;
+  value: number | string;
 }
 
 function reverseModKeyPath(key: string): { modtype: string; mod: string } | undefined {
   const charMatch = key.match(/^system\.characteristics\.(\w+)\.value$/);
   if (charMatch) return { modtype: "Characteristic", mod: charMatch[1] };
 
-  if ((STAT_KEYS as any)[key]) return (STAT_KEYS as any)[key];
+  if (key in STAT_KEYS) return STAT_KEYS[key as keyof typeof STAT_KEYS];
 
   const skillMatch = key.match(/^system\.skills\.(.+?)\.(\w+)$/);
   if (skillMatch) {
@@ -84,7 +84,7 @@ export function getModifierEffectsAsAttributes(doc: any): Record<string, Modifie
   return result;
 }
 
-function buildAEData(modtype: string, mod: string, value: any): any {
+function buildAEData(modtype: string, mod: string, value: number | string): any {
   const exploded = explodeMod(modtype, mod);
   const changes = exploded
     .map((m) => ({
@@ -102,7 +102,7 @@ function buildAEData(modtype: string, mod: string, value: any): any {
   };
 }
 
-export async function createModifierEffect(doc: any, modtype: string, mod: string, value: any): Promise<any> {
+export async function createModifierEffect(doc: any, modtype: string, mod: string, value: number | string): Promise<any> {
   const data = buildAEData(modtype, mod, value);
   return doc.createEmbeddedDocuments("ActiveEffect", [data]);
 }
@@ -112,7 +112,7 @@ export async function updateModifierEffect(
   effectId: string,
   modtype: string,
   mod: string,
-  value: any,
+  value: number | string,
 ): Promise<any> {
   const data = buildAEData(modtype, mod, value);
   data._id = effectId;

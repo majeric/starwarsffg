@@ -1,7 +1,7 @@
 import PopoutEditor from "../popout-editor.js";
 import { DicePoolFFG } from "../dice-pool-ffg.js";
 import DiceHelpers from "../helpers/dice-helpers.js";
-import { itemPillHover } from "../swffg-main.js";
+import { itemPillHover } from "../helpers/item-pill-hover.js";
 
 /**
  * Register the renderChatMessage hook. Extracted from swffg-main.js by

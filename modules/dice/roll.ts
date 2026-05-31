@@ -184,30 +184,30 @@ export class RollFFG extends (Roll as any) {
     if (this.hasFFG) {
       this.terms.forEach((term: any) => {
         if (game.ffg.diceterms.includes(term.constructor)) {
-          this.ffg.success += parseInt(term.ffg.success);
-          this.ffg.failure += parseInt(term.ffg.failure);
-          this.ffg.advantage += parseInt(term.ffg.advantage);
-          this.ffg.threat += parseInt(term.ffg.threat);
-          this.ffg.triumph += parseInt(term.ffg.triumph);
-          this.ffg.despair += parseInt(term.ffg.despair);
-          this.ffg.light += parseInt(term.ffg.light);
-          this.ffg.dark += parseInt(term.ffg.dark);
+          this.ffg.success += term.ffg.success;
+          this.ffg.failure += term.ffg.failure;
+          this.ffg.advantage += term.ffg.advantage;
+          this.ffg.threat += term.ffg.threat;
+          this.ffg.triumph += term.ffg.triumph;
+          this.ffg.despair += term.ffg.despair;
+          this.ffg.light += term.ffg.light;
+          this.ffg.dark += term.ffg.dark;
         }
       });
 
       // Step 6 - Calculate actual results by cancelling out success with failure, advantage with threat etc.
       if (this.ffg.success < this.ffg.failure) {
-        this.ffg.failure -= parseInt(this.ffg.success as any);
+        this.ffg.failure -= this.ffg.success;
         this.ffg.success = 0;
       } else {
-        this.ffg.success -= parseInt(this.ffg.failure as any);
+        this.ffg.success -= this.ffg.failure;
         this.ffg.failure = 0;
       }
       if (this.ffg.advantage < this.ffg.threat) {
-        this.ffg.threat -= parseInt(this.ffg.advantage as any);
+        this.ffg.threat -= this.ffg.advantage;
         this.ffg.advantage = 0;
       } else {
-        this.ffg.advantage -= parseInt(this.ffg.threat as any);
+        this.ffg.advantage -= this.ffg.threat;
         this.ffg.threat = 0;
       }
     }

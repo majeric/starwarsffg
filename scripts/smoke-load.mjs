@@ -3,10 +3,20 @@
 import fs from "node:fs";
 import path from "node:path";
 
-const buildDir = path.resolve("dist");
-const manifestPath = path.join(buildDir, "system.json");
+const manifestChecks = [
+  {
+    baseDir: path.resolve("."),
+    manifestPath: path.resolve("system.json"),
+    label: "root system.json",
+  },
+  {
+    baseDir: path.resolve("dist"),
+    manifestPath: path.resolve("dist", "system.json"),
+    label: "dist/system.json",
+  },
+];
 
-function readManifest() {
+function readManifest(manifestPath) {
   try {
     return JSON.parse(fs.readFileSync(manifestPath, "utf8"));
   } catch (error) {
@@ -16,15 +26,17 @@ function readManifest() {
   }
 }
 
-const manifest = readManifest();
-const missingEntries = manifest.esmodules.filter((entry) => !fs.existsSync(path.join(buildDir, entry)));
+for (const check of manifestChecks) {
+  const manifest = readManifest(check.manifestPath);
+  const missingEntries = manifest.esmodules.filter((entry) => !fs.existsSync(path.join(check.baseDir, entry)));
 
-if (missingEntries.length > 0) {
-  console.error("Build output is missing Foundry ESM entries:");
-  for (const entry of missingEntries) {
-    console.error(`- ${entry}`);
+  if (missingEntries.length > 0) {
+    console.error(`${check.label} is missing Foundry ESM entries:`);
+    for (const entry of missingEntries) {
+      console.error(`- ${entry}`);
+    }
+    process.exit(1);
   }
-  process.exit(1);
-}
 
-console.log("system.json parses and all Foundry ESM entries exist in dist/");
+  console.log(`${check.label} parses and all Foundry ESM entries exist`);
+}

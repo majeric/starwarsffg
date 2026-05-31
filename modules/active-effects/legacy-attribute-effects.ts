@@ -111,8 +111,8 @@ async function syncSubmittedAttributeEffects(existingEffects: any, formData: any
 }
 
 function speciesThresholdValues(item: any, formData: any, changes: any[]): Record<string, number> {
-  const newBrawn = changes.find((ae) => ae.key === "system.characteristics.Brawn.value").value;
-  const newWillpower = changes.find((ae) => ae.key === "system.characteristics.Willpower.value").value;
+  const newBrawn = changes.find((ae) => ae.key === "system.characteristics.Brawn.value")?.value ?? 0;
+  const newWillpower = changes.find((ae) => ae.key === "system.characteristics.Willpower.value")?.value ?? 0;
   const wounds = submittedAttributeValue(formData, item, "Wounds");
   const strain = submittedAttributeValue(formData, item, "Strain");
 
@@ -130,13 +130,13 @@ function submittedAttributeValue(formData: any, item: any, key: string): any {
 }
 
 function updateSpeciesThresholdChange(change: any, values: Record<string, number>): void {
-  const thresholdValues = {
+  const thresholdValues: Record<string, number> = {
     "system.stats.wounds.max": values.wounds,
     "system.stats.strain.max": values.strain,
     "system.stats.encumbrance.max": values.encumbrance,
   };
 
-  if (hasKey(thresholdValues, change.key)) change.value = (thresholdValues as any)[change.key];
+  if (hasKey(thresholdValues, change.key)) change.value = thresholdValues[change.key];
 }
 
 async function updateSpeciesThresholdEffects(item: any, formData: any, existingEffects: any): Promise<void> {

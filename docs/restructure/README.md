@@ -19,6 +19,7 @@ The plan is split across files in this directory:
 - `architecture/current-state.md` — the analysis that motivated the restructure
 - `architecture/target-state.md` — what we are building toward
 - `architecture/decision-log.md` — major decisions already made; do not relitigate
+- `architecture/testing-strategy.md` — test layering and Playwright E2E setup
 - `phases/phase-NN-name.md` — the actual work, broken into atomic tasks
 
 ## Your first 5 commands every session

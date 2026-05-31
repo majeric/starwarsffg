@@ -13,7 +13,7 @@ don't accidentally extend them.
 
 ## Repository scale
 
-- 32,932 lines of JavaScript across `modules/` (excludes lib/, cypress/, e2e/)
+- 32,932 lines of JavaScript across `modules/` (excludes lib/, e2e/)
 - 0.8% TypeScript (effectively all-JS)
 - Foundry V13 only (minimum/verified/maximum all 13)
 - No bundler (ships raw ES modules referenced by `system.json`)
@@ -157,7 +157,7 @@ standard test framework. Fixtures use the pre-v10 `data:` namespace, not
 - The dice library ([`lib/@swrpg-online/dice/`](../../lib/@swrpg-online/dice/))
   is a clean external dependency (though vendored without package.json)
 - Localization is in place (7 languages)
-- Cypress E2E and Playwright AE tests exist (cypress/, e2e/) — keep them as smoke
+- Playwright E2E tests exist (e2e/) — smoke and active-effects coverage
 
 ---
 

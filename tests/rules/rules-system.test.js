@@ -14,6 +14,11 @@ describe("StarWarsRules", () => {
     expect(rules.compareTalents({ name: "Beta" }, { name: "Alpha" })).toBeGreaterThan(0);
   });
 
+  it("sorts talents with missing names without throwing", () => {
+    expect(rules.compareTalents({}, { name: "Beta" })).toBeLessThan(0);
+    expect(rules.compareTalents({ name: "Alpha" }, {})).toBeGreaterThan(0);
+  });
+
   it("returns undefined for talent tier", () => {
     expect(rules.talentTier({ system: { tier: 3 } })).toBeUndefined();
   });

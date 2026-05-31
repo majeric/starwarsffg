@@ -34,6 +34,7 @@ requires the runbook structure (`docs/restructure/`) which upstream may not
 accept.
 
 **Options considered:**
+
 - (a) Submit each phase as a series of PRs to upstream `StarWarsFoundryVTT`
 - (b) Develop in a personal fork as an alternate system
 - (c) Hybrid: develop in fork, propose safe phases upstream as they stabilize
@@ -41,6 +42,7 @@ accept.
 **Decision:** (b) — personal fork, ship as alternate system.
 
 **Consequences:**
+
 - Full velocity, no upstream gating
 - Must support migration from any upstream version (strict compatibility, ADR-002)
 - Splits user base; fork must justify its existence with concrete improvements
@@ -59,6 +61,7 @@ migrate to the fork and continue working. The fork's value is in architectural
 improvement; that value is destroyed if users lose their campaigns.
 
 **Options considered:**
+
 - (a) Strict — every phase ships a migration; no world ever breaks
 - (b) Permissive — one v3.0 break is allowed; users run migration once
 - (c) Aggressive — treat it like a rewrite; provide an importer from old format
@@ -66,6 +69,7 @@ improvement; that value is destroyed if users lose their campaigns.
 **Decision:** (a) — strict compatibility.
 
 **Consequences:**
+
 - Every schema change requires a migration in `modules/migrations/`
 - `test-worlds/` fixtures cover migration from each upstream version
 - `npm run verify` includes migration replay
@@ -85,6 +89,7 @@ pipeline and for TypeScript output. The current codebase is plain ES modules
 with no build step.
 
 **Options considered:**
+
 - (a) Add TypeScript + Vite gradually with `allowJs: true`
 - (b) Stay vanilla JS, add JSDoc types where useful, use Vite for bundling
 - (c) Full TypeScript rewrite
@@ -92,6 +97,7 @@ with no build step.
 **Decision:** (a) — gradual TypeScript on Vite.
 
 **Consequences:**
+
 - `tsconfig.json` with `allowJs: true, strict: false` initially
 - JS and TS files coexist; conversion is one file at a time
 - Phase 12 dedicates focused effort to TS conversion, but conversion can also
@@ -112,6 +118,7 @@ Effects. Maintaining both produces edge-case bugs and doubles the surface
 area of every modifier-touching feature.
 
 **Options considered:**
+
 - (a) Keep bespoke, add AE as a thin layer on top (status quo)
 - (b) Unify on Active Effects; remove bespoke entirely
 - (c) Unify on bespoke; replace AE wiring
@@ -119,6 +126,7 @@ area of every modifier-touching feature.
 **Decision:** (b) — Active Effects only.
 
 **Consequences:**
+
 - Phase 07 migrates all `item.system.attributes` entries to embedded `ActiveEffect` documents
 - `ModifierHelpers.getCalculatedValueFromItems` and all callers are deleted
 - Custom FFG modifier semantics (dice symbols, characteristic caps) become
@@ -140,6 +148,7 @@ drop-in replacement and existing worlds work unchanged). For a personal fork
 used as the operator's primary system, coexistence is not needed.
 
 **Options considered:**
+
 - (a) Rename to `starwarsffg-next` or similar; supports side-by-side install
 - (b) Keep `starwarsffg` id; fork is a drop-in replacement
 - (c) Configurable id determined at build time
@@ -147,6 +156,7 @@ used as the operator's primary system, coexistence is not needed.
 **Decision:** (b) — keep `starwarsffg`.
 
 **Consequences:**
+
 - Existing worlds bound to system id `starwarsffg` work without migration
 - Compendium pack paths (`world.starwarsffg.X`) unchanged
 - The fork's `system.json` `manifest` and `download` fields point at the fork's
@@ -172,20 +182,23 @@ assistance and without reading the entire codebase.
 
 This requires explicit constraints because AI-generated code drifts toward two
 failure modes:
+
 - **AI cliff:** clever, over-abstracted, or framework-style code that humans
   cannot extend without re-deriving the AI's intent
 - **AI sprawl:** verbose, over-commented, defensively-wrapped code that humans
   cannot navigate
 
 **Options considered:**
+
 - (a) Trust per-task code review to catch readability issues
 - (b) Encode hard limits as lint gates and per-task principles; treat human
-      maintainability as a first-class verification gate
+  maintainability as a first-class verification gate
 - (c) Defer readability work to a dedicated cleanup phase
 
 **Decision:** (b) — encode the constraints as enforceable rules.
 
 **Consequences:**
+
 - Hard limits added via ESLint (`max-lines: 500`, `max-lines-per-function: 50`,
   `complexity: 10`, `max-depth: 4`, `max-params: 5`)
 - A heuristic comment-checker script flags vacuous comments
@@ -211,6 +224,7 @@ dependency list omitted both packages, and Vitest expects DOM environments to
 be installed separately.
 
 **Options considered:**
+
 - (a) Install `jsdom`
 - (b) Install `happy-dom`
 - (c) Use Vitest's Node environment and fake DOM globals manually
@@ -218,6 +232,7 @@ be installed separately.
 **Decision:** (b) — install `happy-dom` as a dev dependency.
 
 **Consequences:**
+
 - Adds one test-only dependency during task 0.5
 - Keeps DOM test startup lighter than `jsdom`
 - Provides enough browser surface for Phase 0 smoke tests while still allowing
@@ -242,6 +257,7 @@ Phase 13 provides final certification before the restructure is declared
 complete.
 
 **Options considered:**
+
 - (a) Target V14 only; drop V13 once V14 stabilizes
 - (b) Target V13 only; defer V14 until upstream catches up
 - (c) Dual compatibility: V13 minimum, V14 verified, both gated in CI
@@ -249,8 +265,9 @@ complete.
 **Decision:** (c) — dual compatibility.
 
 **Consequences:**
+
 - `system.json` `compatibility` evolves to `{ minimum: 13, verified: 14,
-  maximum: 14 }` at Phase 13 close (until then, V13-only)
+maximum: 14 }` at Phase 13 close (until then, V13-only)
 - Every phase that touches Foundry APIs (2, 3, 4, 5, 6, 7, 8, 9, 11) gains
   a postcondition: "V13/V14 compatibility verified per ADR-008"
 - PRINCIPLES.md gains principles 39-40 on cross-version Foundry API discipline
@@ -282,6 +299,7 @@ uses the same custom-runner export shape and causes `npx vitest run` to fail
 with "No test suite found" once the modifier import crash is avoided.
 
 **Options considered:**
+
 - (a) Rewrite the legacy tests into Vitest now
 - (b) Expand Foundry mocks until the legacy imports collect, but leave the
   custom-runner shape in place
@@ -292,6 +310,7 @@ with "No test suite found" once the modifier import crash is avoided.
 Vitest marker suites.
 
 **Consequences:**
+
 - `tests/modifiers.test.js` becomes a skipped Vitest marker; the preserved
   legacy body moves to `tests/modifiers.test.js.legacy`
 - `tests/common.test.js` keeps its legacy export and gains a skipped Vitest
@@ -324,12 +343,14 @@ Both patterns are fragile across Foundry minor releases. This ADR records
 the V13-canonical replacement patterns chosen for tasks 4.2 and 4.3.
 
 **Sources consulted:**
+
 - `node_modules/fvtt-types/src/foundry/client/config.d.mts` (CONFIG.Dice)
 - `node_modules/fvtt-types/src/foundry/client/canvas/placeables/token.d.mts` (Token class)
 
 **Findings:**
 
 For Token:
+
 - The Token class lives at `foundry.canvas.placeables.Token` in V13.
 - `_drawBar(number, bar, data)` is `protected` and documented as
   "Unconditionally returns `true`" (return type `boolean`).
@@ -343,6 +364,7 @@ For Token:
   unless the operator confirms the coupling is intentional.
 
 For Dice:
+
 - `CONFIG.Dice.rolls` is documented as `Array<foundry.dice.Roll.Internal.AnyConstructor>`
   with default `[foundry.dice.Roll]` (single-element array containing the
   base Roll class).
@@ -367,6 +389,7 @@ For Dice:
 **Consequences:**
 
 For Token (task 4.2):
+
 - TokenFFG (already in `modules/tokens/token-ffg.js`) gains a `_drawBar(number, bar, data)`
   method. Body verbatim from the current prototype assignment, plus a
   `return true;` at the end to match the documented contract.
@@ -382,6 +405,7 @@ For Token (task 4.2):
   documented rationale.
 
 For Dice (task 4.3):
+
 - `modules/dice/roll-registration.js` exports `registerRollFFG()` whose
   body is `CONFIG.Dice.rolls.unshift(RollFFG);` plus the import.
 - swffg-main.js replaces the two-line mutation with one
@@ -390,6 +414,7 @@ For Dice (task 4.3):
   need to know the implementation detail.
 
 For both:
+
 - Per ADR-008, V14 may have changed either API. Phase 13 will verify
   both subclass override and `Dice.rolls.unshift` still work on V14.
   PRINCIPLES.md 39 (feature detection over version sniffing) means the
@@ -428,7 +453,7 @@ per-type conversions consistent.
    0 mocked only `foundry.utils`). Fully simulating Foundry's DataModel
    cleaning/validation is the tarpit Phase 0 task 0.5 warned against. Instead,
    `tests/setup.ts` provides minimal field stubs that record their declared
-   options and expose `getInitial()`. Schema tests assert the *declared* shape
+   options and expose `getInitial()`. Schema tests assert the _declared_ shape
    and defaults (e.g. "homestead declares `cost.value` as a NumberField with
    initial 0") — the Phase 5 contract. Cleaning/validation correctness is
    Foundry's responsibility, verified by the operator Foundry smoke in the phase
@@ -437,7 +462,7 @@ per-type conversions consistent.
 
 3. **Omit redundant template.json hint keys by default.** Many sub-objects bake
    in `type`/`label`/`abrev` keys (e.g. `cost: { value, type:"Number",
-   label:"Cost", adjusted }`). These are template.json's pre-DataModel type
+label:"Cost", adjusted }`). These are template.json's pre-DataModel type
    system, which the field classes replace, and FFG sheets localise their own
    labels (the homestead sheet passes `title="SWFFG.ItemsPrice"`). Schemas
    declare only meaningful data fields; Foundry cleaning drops the hint keys on
@@ -451,6 +476,7 @@ behavioral mock / carry every template.json key verbatim — all rejected for th
 reasons above.
 
 **Consequences:**
+
 - `tests/setup.ts` gains the introspection field stubs and a `TypeDataModel`
   base; per-type tasks add a `*-data.js` (schema only) plus a schema test
   asserting declared fields/defaults.
@@ -472,6 +498,7 @@ namespace recomputed every prepare and never persisted. Foundry's TypeDataModel
 has no built-in derived layer, so the mechanism must be chosen explicitly.
 
 **Options considered:**
+
 - (a) A getter on the DataModel (`get derived()`) — awkward for writing many
   computed values; caching/recompute semantics unclear.
 - (b) A plain `derived` object on the parent Document, reset in the base
@@ -486,6 +513,7 @@ read `actor.derived.*`. Per-type `prepareBaseData` overrides must call
 `super.prepareBaseData()`.
 
 **Consequences:**
+
 - Derived state can never be persisted (it lives off-schema on the document),
   eliminating the "stale derived value" bug class.
 - Derived unit tests need a harness that executes the prepare hooks; the ADR-010
@@ -501,13 +529,14 @@ read `actor.derived.*`. Per-type `prepareBaseData` overrides must call
 **Phase:** 06 / 07
 
 **Context:** Phase 6's postconditions, as written, require stripping `*.adjusted`
-from *every* DataModel (actors and items). But `*.adjusted` is overwhelmingly
+from _every_ DataModel (actors and items). But `*.adjusted` is overwhelmingly
 item-side: `item-ffg.js` computes it in ~58 places and item / weapon / chat
 templates render it across ~70 references. That computation is the bespoke
 `item.system.attributes` modifier pipeline that ADR-004 / Phase 7 replaces
 wholesale with Active Effects.
 
 **Options considered:**
+
 - (a) Phase 6 splits both actor and item derived state (the literal written
   scope), then Phase 7 reworks the item computation onto Active Effects — two
   passes over the most entangled code in the system.
@@ -520,6 +549,7 @@ risk and producing the cleanest code. Touching the item modifier layer once (in
 Phase 7) instead of twice avoids the highest-risk double-churn.
 
 **Consequences:**
+
 - Phase 6 postconditions re-scope to actors: no `*.adjusted` in any ACTOR
   DataModel schema; actor derived values live in `derived.*`.
 - Phase 7 gains postconditions: strip `item.system.*.adjusted` from item schemas
@@ -542,7 +572,7 @@ pipeline — AE changes target `system.stats.*` and `applyActiveEffects`
 edit mode where AEs are suspended. Recomputing these via the Phase 1 calculators
 needs a `modifiers` input that faithfully replays AE change modes
 (add/multiply/override/upgrade) — exactly Phase 7's work. As written, the Phase 6
-postconditions (recompute *all* stats via calculators, drop *all* `*.adjusted`,
+postconditions (recompute _all_ stats via calculators, drop _all_ `*.adjusted`,
 remove `_preUpdate`/mutations) cannot be met before Phase 7 without changing
 behavior or duplicating effort. The operator directed removing this blocking
 clause so it stops gating future work.
@@ -552,6 +582,7 @@ Also discovered: `ActorFFG.prepareDerivedData` never called
 hook never ran. Phase 6 adds the `super` call so the derived pattern functions.
 
 **Decision:** Relax Phase 6 to the AE-independent derived work:
+
 - Establish the `derived` namespace (ADR-011) and wire `super.prepareDerivedData()`.
 - Compute the AE-independent derived values via the Phase 1 calculators —
   currently encumbrance (sum of item encumbrance) — into `this.parent.derived.*`,
@@ -562,6 +593,7 @@ hook never ran. Phase 6 adds the `super` call so the derived pattern functions.
   migration, and switching templates to `derived.*`.
 
 **Consequences:**
+
 - Phase 6 is behavior-preserving and additive (no removal, so no regression risk
   before the operator smoke); it unblocks future work by establishing the
   derived namespace and the AE-independent values.
@@ -585,6 +617,7 @@ reach "AE as the sole pipeline" (ADR-004) and how to handle migration edge cases
 (the phase mandates ADRs for these).
 
 **Decision:**
+
 - **AEs become canonical; the `attributes` intermediary is removed.** The
   authoring UI creates/edits AEs directly; the attributes→AE sync, `modifiers.js`,
   and `item.system.attributes` are removed; FFG semantics become custom AE
@@ -615,6 +648,7 @@ reach "AE as the sole pipeline" (ADR-004) and how to handle migration edge cases
   gate closes — this is the irreversible-migration safety net (ADR-002).
 
 **Consequences:**
+
 - The taxonomy module (7.1) is the safe first step and the single source of
   truth for mod→key mapping across migration/change-modes/UI.
 - `applyActiveEffects` force-pool mutation becomes a custom change mode (7.2/7.7).
@@ -636,6 +670,7 @@ silently drop out of lint coverage — both unacceptable since the
 maintainability rules (max-lines, complexity, etc.) are enforced gates.
 
 **Options considered:**
+
 - (a) Add `typescript-eslint` — the standard TypeScript ESLint integration.
   Provides a parser and optional type-aware rules. Widely adopted; maintained
   by the TypeScript ESLint team.
@@ -648,6 +683,7 @@ maintainability rules (max-lines, complexity, etc.) are enforced gates.
 **Decision:** (a) — add `typescript-eslint` as a dev dependency.
 
 **Consequences:**
+
 - One new dev dependency (`typescript-eslint`, which bundles the parser and
   plugin).
 - `eslint.config.mjs` gains a TS file pattern using the typescript-eslint
@@ -657,6 +693,34 @@ maintainability rules (max-lines, complexity, etc.) are enforced gates.
 - No type-aware lint rules are enabled initially (they require
   `parserOptions.project` pointing at `tsconfig.json`, which slows linting).
   A future task can enable them if the benefit justifies the cost.
+
+---
+
+## ADR-016: 2026-05-30 — Standardize browser E2E on Playwright
+
+**Status:** accepted (completed)
+**Phase:** meta
+
+**Context:** The repository had two browser E2E harnesses: Cypress tests under
+`cypress/` and Playwright tests under `e2e/` with helpers under `playwright/`.
+Vitest now covers fast unit and integration-style behavior, but it cannot
+replace browser-real Foundry checks for sheets, dialogs, drag/drop, document
+lifecycle, or Active Effects applied by a running Foundry world.
+
+**Decision:** Standardize on Playwright. Cypress legacy smoke flows (actor/item
+creation, item-sheet rendering) have been ported to `e2e/smoke.spec.js` and all
+Cypress files removed.
+
+**Consequences:**
+
+- `@playwright/test` is a dev dependency.
+- `npm run verify` remains the fast local gate and intentionally excludes
+  browser E2E because it requires a running Foundry world.
+- `npm run test:e2e`, `npm run test:e2e:ae`, `npm run test:e2e:ui`, and
+  `npm run verify:e2e` provide explicit browser-test entry points.
+- Playwright configuration is local and environment-driven via
+  `FOUNDRY_BASE_URL`, `FOUNDRY_TEST_USER`, `FOUNDRY_TEST_PASSWORD`, and
+  `PLAYWRIGHT_STORAGE_STATE`; no test should hard-code a private Foundry URL.
 
 ---
 

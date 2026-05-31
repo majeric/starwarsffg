@@ -277,7 +277,7 @@ build
 - Use jsdom or happy-dom environment (Foundry code touches DOM)
 - Run setup file `tests/setup.ts` before every test file
 - Include pattern: `tests/**/*.test.{js,ts}`
-- Exclude: `node_modules`, `cypress`, `e2e`
+- Exclude: `node_modules`, `e2e`
 
 **tests/setup.ts requirements:**
 - Define minimum Foundry globals as `globalThis.game`, `globalThis.CONFIG`,

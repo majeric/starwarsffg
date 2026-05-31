@@ -146,15 +146,15 @@ export class TokenFFG extends foundry.canvas.placeables.Token {
   #colorsForAttribute(attribute: string): BarColors {
     if (WOUND_LIKE_ATTRIBUTES.has(attribute)) {
       return {
-        ok: game.settings!.get("starwarsffg", "ui-token-healthy") as unknown as number,
-        damaged: game.settings!.get("starwarsffg", "ui-token-wounded") as unknown as number,
-        overDamaged: game.settings!.get("starwarsffg", "ui-token-overwounded") as unknown as number,
+        ok: game.settings!.get("starwarsffg", "ui-token-healthy") as number,
+        damaged: game.settings!.get("starwarsffg", "ui-token-wounded") as number,
+        overDamaged: game.settings!.get("starwarsffg", "ui-token-overwounded") as number,
       };
     }
     return {
-      ok: game.settings!.get("starwarsffg", "ui-token-stamina-ok") as unknown as number,
-      damaged: game.settings!.get("starwarsffg", "ui-token-stamina-damaged") as unknown as number,
-      overDamaged: game.settings!.get("starwarsffg", "ui-token-stamina-over") as unknown as number,
+      ok: game.settings!.get("starwarsffg", "ui-token-stamina-ok") as number,
+      damaged: game.settings!.get("starwarsffg", "ui-token-stamina-damaged") as number,
+      overDamaged: game.settings!.get("starwarsffg", "ui-token-stamina-over") as number,
     };
   }
 }

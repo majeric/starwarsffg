@@ -12,6 +12,8 @@ const gates = [
   { name: "migration replay", command: "node", args: ["scripts/replay-migrations.mjs"] },
 ];
 
+const failFast = !process.argv.includes("--no-fail-fast");
+
 function runGate(gate) {
   return new Promise((resolve) => {
     const child = spawn(gate.command, gate.args, {
@@ -43,6 +45,8 @@ for (const gate of gates) {
 
   console.error(`[FAIL] ${gate.name}`);
   results.push({ ...gate, code });
+
+  if (failFast) break;
 }
 
 console.log("");

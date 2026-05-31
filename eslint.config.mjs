@@ -18,8 +18,6 @@ const foundryGlobals = {
 const testGlobals = {
   afterEach: "readonly",
   beforeEach: "readonly",
-  cy: "readonly",
-  Cypress: "readonly",
   describe: "readonly",
   expect: "readonly",
   it: "readonly",
@@ -37,6 +35,29 @@ const recommendedRulesAsWarnings = Object.fromEntries(
   Object.keys(js.configs.recommended.rules).map((ruleName) => [ruleName, "warn"])
 );
 
+function warningRule(ruleValue) {
+  if (ruleValue === "off" || ruleValue === 0) return ruleValue;
+  if (Array.isArray(ruleValue)) {
+    const [severity, ...options] = ruleValue;
+    if (severity === "off" || severity === 0) return ruleValue;
+    return ["warn", ...options];
+  }
+  return "warn";
+}
+
+const typescriptRecommendedConfigs = tseslint.configs.recommended.map((config) => {
+  const recommendedConfig = {
+    ...config,
+    files: config.files ?? ["**/*.ts"],
+  };
+  if (config.rules) {
+    recommendedConfig.rules = Object.fromEntries(
+      Object.entries(config.rules).map(([ruleName, ruleValue]) => [ruleName, warningRule(ruleValue)])
+    );
+  }
+  return recommendedConfig;
+});
+
 const legacyMaintainabilityRules = {
   "max-lines": ["warn", { max: 500, skipBlankLines: true, skipComments: true }],
   "max-lines-per-function": ["warn", { max: 50, skipBlankLines: true, skipComments: true }],
@@ -53,6 +74,7 @@ export default [
     ...js.configs.recommended,
     rules: recommendedRulesAsWarnings,
   },
+  ...typescriptRecommendedConfigs,
   {
     files: ["**/*.{js,mjs,cjs}"],
     languageOptions: {

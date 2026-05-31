@@ -241,6 +241,6 @@ No `item.system.attributes` array. No `getCalculatedValueFromItems`.
 - `lib/@swrpg-online/dice` as the dice engine (registration cleaned up, but
   the library itself is fine)
 - Localization structure
-- Cypress E2E tests as smoke
+- Playwright E2E smoke tests
 - The Mandar theme
 - Custom dice term registration (it's documented Foundry API)

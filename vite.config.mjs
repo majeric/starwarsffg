@@ -13,9 +13,21 @@ const outDir = path.resolve(rootDir, "dist");
 const manifest = JSON.parse(fs.readFileSync(path.join(rootDir, "system.json"), "utf8"));
 const staticPaths = ["system.json", "template.json", "lang", "templates", "styles", "images", "fonts", "lib"];
 
+function normalizeBuildEntry(entry) {
+  return entry.startsWith("dist/") ? entry.slice("dist/".length) : entry;
+}
+
+function manifestForPackage() {
+  return {
+    ...manifest,
+    esmodules: manifest.esmodules.map(normalizeBuildEntry),
+  };
+}
+
 function foundryModuleInputs() {
   return Object.fromEntries(
     manifest.esmodules
+      .map(normalizeBuildEntry)
       .filter((entry) => entry.startsWith("modules/"))
       .map((entry) => {
         const key = entry.replace(/\.js$/, "");
@@ -33,6 +45,11 @@ function copyFoundryAssets() {
       for (const relativePath of staticPaths) {
         const sourcePath = path.resolve(rootDir, relativePath);
         const targetPath = path.resolve(outDir, relativePath);
+
+        if (relativePath === "system.json") {
+          fs.writeFileSync(targetPath, `${JSON.stringify(manifestForPackage(), null, 2)}\n`);
+          continue;
+        }
 
         fs.cpSync(sourcePath, targetPath, { recursive: true });
       }

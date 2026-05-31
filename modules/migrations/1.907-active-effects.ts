@@ -1,4 +1,5 @@
 import ModifierHelpers from "../helpers/modifiers.js";
+import type { MigrationWorld } from "./runner.js";
 
 /**
  * Migration to 1.907: convert the legacy per-item attribute system into
@@ -22,9 +23,12 @@ export const slug = "active-effects";
 export const description = "Convert legacy item attributes to Active Effects and parse XP log";
 
 /* eslint-disable max-lines-per-function, complexity, max-depth -- relocated verbatim from swffg-migration.js; decomposition is a future task. */
-export default async function migrate(world: any): Promise<void> {
+export default async function migrate(world: MigrationWorld): Promise<void> {
   try {
-    for (const actor of world.actors) {
+    const actors = world.actors ?? [];
+    const items = world.items ?? [];
+
+    for (const actor of actors) {
       const xpLog = actor.getFlag("starwarsffg", "xpLog") || [];
       const updatedLog = [];
       const purchaseRegex = new RegExp("<b>(.*?)</b>: (.*?) <b>(.*?)</b>.*<b>(.*?)</b> \\((.*?) available, (.*?) total");
@@ -66,7 +70,7 @@ export default async function migrate(world: any): Promise<void> {
       actor.setFlag("starwarsffg", "xpLog", updatedLog);
     }
 
-    for (const actor of world.actors) {
+    for (const actor of actors) {
       const inputStats: any = { system: {} };
 
       if (["character", "nemesis", "rival"].includes(actor.type)) {
@@ -96,7 +100,7 @@ export default async function migrate(world: any): Promise<void> {
         await ModifierHelpers.applyActiveEffectOnUpdate(item, itemData);
       }
 
-      const updatedStats = world.actors.get(actor.id);
+      const updatedStats = actors.get(actor.id);
       const finalStats = foundry.utils.deepClone(inputStats);
 
       if (["character", "nemesis", "rival"].includes(actor.type)) {
@@ -145,7 +149,7 @@ export default async function migrate(world: any): Promise<void> {
       }
     }
 
-    for (const actor of world.actors) {
+    for (const actor of actors) {
       for (const item of actor.items) {
         if (item.type === "specialization") {
           await convertSpecializationToAEs(item);
@@ -157,7 +161,7 @@ export default async function migrate(world: any): Promise<void> {
       }
     }
 
-    for (const item of world.items) {
+    for (const item of items) {
       await item._onCreateAEs({ parent: false });
       const itemData = item.toJSON();
       itemData.data = itemData.system;

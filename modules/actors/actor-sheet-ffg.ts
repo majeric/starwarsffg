@@ -23,7 +23,7 @@ import {
 } from "../helpers/crew.js";
 import {DicePoolFFG} from "../dice/pool.js";
 import {get_dice_pool} from "../helpers/dice-helpers.js";
-import {itemPillHover} from "../swffg-main.js";
+import { itemPillHover } from "../helpers/item-pill-hover.js";
 import { buildActorSheetSystemData } from "./sheet-system-data.js";
 
 export class ActorSheetFFG extends foundry.appv1.sheets.ActorSheet {

@@ -1,6 +1,62 @@
 /**
  * Dice pool utility specializing in the FFG special dice
  */
+
+type DicePoolValue = number | string;
+type DicePoolSourceKey =
+  | "skill"
+  | "boost"
+  | "remsetback"
+  | "setback"
+  | "upgrades"
+  | "success"
+  | "advantage"
+  | "light"
+  | "failure"
+  | "threat"
+  | "dark"
+  | "despair"
+  | "triumph";
+type AdditionalSymbol = "advantage" | "success" | "threat" | "failure" | "light" | "dark" | "triumph" | "despair";
+
+interface DicePoolSourceEntry {
+  value: DicePoolValue;
+  name?: string;
+  modtype?: string;
+  type?: string;
+}
+
+export interface DicePoolFFGInit {
+  proficiency?: DicePoolValue;
+  ability?: DicePoolValue;
+  challenge?: DicePoolValue;
+  difficulty?: DicePoolValue;
+  boost?: DicePoolValue;
+  setback?: DicePoolValue;
+  remsetback?: DicePoolValue;
+  force?: DicePoolValue;
+  advantage?: DicePoolValue;
+  success?: DicePoolValue;
+  threat?: DicePoolValue;
+  failure?: DicePoolValue;
+  light?: DicePoolValue;
+  dark?: DicePoolValue;
+  triumph?: DicePoolValue;
+  despair?: DicePoolValue;
+  upgrades?: DicePoolValue;
+  source?: Partial<Record<DicePoolSourceKey, DicePoolSourceEntry[]>>;
+}
+
+function parseDicePoolInit(obj?: DicePoolFFGInit | string): DicePoolFFGInit {
+  if (obj === undefined) return {};
+  if (typeof obj === "string") return JSON.parse(obj) as DicePoolFFGInit;
+  return obj;
+}
+
+function numericValue(value: DicePoolValue | undefined): number {
+  return Number(value ?? 0) || 0;
+}
+
 export class DicePoolFFG {
   proficiency: number;
   ability: number;
@@ -19,42 +75,37 @@ export class DicePoolFFG {
   triumph: number;
   despair: number;
   upgrades: number;
-  source: Record<string, string[]>;
-  [key: string]: any;
+  source: Partial<Record<DicePoolSourceKey, string[]>>;
 
-  constructor(obj?: any) {
-    if (obj === undefined) {
-      obj = {};
-    }
-    if (typeof obj === "string") {
-      obj = JSON.parse(obj);
-    }
-    this.proficiency = obj.proficiency || 0;
-    this.ability = obj.ability || 0;
-    this.challenge = obj.challenge || 0;
-    this.difficulty = obj.difficulty || 0;
-    this.boost = obj.boost || 0;
-    this.setback = obj.setback || 0;
-    this.remsetback = obj.remsetback || 0;
-    this.force = obj.force || 0;
+  constructor(obj?: DicePoolFFGInit | string) {
+    const data = parseDicePoolInit(obj);
 
-    this.advantage = obj.advantage || 0;
-    this.success = obj.success || 0;
-    this.threat = obj.threat || 0;
-    this.failure = obj.failure || 0;
-    this.light = obj.light || 0;
-    this.dark = obj.dark || 0;
-    this.triumph = obj.triumph || 0;
-    this.despair = obj.despair || 0;
+    this.proficiency = numericValue(data.proficiency);
+    this.ability = numericValue(data.ability);
+    this.challenge = numericValue(data.challenge);
+    this.difficulty = numericValue(data.difficulty);
+    this.boost = numericValue(data.boost);
+    this.setback = numericValue(data.setback);
+    this.remsetback = numericValue(data.remsetback);
+    this.force = numericValue(data.force);
 
-    this.upgrades = obj.upgrades || 0;
+    this.advantage = numericValue(data.advantage);
+    this.success = numericValue(data.success);
+    this.threat = numericValue(data.threat);
+    this.failure = numericValue(data.failure);
+    this.light = numericValue(data.light);
+    this.dark = numericValue(data.dark);
+    this.triumph = numericValue(data.triumph);
+    this.despair = numericValue(data.despair);
+
+    this.upgrades = numericValue(data.upgrades);
 
     this.source = {};
 
-    if (obj?.source?.skill?.length) {
-      this.source.skill = obj.source.skill
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.skill?.length) {
+      this.source.skill = data.source.skill
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.name === "purchased") {
             return `Purchased: ${rank.value} rank(s)`;
           }
@@ -64,100 +115,100 @@ export class DicePoolFFG {
           return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
-    if (obj?.source?.boost?.length) {
-      this.source.boost = obj.source.boost
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.boost?.length) {
+      this.source.boost = data.source.boost
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Boost") {
             return `${rank.name} (${rank.type}): +${rank.value} boost dice`;
           }
           return `${rank.modtype} from ${rank.name} (${rank.type}): +${rank.value} boost dice`;
         });
     }
-    if (obj?.source?.remsetback?.length) {
-      this.source.remsetback = obj.source.remsetback
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.remsetback?.length) {
+      this.source.remsetback = data.source.remsetback
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Remove Setback") {
             return `${rank.name} (${rank.type}): -${rank.value} setback dice`;
           }
           return `${rank.modtype} from ${rank.name} (${rank.type}): -${rank.value} setback dice`;
         });
     }
-    if (obj?.source?.setback?.length) {
-      this.source.setback = obj.source.setback
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.setback?.length) {
+      this.source.setback = data.source.setback
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Setback") {
             return `${rank.name} (${rank.type}): +${rank.value} setback dice`;
           }
           return `${rank.modtype} from ${rank.name} (${rank.type}): +${rank.value} setback dice`;
         });
     }
-    if (obj?.source?.upgrades?.length) {
-      this.source.upgrades = obj.source.upgrades
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.upgrades?.length) {
+      this.source.upgrades = data.source.upgrades
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Add Upgrade") {
             return `${rank.name} (${rank.type}): ${rank.value} upgrade(s)`;
           }
           return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
-    if (obj?.source?.success?.length) {
-      this.source.success = obj.source.success
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.success?.length) {
+      this.source.success = data.source.success
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Add Success") {
             return `${rank.name} (${rank.type}): ${rank.value} Success`;
           }
           return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
-    if (obj?.source?.advantage?.length) {
-      this.source.advantage = obj.source.advantage
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.advantage?.length) {
+      this.source.advantage = data.source.advantage
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Add Advantage") {
             return `${rank.name} (${rank.type}): ${rank.value} Advantage`;
           }
           return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
-    if (obj?.source?.light?.length) {
-      this.source.light = obj.source.light
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.light?.length) {
+      this.source.light = data.source.light
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Add Light") {
             return `${rank.name} (${rank.type}): ${rank.value} Light`;
           }
           return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
-    if (obj?.source?.failure?.length) {
-      this.source.failure = obj.source.failure
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.failure?.length) {
+      this.source.failure = data.source.failure
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Add Failure") {
             return `${rank.name} (${rank.type}): ${rank.value} Failure`;
           }
           return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
-    if (obj?.source?.threat?.length) {
-      this.source.threat = obj.source.threat
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.threat?.length) {
+      this.source.threat = data.source.threat
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Add Threat") {
             return `${rank.name} (${rank.type}): ${rank.value} Threat`;
           }
           return `${rank.modtype} from ${rank.name} (${rank.type}): ${rank.value}`;
         });
     }
-    if (obj?.source?.dark?.length) {
-      this.source.dark = obj.source.dark
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.dark?.length) {
+      this.source.dark = data.source.dark
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Add Dark") {
             return `${rank.name} (${rank.type}): ${rank.value} Dark`;
           }
@@ -165,10 +216,10 @@ export class DicePoolFFG {
         });
     }
 
-    if (obj?.source?.despair?.length) {
-      this.source.despair = obj.source.despair
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.despair?.length) {
+      this.source.despair = data.source.despair
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Add Despair") {
             return `${rank.name} (${rank.type}): ${rank.value} Despair`;
           }
@@ -176,10 +227,10 @@ export class DicePoolFFG {
         });
     }
 
-    if (obj?.source?.triumph?.length) {
-      this.source.triumph = obj.source.triumph
-        .filter((item: any) => parseInt(item.value, 10) > 0)
-        .map((rank: any) => {
+    if (data?.source?.triumph?.length) {
+      this.source.triumph = data.source.triumph
+        .filter((item) => numericValue(item.value) > 0)
+        .map((rank) => {
           if (rank.modtype === "Skill Add Triumph") {
             return `${rank.name} (${rank.type}): ${rank.value} Triumph`;
           }
@@ -318,7 +369,7 @@ export class DicePoolFFG {
     let advanceContainer = this.renderPreview(container);
 
     let additionalSymbols: string[] = [];
-    (["advantage", "success", "threat", "failure", "light", "dark", "triumph", "despair"] as const).forEach((symbol) => {
+    (["advantage", "success", "threat", "failure", "light", "dark", "triumph", "despair"] as const satisfies readonly AdditionalSymbol[]).forEach((symbol) => {
       let diceSymbol = "";
       switch (symbol) {
         case "advantage": {

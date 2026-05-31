@@ -11,13 +11,13 @@ import { explodeMod, getModKeyPath } from "./modifier-map.js";
 export interface LegacyAttribute {
   modtype: string;
   mod: string;
-  value: any;
+  value: number | string;
 }
 
 export interface ActiveEffectChangeData {
   key: string | undefined;
-  mode: any;
-  value: any;
+  mode: number;
+  value: number | string;
 }
 
 export interface AttributeEffectData {

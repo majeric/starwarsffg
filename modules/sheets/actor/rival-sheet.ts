@@ -7,9 +7,9 @@ import { ActorSheetFFG } from "../../actors/actor-sheet-ffg.js";
 export class RivalSheet extends ActorSheetFFG {
   /** @override */
   // FIXME(types): fvtt-types tuple width mismatch on classes array
-  static get defaultOptions(): any {
+  static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["starwarsffg", "sheet", "actor", "v2", "rival"],
+      classes: ["starwarsffg", "sheet", "actor", "v2", "rival"] as any,
       width: 710,
       height: 650,
       tabs: [

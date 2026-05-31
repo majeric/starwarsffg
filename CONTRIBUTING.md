@@ -32,6 +32,22 @@ same branch and the PR will be updated.
 
 # E2E Tests
 
-Uses Playwright. Steps to run:
-1. `npm install playwright`
-2. `npx playwright test --trace on`
+Playwright is the browser E2E runner.
+
+Before running E2E tests, start a local Foundry world with this system enabled.
+The default URL is `http://localhost:30001`.
+
+If Playwright reports that Chromium is missing, run `npx playwright install chromium`.
+
+Useful commands:
+
+- `npm run test:e2e`
+- `npm run test:e2e:ae`
+- `npm run test:e2e:ui`
+
+Optional environment variables:
+
+- `FOUNDRY_BASE_URL`: Foundry server root URL, for example `http://localhost:30001`
+- `FOUNDRY_TEST_USER`: Foundry user to join as; defaults to `Gamemaster`
+- `FOUNDRY_TEST_PASSWORD`: password for the selected Foundry user, if required
+- `PLAYWRIGHT_STORAGE_STATE`: storage state file path; defaults to `playwright/.auth/foundry.json`
