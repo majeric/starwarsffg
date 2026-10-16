@@ -39,8 +39,15 @@ export default class ModifierHelpers {
                 total += parseInt(item.system.soak.adjusted, 10);
               }
               if ((key === "Defence-Melee" || key === "Defence-Ranged") && item.system?.defence) {
-                // get the highest defense item
-                const shouldUse = items.filter((i) => item.system.defence >= i.system.defence).length >= 0;
+                // Defence does not stack: only the best worn source counts. The old
+                // guard compared the defence objects and then tested `.length >= 0`,
+                // which is always true, so every equipped source was summed.
+                const defenceOf = (i) => parseInt(i?.system?.defence?.adjusted, 10) || 0;
+                const bestDefence = items.reduce((best, i) => Math.max(best, defenceOf(i)), 0);
+                // On a tie, count the first item holding the best value, once.
+                const shouldUse =
+                  defenceOf(item) === bestDefence &&
+                  items.find((i) => defenceOf(i) === bestDefence) === item;
                 if (shouldUse) {
                   sources.push({ modtype, key, name: item.name, value: item.system.defence.adjusted, type: item.type });
                   total += parseInt(item.system.defence.adjusted, 10);
@@ -144,6 +151,14 @@ export default class ModifierHelpers {
                     }
                     sources.push({ modtype, key, name: item.name, value: attr.value * multiplier, type: item.type });
                     total += parseInt(attr.value, 10) * multiplier;
+                  } else if (item.type === "itemmodifier") {
+                    // A modification contributes once per rank, the same way it does when
+                    // installed directly on the item (see getCalculatedValueFromCurrentAndArray).
+                    // Reaching it through an attachment fell to the quantity branch below,
+                    // which a modification has no quantity for, so it always counted once.
+                    const rank = item.system?.rank ?? 1;
+                    sources.push({ modtype, key, name: item.name, value: attr.value * rank, type: item.type });
+                    total += parseInt(attr.value, 10) * rank;
                   } else {
                     const quantity = (isNaN(item.system?.quantity?.value)) ? 1 : item.system.quantity.value;
                     sources.push({ modtype, key, name: item.name, value: attr.value, type: item.type });
@@ -161,7 +176,8 @@ export default class ModifierHelpers {
 
     if (modtype === "Career Skill" || modtype === "Force Boost") {
       if (includeSource) {
-        checked = true;
+        // `checked` is set by the scan above; overwriting it here reported every
+        // skill as granted, including against an empty item list.
         return { checked, sources };
       }
       return 0;

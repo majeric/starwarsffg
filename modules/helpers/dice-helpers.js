@@ -308,6 +308,13 @@ export default class DiceHelpers {
  */
 export function get_dice_pool(actor_id, skill_name, incoming_roll) {
   const actor = game.actors.get(actor_id);
+  if (!actor) {
+    // The crew member has been deleted. Every other crew role warns and carries on;
+    // the pilot path had no guard and threw out of the sheet handler.
+    CONFIG.logger.warn(`Cannot build a dice pool: actor ${actor_id} no longer exists`);
+    ui.notifications.warn(game.i18n.localize("SWFFG.Crew.Actor.Removed"));
+    return new DicePoolFFG({});
+  }
   const parsed_skill_name = convert_skill_name(skill_name);
   const skill = actor.system.skills[parsed_skill_name];
   const characteristic = actor.system.characteristics[skill.characteristic];
@@ -327,7 +334,7 @@ export function get_dice_pool(actor_id, skill_name, incoming_roll) {
     triumph: (skill.triumph ?? 0) + incoming_roll.triumph,
     despair: (skill.despair ?? 0) + incoming_roll.despair,
     upgrades: (skill.upgrades ?? 0) + incoming_roll.upgrades,
-    remsetback: skill?.remsetback ? skill.remsetback : 0 + incoming_roll.remsetback,
+    remsetback: (skill?.remsetback ?? 0) + incoming_roll.remsetback,
     difficulty: +incoming_roll.difficulty,
     challenge: +incoming_roll.challenge,
   });

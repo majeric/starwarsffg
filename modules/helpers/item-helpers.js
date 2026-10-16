@@ -194,14 +194,19 @@ export default class ItemHelpers {
         for (const modification of attachment.system.itemmodifier) {
           try {
             const foundMod = modification.system.attributes[activeEffect.name];
+            if (!foundMod) {
+              // This modification does not carry the effect. Returning here decided the
+              // answer from whichever modification happened to come first, so an
+              // uninstalled one sitting later in the attachment was applied anyway.
+              continue;
+            }
             CONFIG.logger.debug(`Located mod ${activeEffect.name}, checking if it's active or not`);
-            if (foundMod && !modification.system.active) {
+            if (!modification.system.active) {
               CONFIG.logger.debug(`Mod ${activeEffect.name} is not active, not syncing AE status`);
               return false;
-            } else {
-              CONFIG.logger.debug(`Mod ${activeEffect.name} is active, syncing AE status`);
-              return true;
             }
+            CONFIG.logger.debug(`Mod ${activeEffect.name} is active, syncing AE status`);
+            return true;
           } catch {
             CONFIG.logger.debug(`No mod located, continuing search...`);
           }

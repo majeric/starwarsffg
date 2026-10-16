@@ -4,6 +4,9 @@
  * @returns {*}
  */
 export function migrateDataToSystem(updateData) {
+  if (!updateData || typeof updateData !== 'object') {
+    return updateData;
+  }
   if (Object.keys(updateData).includes('data')) {
     if (Object.keys(updateData).includes('system')) {
       updateData.system = foundry.utils.mergeObject(
@@ -16,8 +19,10 @@ export function migrateDataToSystem(updateData) {
     delete updateData.data;
   }
   for (const curKey of Object.keys(updateData)) {
-    if (curKey.includes('data.')) {
-      updateData[curKey.replace('data.', 'system.')] = updateData[curKey];
+    // Only the leading segment is the legacy "data" prefix. Matching anywhere also
+    // rewrote keys that merely contain it, such as "metadata.source".
+    if (curKey.startsWith('data.')) {
+      updateData[`system.${curKey.slice('data.'.length)}`] = updateData[curKey];
       delete updateData[curKey];
     }
   }

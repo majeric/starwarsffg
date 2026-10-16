@@ -11,8 +11,14 @@ export default class ActorHelpers {
       if (this.object.type === "minion") {
         Object.keys(formData?.data?.skills).forEach((skill) => {
           if (!formData.data.skills[skill].groupskill && this.object.system.skills[skill].groupskill) {
-            // this is a minion group with a group skill being removed - reduce the rank by one (since we added 1 when it was checked)
-            formData.data.skills[skill].rank -= this.object.system.quantity.value;
+            // A group skill's displayed rank is derived as quantity - 1, so that is what
+            // the form submits. Subtracting the quantity drove it to -1, which then built
+            // dice pools with negative proficiency. The rank held before the skill was
+            // grouped is not recoverable from the submission, so clamp at zero.
+            formData.data.skills[skill].rank = Math.max(
+              formData.data.skills[skill].rank - this.object.system.quantity.value,
+              0
+            );
           }
         });
       }
@@ -30,7 +36,15 @@ export default class ActorHelpers {
       }
       if (this.object.type === "minion") {
         // include the updated quantity of minions in the group in the update object so automation can access it
-        formData.data.quantity.value = Math.min(formData.data.quantity.max, formData.data.quantity.max - Math.floor(formData.data.stats.wounds.value - 1) / formData.data.unit_wounds.value);
+        // Mirrors the derived formula in actor-ffg.js: floor the division, not just
+        // the numerator, and never report fewer than zero minions standing.
+        formData.data.quantity.value = Math.max(
+          Math.min(
+            formData.data.quantity.max,
+            formData.data.quantity.max - Math.floor((formData.data.stats.wounds.value - 1) / formData.data.unit_wounds.value)
+          ),
+          0
+        );
       }
     }
     // Handle the free-form attributes list
@@ -58,9 +72,13 @@ export default class ActorHelpers {
     // as of v12, "data" is no longer shimmed into "system" for you, so we must do it ourselves
     formData = migrateDataToSystem(formData);
 
-    const curXP = this.object?.system?.experience?.available ? this.object.system.experience.available : 0;
-    const newXP = formData?.system?.experience?.available ? formData.system.experience.available : 0;
-    if (curXP !== newXP && curXP !== 0 && newXP !== 0) {
+    // A save that does not touch experience omits the field entirely; that is the
+    // case the guard needs to skip. Testing for a falsy value also skipped a
+    // legitimate zero, so editing available XP down to 0 or up from 0 went unlogged.
+    const curXP = this.object?.system?.experience?.available ?? 0;
+    const submittedXP = formData?.system?.experience?.available;
+    const newXP = submittedXP === undefined ? curXP : submittedXP;
+    if (submittedXP !== undefined && curXP !== newXP) {
       await xpLogEarn(this.object, newXP - curXP, newXP, this.object?.system?.experience.total, "manual adjustment", "Self");
     }
 
