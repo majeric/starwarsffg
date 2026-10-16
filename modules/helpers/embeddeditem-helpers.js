@@ -323,17 +323,38 @@ export default class EmbeddedItemHelpers {
     }
   }
 
-  // totally not ripped from phind telling me how to do this
-  static findKeysIncludingStringRecursively(obj, str) {
-    let keys = [];
-    for (let key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        if (key.includes(str)) {
-          keys.push(key);
-        }
-        if (typeof obj[key] === 'object') {
-          keys = keys.concat(EmbeddedItemHelpers.findKeysIncludingStringRecursively(obj[key], str));
-        }
+  /**
+   * Collect every key anywhere in an object graph whose name contains `str`.
+   *
+   * Tracks what it has already walked. Documents and DataModels hold references
+   * back to their parents, so an unguarded walk follows item -> system -> parent
+   * -> item forever and takes the stack with it.
+   *
+   * @param {object} obj   The object to search.
+   * @param {string} str   Substring to look for in key names.
+   * @param {WeakSet} [seen]  Internal: objects already visited.
+   * @returns {string[]}   Matching key names, in the order encountered.
+   */
+  static findKeysIncludingStringRecursively(obj, str, seen = new WeakSet()) {
+    const keys = [];
+    if (obj === null || typeof obj !== "object") {
+      return keys;
+    }
+    if (seen.has(obj)) {
+      return keys;
+    }
+    seen.add(obj);
+
+    for (const key in obj) {
+      if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+        continue;
+      }
+      if (key.includes(str)) {
+        keys.push(key);
+      }
+      const value = obj[key];
+      if (value !== null && typeof value === "object") {
+        keys.push(...EmbeddedItemHelpers.findKeysIncludingStringRecursively(value, str, seen));
       }
     }
     return keys;
