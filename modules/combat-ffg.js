@@ -1,5 +1,6 @@
 import {DicePoolFFG, RollFFG} from "./dice-pool-ffg.js";
 import PopoutEditor from "./popout-editor.js";
+import {buildInitiativePool, decodeInitiative, encodeInitiative, sortInit} from "./combat/initiative-rules.js";
 
 /**
  * Extend the base Combat entity.
@@ -156,7 +157,7 @@ export class CombatFFG extends Combat {
 
     let roll = await new RollFFG(formula, rollData).roll();
 
-    const total = roll.ffg.success + roll.ffg.advantage * 0.01;
+    const total = encodeInitiative(roll.ffg.success, roll.ffg.advantage);
     roll._result = total;
     roll._total = total;
 
@@ -291,7 +292,7 @@ export class CombatFFG extends Combat {
 
                   const rollData = c.actor ? c.actor.getRollData() : {};
                   let roll = await new RollFFG(pool.renderDiceExpression(), rollData, { success: pool.success, advantage: pool.advantage, failure: pool.failure, threat: pool.threat }).roll();
-                  const total = roll.ffg.success + roll.ffg.advantage * 0.01;
+                  const total = encodeInitiative(roll.ffg.success, roll.ffg.advantage);
                   roll._result = total;
                   roll._total = total;
 
@@ -958,20 +959,15 @@ export class CombatFFG extends Combat {
         "triumphs": "",
       }
       if (slotInitiative) {
-        const initiativeParts = slotInitiative.toFixed(2);
-        const decimalPosition = initiativeParts.indexOf(".");
-        const successes = initiativeParts.substring(0, decimalPosition);
-        const triumphs = initiativeParts.substring(decimalPosition + 1, decimalPosition + 2);
-        const advantages = initiativeParts.substring(decimalPosition + 2, decimalPosition + 3);
+        // Slicing the decimal string mis-read ten or more advantages as a triumph plus
+        // a stray advantage. Initiative only ever encodes successes and advantages.
+        const { successes, advantages } = decodeInitiative(slotInitiative);
 
         for (let x = 0; x < successes; x++) {
           initiativeImage['successes'] += await foundry.applications.ux.TextEditor.enrichHTML("[su]");
         }
         for (let x = 0; x < advantages; x++) {
           initiativeImage['advantages'] += await foundry.applications.ux.TextEditor.enrichHTML("[ad]");
-        }
-        for (let x = 0; x < triumphs; x++) {
-          initiativeImage['triumphs'] += await foundry.applications.ux.TextEditor.enrichHTML("[tr]");
         }
       }
 
@@ -1030,14 +1026,11 @@ export class CombatFFG extends Combat {
 }
 
 function _getInitiativeFormula(skill, ability) {
-  const dicePool = new DicePoolFFG({
-    ability: ability,
-    boost: parseInt(skill.boost),
-    setback: parseInt(skill.setback),
-    force: parseInt(skill.force),
-  });
-  dicePool.upgrade(parseInt(skill.rank));
-  return dicePool.renderDiceExpression();
+  return buildInitiativePool(ability, skill.rank, {
+    boost: skill.boost,
+    setback: skill.setback,
+    force: skill.force,
+  }).renderDiceExpression();
 }
 
 function _findActorForInitiative(c) {
@@ -1062,15 +1055,13 @@ function _findActorForInitiative(c) {
 }
 
 function _buildInitiativePool(data, skill) {
-  const pool = new DicePoolFFG({
-    ability: Math.max(data.characteristics[data.skills[skill].characteristic].value, data.skills[skill].rank),
-    boost: data.skills[skill].boost,
-    advantage: data.skills[skill].advantage,
-    success: data.skills[skill].success,
+  const skillData = data.skills[skill];
+  const characteristic = data.characteristics[skillData.characteristic].value;
+  return buildInitiativePool(characteristic, skillData.rank, {
+    boost: skillData.boost,
+    advantage: skillData.advantage,
+    success: skillData.success,
   });
-  pool.upgrade(Math.min(data.characteristics[data.skills[skill].characteristic].value, data.skills[skill].rank));
-
-  return pool;
 }
 
 export class CombatTrackerFFG extends foundry.applications.sidebar.tabs.CombatTracker {
@@ -1440,21 +1431,6 @@ export function updateCombatTracker() {
  * @param b
  * @returns {number|number}
  */
-function sortInit(a, b) {
-  // equal items sort equally
-  if (a === b) {
-      return 0;
-  }
-  // nulls sort before anything else
-  if (a === null) {
-      return -1;
-  }
-  if (b === null) {
-      return 1;
-  }
-  return a < b ? -1 : 1;
-}
-
 export function registerHandleCombatantRemoval(combatant, options, userId) {
   game.combat.handleCombatantRemoval(combatant, options, userId);
   return false;

@@ -6,6 +6,7 @@
   "scripts": {
     "compile": "gulp css",
     "lint": "npx eslint modules",
+    "test:unit": "node --test \"tests/unit/**/*.test.mjs\"",
     "watch": "gulp",
     "test:affected": "npx playwright test $(node scripts/affected.mjs)"
   },
