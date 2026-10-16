@@ -110,11 +110,38 @@ export class RollFFG extends Roll {
 
   /* -------------------------------------------- */
   /** @override */
+  /**
+   * Cancel opposing symbols against one another: successes with failures and
+   * advantages with threats, one for one. Triumphs and Despairs do not cancel.
+   */
+  cancelResults() {
+    if (this.ffg.success < this.ffg.failure) {
+      this.ffg.failure -= parseInt(this.ffg.success);
+      this.ffg.success = 0;
+    } else {
+      this.ffg.success -= parseInt(this.ffg.failure);
+      this.ffg.failure = 0;
+    }
+    if (this.ffg.advantage < this.ffg.threat) {
+      this.ffg.threat -= parseInt(this.ffg.advantage);
+      this.ffg.advantage = 0;
+    } else {
+      this.ffg.advantage -= parseInt(this.ffg.threat);
+      this.ffg.threat = 0;
+    }
+  }
+
   async evaluate({ minimize = false, maximize = false } = {}) {
     if (this._evaluated) throw new Error("This Roll object has already been rolled.");
 
     // Step 0 - is this rolling nothing?
     if(this.terms.length == 0) {
+      // Symbols added by item modifiers still cancel each other even when there
+      // are no dice to roll, and they still belong on an FFG chat card.
+      if (this.addedResults.length) {
+        this.hasFFG = true;
+        this.cancelResults();
+      }
       this._evaluated = true
       this._total = 0
       return this
@@ -185,20 +212,7 @@ export class RollFFG extends Roll {
       });
 
       // Step 6 - Calculate actual results by cancelling out success with failure, advantage with threat etc.
-      if (this.ffg.success < this.ffg.failure) {
-        this.ffg.failure -= parseInt(this.ffg.success);
-        this.ffg.success = 0;
-      } else {
-        this.ffg.success -= parseInt(this.ffg.failure);
-        this.ffg.failure = 0;
-      }
-      if (this.ffg.advantage < this.ffg.threat) {
-        this.ffg.threat -= parseInt(this.ffg.advantage);
-        this.ffg.advantage = 0;
-      } else {
-        this.ffg.advantage -= parseInt(this.ffg.threat);
-        this.ffg.threat = 0;
-      }
+      this.cancelResults();
     }
 
     // Store final outputs
