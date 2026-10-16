@@ -1014,7 +1014,11 @@ Hooks.on("renderChatInput", (app, html, data) => {
       rollButton.type = "button";
       rollButton.classList.add("ui-control", "icon", "fa-light", "fa-dice-d20");
 
-      const rollPrivacyElement = document.querySelector("#roll-privacy");
+      // v14 no longer renders these controls under #roll-privacy in the document; the
+      // renderChatInput hook supplies them directly. v13 supplies the same map.
+      const rollPrivacyElement = html?.["#message-modes"] ?? html?.["#roll-privacy"]
+        ?? document.querySelector("#roll-privacy");
+      if (!rollPrivacyElement) return;
       rollPrivacyElement.appendChild(rollButton);
 
       rollButton.onclick = async function () {
