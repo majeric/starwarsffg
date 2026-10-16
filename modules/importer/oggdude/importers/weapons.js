@@ -50,7 +50,14 @@ export default class Weapons {
                 isrestricted: item.Restricted === "true" ? true : false,
               },
               damage: {
-                value: parseInt(!item?.Damage ? item.DamageAdd : item.Damage, 10),
+                // DamageAdd is a bonus on top of Brawn. For personal weapons it is applied
+                // below as a "Weapon Stat" damage modifier, so seeding the base damage with
+                // it as well counts it twice -- a Melee weapon written with DamageAdd and no
+                // Damage element came out at Brawn + 2x the bonus. Vehicle weapons never get
+                // that modifier, so they keep the fallback.
+                value: item?.Damage
+                  ? parseInt(item.Damage, 10)
+                  : (itemType === "weapon" ? 0 : parseInt(item.DamageAdd ?? 0, 10)),
               },
               crit: {
                 value: item.Crit ? parseInt(item.Crit, 10) : 0,

@@ -64,7 +64,10 @@ export default class Skills {
               data.img = `icons/svg/eye.svg`;
             }
           }
-          data.content += ImportHelpers.getSources(item?.Sources ?? item?.Source);
+          // `data` has no top-level `content`; it carries a JournalEntryPage. Appending
+          // there created a stray property that Foundry drops, so the source citations
+          // never reached the reader.
+          data.pages[0].text.content += ImportHelpers.getSources(item?.Sources ?? item?.Source);
           await ImportHelpers.addImportItemToCompendium("JournalEntry", data, pack);
 
           currentCount += 1;
