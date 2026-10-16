@@ -850,20 +850,19 @@ export class CombatFFG extends Combat {
         let defeated = claimant.isDefeated;
 
         const effects = new Set();
-        if (claimant.token) {
-          claimant.token.effects.forEach((e) => effects.add(e))
-          if (claimant.token.overlayEffect) {
-            effects.add(claimant.token.overlayEffect);
-          }
-        }
+        // TokenDocument#effects and #overlayEffect were shims returning [] and "" from v12 and
+        // were removed in v14, where reading them throws. Status icons live on the actor's
+        // ActiveEffects, which is what the block below already collects.
 
         if (claimant.actor) {
           if (claimant.isDefeated) {
             defeated = true;
           }
           for (const effect of claimant.actor.temporaryEffects) {
-            if (effect?.icon) {
-              effects.add(effect.icon);
+            // v14 renamed ActiveEffect#icon to #img; keep the old name as a v13 fallback
+            const effectImg = effect?.img ?? effect?.icon;
+            if (effectImg) {
+              effects.add(effectImg);
             }
           }
         }

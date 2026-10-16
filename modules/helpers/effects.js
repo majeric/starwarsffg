@@ -15,26 +15,35 @@ export default class EffectHelpers {
     effect.parentName = originalEffect.parent.name;
     effect.active = originalEffect.active;
 
-    // Convert duration to string
-    if (effect.duration.combat) {
+    // Convert duration to string.
+    // Read these off the source document rather than the clone: v14 serves several of them
+    // through compatibility getters (and moved duration.combat onto ActiveEffect#start),
+    // and structuredClone keeps only own data properties, so the clone loses them.
+    const duration = originalEffect.duration ?? {};
+    if (duration.combat ?? originalEffect.start?.combat) {
       effect.duration = game.i18n.localize("SWFFG.Effect.Duration.CurrentCombat");
-    } else if (effect.duration.seconds) {
-      effect.duration = `${effect.duration.seconds} ${game.i18n.localize("SWFFG.Effect.Duration.Seconds")}`;
-    } else if (effect.duration.rounds) {
-      effect.duration = `${effect.duration.rounds} ${game.i18n.localize("SWFFG.Effect.Duration.Rounds")}`;
-    } else if (effect.duration.turns) {
-      effect.duration = `${effect.duration.turns} ${game.i18n.localize("SWFFG.Effect.Duration.Turns")}`;
+    } else if (duration.seconds) {
+      effect.duration = `${duration.seconds} ${game.i18n.localize("SWFFG.Effect.Duration.Seconds")}`;
+    } else if (duration.rounds) {
+      effect.duration = `${duration.rounds} ${game.i18n.localize("SWFFG.Effect.Duration.Rounds")}`;
+    } else if (duration.turns) {
+      effect.duration = `${duration.turns} ${game.i18n.localize("SWFFG.Effect.Duration.Turns")}`;
     } else {
       effect.duration = game.i18n.localize("SWFFG.Effect.Duration.Permanent");
     }
 
+    // v14 moved ActiveEffect#changes to #system.changes. Same reason as above: take the
+    // array from the document, not the clone, then copy each entry before rewriting it.
+    const sourceChanges = originalEffect.system?.changes ?? originalEffect.changes ?? [];
+    effect.changes = sourceChanges.map((change) => ({ ...change }));
+
     // Update each change from this effect
     effect.changes.forEach((change, index) => {
-      // Convert mode to string
-      change.mode = EffectHelpers.MODES[change.mode];
+      // Convert mode to string. v14 replaced the numeric change.mode with a string change.type.
+      change.mode = change.type ?? EffectHelpers.MODES[change.mode];
 
       // LStrip 'system.' for shorter keys
-      if (change.key.startsWith("system.")) {
+      if (change.key?.startsWith("system.")) {
         change.key = change.key.substring(7);
       }
     });
