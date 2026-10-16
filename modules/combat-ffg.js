@@ -394,7 +394,8 @@ export class CombatFFG extends Combat {
   /**
    * gets any existing initiative claims for this round of a given combat
    * @param round - INT - the round
-   * @returns {*|*[]} - a list of combatant IDs (NOT token IDs, NOT actor IDs)
+   * @returns {Object<string, string>} - a map of slot ID to the combatant ID
+   *          claiming it (NOT token IDs, NOT actor IDs), empty if none
    */
   getClaims(round) {
     const combatClaims = this.getFlag('starwarsffg', 'combatClaims');
@@ -664,8 +665,13 @@ export class CombatFFG extends Combat {
     const claims = {
       ...this.getFlag('starwarsffg', 'combatClaims')
     };
-    if (!claims[round]) {
-      claims[round] = {};
+    claims[round] = { ...claims[round] };
+    // A character acts once per round, so taking a slot moves them out of any
+    // slot they already hold this round rather than giving them a second turn.
+    for (const [heldSlot, claimant] of Object.entries(claims[round])) {
+      if (claimant === combatantId && heldSlot !== slot_id) {
+        delete claims[round][heldSlot];
+      }
     }
     claims[round][slot_id] = combatantId;
     await this.setFlag('starwarsffg', 'combatClaims', claims);
